@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { productService, categoryService } from '../../../services/productService';
+import ProductDetailModal from '../../../components/ProductDetailModal';
 
 const ProductosDestacados = () => {
   const [productos, setProductos] = useState([]);
@@ -7,6 +8,7 @@ const ProductosDestacados = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState(null);
   
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -215,21 +217,69 @@ const ProductosDestacados = () => {
             </button>
             
             {/* Páginas */}
-            {Array.from({ length: Math.min(totalPages, 3) }, (_, i) => i + 1).map((page) => (
-              <button 
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`w-8 h-8 flex items-center justify-center text-xs font-bold shadow-sm transition-colors ${
-                  currentPage === page 
-                    ? 'bg-blue-600 text-white' 
-                    : 'border border-gray-200 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-            
-            {totalPages > 3 && <span className="px-2 text-gray-400 text-xs">...</span>}
+            {(() => {
+              const maxVisiblePages = 5; // Mostrar máximo 5 números de página
+              let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+              let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+              
+              // Ajustar startPage si estamos cerca del final
+              if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+              }
+              
+              const pages = [];
+              
+              // Botón primera página si no está visible
+              if (startPage > 1) {
+                pages.push(
+                  <button 
+                    key={1}
+                    onClick={() => setCurrentPage(1)}
+                    className="w-8 h-8 flex items-center justify-center text-xs font-bold shadow-sm transition-colors border border-gray-200 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50"
+                  >
+                    1
+                  </button>
+                );
+                if (startPage > 2) {
+                  pages.push(<span key="start-ellipsis" className="px-2 text-gray-400 text-xs">...</span>);
+                }
+              }
+              
+              // Páginas visibles
+              for (let i = startPage; i <= endPage; i++) {
+                pages.push(
+                  <button 
+                    key={i}
+                    onClick={() => setCurrentPage(i)}
+                    className={`w-8 h-8 flex items-center justify-center text-xs font-bold shadow-sm transition-colors ${
+                      currentPage === i 
+                        ? 'bg-blue-600 text-white' 
+                        : 'border border-gray-200 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50'
+                    }`}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+              
+              // Botón última página si no está visible
+              if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                  pages.push(<span key="end-ellipsis" className="px-2 text-gray-400 text-xs">...</span>);
+                }
+                pages.push(
+                  <button 
+                    key={totalPages}
+                    onClick={() => setCurrentPage(totalPages)}
+                    className="w-8 h-8 flex items-center justify-center text-xs font-bold shadow-sm transition-colors border border-gray-200 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50"
+                  >
+                    {totalPages}
+                  </button>
+                );
+              }
+              
+              return pages;
+            })()}
             
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
@@ -252,9 +302,16 @@ const ProductosDestacados = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {paginatedProducts.map((producto) => {
                 const imageUrl = getFirstImageUrl(producto);
+                const hasImage = imageUrl !== null;
                 
                 return (
-                  <article key={producto.id} className="group bg-white rounded-lg border border-gray-100 hover:border-red-200 shadow-sm hover:shadow-xl hover:shadow-red-500/5 transition-all duration-300 flex flex-col h-full">
+                  <article 
+                    key={producto.id} 
+                    onClick={() => hasImage && setSelectedProduct(producto)}
+                    className={`group bg-white rounded-lg border border-gray-100 hover:border-red-200 shadow-sm hover:shadow-xl hover:shadow-red-500/5 transition-all duration-300 flex flex-col h-full ${
+                      hasImage ? 'cursor-pointer' : 'cursor-default'
+                    }`}
+                  >
                     {imageUrl && (
                       <div className="relative w-full pt-[100%] overflow-hidden">
                         <div className="absolute inset-0 flex items-center justify-center p-2 bg-gray-50">
@@ -281,9 +338,11 @@ const ProductosDestacados = () => {
                         <span className="text-base font-bold text-gray-900">
                           {producto.marcaNombre || 'Sin marca'}
                         </span>
-                        <button className="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-2 rounded uppercase tracking-wide transition-colors shadow-sm">
-                          Ver Más
-                        </button>
+                        {hasImage && (
+                          <button className="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-2 rounded uppercase tracking-wide transition-colors shadow-sm">
+                            Ver Más
+                          </button>
+                        )}
                       </div>
                     </div>
                   </article>
@@ -293,6 +352,14 @@ const ProductosDestacados = () => {
           )}
         </div>
       </div>
+
+      {/* Modal de Detalle del Producto */}
+      {selectedProduct && (
+        <ProductDetailModal 
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </div>
   );
 };

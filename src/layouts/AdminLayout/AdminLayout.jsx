@@ -221,32 +221,35 @@ const AdminLayout = () => {
         </nav>
 
         {/* Bottom Section */}
-        <div className="p-4 border-t border-[#1e293b] flex flex-col gap-2">
+        <div className="p-4 border-t border-[#1e293b]">
+          {/* Usuario Info - Diseño mejorado */}
+          <div className="flex items-center gap-3 px-3 py-2.5 mb-3 bg-gradient-to-r from-[#1e293b] to-[#334155] rounded-lg border border-[#334155] hover:border-[#475569] transition-all duration-200 group">
+            <div className="relative">
+              <div className="size-10 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg group-hover:shadow-blue-500/50 transition-shadow duration-200">
+                <span className="material-symbols-outlined text-white text-[22px]">person</span>
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#0F172A]"></div>
+            </div>
+            <div className="flex flex-col overflow-hidden flex-1">
+              <span className="text-white text-sm font-bold truncate">
+                {user?.username || 'Administrador'}
+              </span>
+              <span className="text-slate-400 text-xs font-medium truncate">
+                {user?.role || 'Administrador'}
+              </span>
+            </div>
+          </div>
+
           {/* Cerrar Sesión */}
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors group"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-200 group border border-transparent hover:border-red-500/20"
           >
-            <span className="material-symbols-outlined group-hover:text-red-400 transition-colors">
+            <span className="material-symbols-outlined group-hover:text-red-400 transition-colors text-[20px]">
               logout
             </span>
             <span className="text-sm font-medium">Cerrar Sesión</span>
           </button>
-
-          {/* Usuario Info */}
-          <div className="flex items-center gap-3 px-4 py-3 mt-2 bg-[#020617] border border-[#1e293b]">
-            <div className="size-8 shrink-0 border border-slate-600 bg-slate-700 flex items-center justify-center">
-              <span className="material-symbols-outlined text-slate-400 text-[20px]">person</span>
-            </div>
-            <div className="flex flex-col overflow-hidden">
-              <span className="text-white text-xs font-bold truncate">
-                {user?.username || 'Administrador'}
-              </span>
-              <span className="text-slate-500 text-[10px] font-mono truncate">
-                {user?.role?.toUpperCase() || 'ADMINISTRADOR'}
-              </span>
-            </div>
-          </div>
         </div>
       </aside>
 

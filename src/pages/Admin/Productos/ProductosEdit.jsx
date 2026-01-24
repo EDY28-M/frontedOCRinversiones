@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { productService, categoryService, nombreMarcaService } from '../../../services/productService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
 import ImageUploader from '../../../components/common/ImageUploader';
+import FichaTecnicaEditor from '../../../components/FichaTecnicaEditor';
 import { useNotification } from '../../../context/NotificationContext';
 
 const ProductosEdit = () => {
@@ -401,23 +402,10 @@ const ProductosEdit = () => {
               </div>
 
               {/* Ficha Técnica */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                  Ficha Técnica <span className="text-gray-400 text-[10px]">(Opcional)</span>
-                </label>
-                <textarea
-                  name="fichaTecnica"
-                  value={formData.fichaTecnica}
-                  onChange={handleChange}
-                  rows="4"
-                  className="w-full px-3 py-2 border-2 border-gray-200 focus:border-blue-500 focus:outline-none bg-gray-50 text-xs font-mono"
-                  placeholder="Especificaciones técnicas..."
-                  maxLength="10000"
-                />
-                <p className="text-[10px] text-gray-500 mt-0.5">
-                  {formData.fichaTecnica.length} / 10000
-                </p>
-              </div>
+              <FichaTecnicaEditor
+                value={formData.fichaTecnica}
+                onChange={(value) => setFormData(prev => ({ ...prev, fichaTecnica: value }))}
+              />
 
               {/* Estado */}
               <div className="flex items-center pt-2">
