@@ -1,22 +1,29 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { productService, categoryService, nombreMarcaService } from '../../../services/productService';
+import { useQueryClient } from '@tanstack/react-query';
+import { categoryService, nombreMarcaService } from '../../../services/productService';
 import { ErrorAlert, ConfirmModal, ImportProductsModal } from '../../../components/common';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { PERMISSIONS } from '../../../utils/permissions';
-import { useNotification } from '../../../context/NotificationContext';
+import { useProducts, useToggleProductActive, useDeleteProduct, productKeys } from '../../../hooks/useProducts';
 
 const Productos = () => {
   const { can } = usePermissions();
-  const { error: showErrorNotif } = useNotification();
-  const [productos, setProductos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
+  
+  // React Query hooks
+  const { data: productos = [], isLoading: loading, error: queryError, refetch } = useProducts();
+  const toggleActiveMutation = useToggleProductActive();
+  const deleteMutation = useDeleteProduct();
+  
   const [filtroActivo, setFiltroActivo] = useState('todos');
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null, descripcion: '' });
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [marcas, setMarcas] = useState([]);
+  
+  // Track qué filas están en proceso de toggle (para mostrar loader por fila)
+  const [togglingRows, setTogglingRows] = useState(new Set());
   
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,29 +34,12 @@ const Productos = () => {
 
   // Función para limpiar error - solo por acción del usuario
   const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+    queryClient.resetQueries({ queryKey: productKeys.all });
+  }, [queryClient]);
 
   useEffect(() => {
-    loadProducts();
     loadCategoriesAndMarcas();
   }, []);
-
-  const loadProducts = async () => {
-    try {
-      setLoading(true);
-      // NO limpiar el error aquí - solo si la carga es exitosa
-      const data = await productService.getAllProducts();
-      setProductos(data);
-      // Solo limpiar error si la carga fue exitosa
-      setError(null);
-    } catch (err) {
-      console.error('Error al cargar productos:', err);
-      setError('Error al cargar productos. Verifica que el backend esté corriendo.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const loadCategoriesAndMarcas = async () => {
     try {
@@ -65,7 +55,7 @@ const Productos = () => {
   };
 
   const handleImportSuccess = () => {
-    loadProducts();
+    queryClient.invalidateQueries({ queryKey: productKeys.all });
   };
 
   const handleDelete = async (id, descripcion) => {
@@ -73,36 +63,44 @@ const Productos = () => {
   };
 
   const confirmDeleteAction = async () => {
-    try {
-      await productService.deleteProduct(confirmDelete.id);
-      showErrorNotif('Producto eliminado exitosamente');
-      await loadProducts();
-    } catch (err) {
-      console.error('Error al eliminar producto:', err);
-      setError('Error al eliminar el producto');
-    }
+    deleteMutation.mutate(confirmDelete.id);
+    setConfirmDelete({ isOpen: false, id: null, descripcion: '' });
   };
 
-  const handleToggleActive = async (id, currentStatus) => {
-    try {
-      // Obtener el producto actual
-      const product = productos.find(p => p.id === id);
-      if (!product) return;
+  // Toggle con optimistic update - sin refresh de página
+  const handleToggleActive = useCallback((e, id, currentStatus) => {
+    // Prevenir propagación y navegación
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const product = productos.find(p => p.id === id);
+    if (!product) return;
+    
+    // Marcar fila como "en proceso"
+    setTogglingRows(prev => new Set(prev).add(id));
+    
+    toggleActiveMutation.mutate(
+      {
+        productId: id,
+        product,
+        newActiveState: !currentStatus,
+      },
+      {
+        onSettled: () => {
+          // Quitar fila del estado "en proceso"
+          setTogglingRows(prev => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+        },
+      }
+    );
+  }, [productos, toggleActiveMutation]);
 
-      // Actualizar solo el campo IsActive
-      await productService.updateProduct(id, {
-        ...product,
-        isActive: !currentStatus
-      });
-      
-      await loadProducts();
-    } catch (err) {
-      console.error('Error al actualizar producto:', err);
-      alert('Error al actualizar el estado del producto');
-    }
-  };
+  const error = queryError?.message || (queryError ? 'Error al cargar productos. Verifica que el backend esté corriendo.' : null);
 
-  const filteredProducts = productos.filter(producto => {
+  const filteredProducts = useMemo(() => productos.filter(producto => {
     // Filtro por estado (todos/publicados/borradores)
     if (filtroActivo === 'publicados' && !producto.isActive) return false;
     if (filtroActivo === 'borradores' && producto.isActive) return false;
@@ -136,7 +134,7 @@ const Productos = () => {
     }
     
     return true;
-  });
+  }), [productos, filtroActivo, searchTerm]);
 
   // Productos paginados
   const totalPages = Math.ceil(filteredProducts.length / pageSize);
@@ -173,7 +171,7 @@ const Productos = () => {
           title="Error de Carga"
         />
         <button
-          onClick={loadProducts}
+          onClick={() => refetch()}
           className="mt-4 px-6 py-3 bg-blue-600 text-white font-bold uppercase tracking-wide hover:bg-blue-700 transition-colors"
         >
           Reintentar
@@ -320,12 +318,19 @@ const Productos = () => {
                     </td>
                     <td className="p-4 py-3 text-center align-middle">
                       {can(PERMISSIONS.PRODUCTOS_EDIT) ? (
-                        <input
-                          type="checkbox"
-                          className="sharp-switch"
-                          checked={producto.isActive}
-                          onChange={() => handleToggleActive(producto.id, producto.isActive)}
-                        />
+                        <div className="relative inline-flex items-center">
+                          <input
+                            type="checkbox"
+                            className="sharp-switch"
+                            checked={producto.isActive}
+                            disabled={togglingRows.has(producto.id)}
+                            onChange={(e) => handleToggleActive(e, producto.id, producto.isActive)}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          {togglingRows.has(producto.id) && (
+                            <span className="absolute -right-5 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
+                          )}
+                        </div>
                       ) : (
                         <span className={`inline-block px-2 py-1 text-xs font-semibold rounded ${producto.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                           {producto.isActive ? 'Activo' : 'Inactivo'}

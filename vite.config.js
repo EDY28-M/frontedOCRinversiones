@@ -15,9 +15,26 @@ export default defineConfig({
     assetsInlineLimit: 0,
   },
   server: {
+    host: '0.0.0.0', // Escucha en todas las interfaces
+    port: 5173,
+    strictPort: true, // No cambiar de puerto automáticamente
     // Configuración del servidor de desarrollo
     headers: {
       'Cache-Control': 'no-store',
+    },
+    allowedHosts: [
+      'kiara-unascendant-trustingly.ngrok-free.dev',
+      '.ngrok-free.dev',
+      '.ngrok.io',
+      '.ngrok-free.app',
+    ],
+    // Proxy para redirigir peticiones /api al backend (evita Mixed Content)
+    proxy: {
+      '/api': {
+        target: 'http://192.168.1.68:5095',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 })

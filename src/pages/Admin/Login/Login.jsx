@@ -10,6 +10,7 @@ const Login = () => {
     password: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -130,7 +131,7 @@ const Login = () => {
                     className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-secondary focus:ring-0 transition-colors rounded-none bg-gray-50 text-sm font-semibold"
                     id="usuario"
                     name="usuario"
-                    placeholder="ID Corporativo"
+                    placeholder="Nombre de usuario"
                     type="text"
                     value={formData.usuario}
                     onChange={handleChange}
@@ -154,15 +155,24 @@ const Login = () => {
                     </span>
                   </div>
                   <input
-                    className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-secondary focus:ring-0 transition-colors rounded-none bg-gray-50 text-sm font-semibold"
+                    className="block w-full pl-10 pr-10 py-3 border-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-secondary focus:ring-0 transition-colors rounded-none bg-gray-50 text-sm font-semibold"
                     id="password"
                     name="password"
                     placeholder="••••••••"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={handleChange}
                     required
                   />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-secondary transition-colors"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    <span className="material-symbols-outlined text-gray-400 text-[20px]">
+                      {showPassword ? "visibility_off" : "visibility"}
+                    </span>
+                  </button>
                 </div>
                 <div className="flex items-center justify-end mt-2">
                   <a
