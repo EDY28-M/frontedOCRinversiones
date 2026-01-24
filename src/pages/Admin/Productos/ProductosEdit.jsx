@@ -4,12 +4,16 @@ import { productService, categoryService, nombreMarcaService } from '../../../se
 import ErrorAlert from '../../../components/common/ErrorAlert';
 import ImageUploader from '../../../components/common/ImageUploader';
 import FichaTecnicaEditor from '../../../components/FichaTecnicaEditor';
-import { useNotification } from '../../../context/NotificationContext';
+import { useProduct, useUpdateProduct } from '../../../hooks/useProducts';
 
 const ProductosEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { info } = useNotification();
+  
+  // React Query hooks
+  const { data: producto, isLoading: loadingProduct, error: productError } = useProduct(id);
+  const updateMutation = useUpdateProduct();
+  
   const [categorias, setCategorias] = useState([]);
   const [marcas, setMarcas] = useState([]);
   const [formData, setFormData] = useState({
@@ -25,28 +29,33 @@ const ProductosEdit = () => {
   const [autoGenCodigo, setAutoGenCodigo] = useState(false);
   const [autoGenCodigoComer, setAutoGenCodigoComer] = useState(false);
   const [productImages, setProductImages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [loadingMeta, setLoadingMeta] = useState(true);
   const [error, setError] = useState(null);
 
   const clearError = useCallback(() => setError(null), []);
 
+  // Cargar categorías y marcas
   useEffect(() => {
-    loadData();
-  }, [id]);
+    const loadMeta = async () => {
+      try {
+        const [cats, marcasData] = await Promise.all([
+          categoryService.getAllCategories(),
+          nombreMarcaService.getAllNombreMarcas(),
+        ]);
+        setCategorias(cats);
+        setMarcas(marcasData);
+      } catch (err) {
+        console.error('Error al cargar categorías/marcas:', err);
+      } finally {
+        setLoadingMeta(false);
+      }
+    };
+    loadMeta();
+  }, []);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [producto, cats, marcasData] = await Promise.all([
-        productService.getProductById(id),
-        categoryService.getAllCategories(),
-        nombreMarcaService.getAllNombreMarcas(),
-      ]);
-      console.log('✅ Producto cargado:', producto);
-      console.log('✅ Marcas cargadas:', marcasData);
-      setCategorias(cats);
-      setMarcas(marcasData);
+  // Poblar formulario cuando el producto carga
+  useEffect(() => {
+    if (producto) {
       setFormData({
         codigo: producto.codigo || '',
         codigoComer: producto.codigoComer || '',
@@ -65,17 +74,8 @@ const ProductosEdit = () => {
       if (producto.imagen3) initialImages.push(producto.imagen3);
       if (producto.imagen4) initialImages.push(producto.imagen4);
       setProductImages(initialImages);
-      
-      console.log('📸 Imágenes cargadas:', initialImages);
-      
-      setError(null);
-    } catch (err) {
-      console.error('Error al cargar producto:', err);
-      setError('Error al cargar el producto');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [producto]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -140,31 +140,29 @@ const ProductosEdit = () => {
       return;
     }
 
+    // Preparar payload con PascalCase
+    const productData = {
+      Codigo: formData.codigo.trim(),
+      CodigoComer: formData.codigoComer.trim(),
+      Producto: formData.producto.trim(),
+      Descripcion: formData.descripcion.trim() || null,
+      FichaTecnica: formData.fichaTecnica.trim() || null,
+      MarcaId: parseInt(formData.marcaId),
+      CategoryId: parseInt(formData.categoryId),
+      IsActive: formData.isActive
+    };
+
+    // Convertir archivos File a Base64 antes de enviar
+    const convertFileToBase64 = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    };
+
     try {
-      setSaving(true);
-      
-      // Preparar payload con PascalCase
-      const productData = {
-        Codigo: formData.codigo.trim(),
-        CodigoComer: formData.codigoComer.trim(),
-        Producto: formData.producto.trim(),
-        Descripcion: formData.descripcion.trim() || null,
-        FichaTecnica: formData.fichaTecnica.trim() || null,
-        MarcaId: parseInt(formData.marcaId),
-        CategoryId: parseInt(formData.categoryId),
-        IsActive: formData.isActive
-      };
-
-      // Convertir archivos File a Base64 antes de enviar
-      const convertFileToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = error => reject(error);
-        });
-      };
-
       // Procesar imágenes: convertir File a Base64 o mantener URL string
       const processedImages = await Promise.all(
         productImages.map(async (img) => {
@@ -182,59 +180,73 @@ const ProductosEdit = () => {
         })
       );
 
-      console.log('🖼️ Imágenes procesadas:', {
-        total: processedImages.length,
-        tipos: processedImages.map(img => img ? (img.startsWith('data:') ? 'Base64' : 'URL') : 'null')
-      });
-
       // Agregar imágenes al payload
       productData.ImagenPrincipal = processedImages[0] || null;
       productData.Imagen2 = processedImages[1] || null;
       productData.Imagen3 = processedImages[2] || null;
       productData.Imagen4 = processedImages[3] || null;
       
-      console.log('📦 Datos completos del producto a actualizar:', {
-        ...productData,
-        ImagenPrincipal: productData.ImagenPrincipal ? `${productData.ImagenPrincipal.substring(0, 50)}...` : null,
-        Imagen2: productData.Imagen2 ? `${productData.Imagen2.substring(0, 50)}...` : null,
-        Imagen3: productData.Imagen3 ? `${productData.Imagen3.substring(0, 50)}...` : null,
-        Imagen4: productData.Imagen4 ? `${productData.Imagen4.substring(0, 50)}...` : null
-      });
-      
-      const response = await productService.updateProduct(id, productData);
-      console.log('✅ Producto actualizado exitosamente. Respuesta:', response);
-      info('Producto actualizado exitosamente');
-      navigate('/admin/productos');
-    } catch (err) {
-      console.error('❌ ERROR AL ACTUALIZAR PRODUCTO:', err);
-      console.error('❌ Detalles del error:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status,
-        statusText: err.response?.statusText
-      });
-      
-      let errorMessage = 'Error al actualizar el producto';
-      if (err.response?.data) {
-        if (err.response.data.errors) {
-          const errors = Object.values(err.response.data.errors).flat();
-          errorMessage = `Errores de validación: ${errors.join(', ')}`;
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        } else if (typeof err.response.data === 'string') {
-          errorMessage = err.response.data;
+      // Usar mutation de React Query
+      updateMutation.mutate(
+        { id, productData },
+        {
+          onSuccess: () => {
+            navigate('/admin/productos');
+          },
+          onError: (err) => {
+            let errorMessage = 'Error al actualizar el producto';
+            if (err.response?.data) {
+              if (err.response.data.errors) {
+                const errors = Object.values(err.response.data.errors).flat();
+                errorMessage = `Errores de validación: ${errors.join(', ')}`;
+              } else if (err.response.data.message) {
+                errorMessage = err.response.data.message;
+              } else if (typeof err.response.data === 'string') {
+                errorMessage = err.response.data;
+              }
+            }
+            setError(errorMessage);
+          },
         }
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-      setError(errorMessage);
-    } finally {
-      setSaving(false);
+      );
+    } catch (err) {
+      console.error('Error al procesar imágenes:', err);
+      setError('Error al procesar las imágenes');
     }
   };
 
+  const loading = loadingProduct || loadingMeta;
+  const saving = updateMutation.isPending;
+  
+  // Mostrar error de carga del producto
+  const displayError = error || (productError ? 'Error al cargar el producto' : null);
+
+  // Skeleton loader en lugar de pantalla blanca
   if (loading) {
-    return null;
+    return (
+      <div className="p-4 animate-pulse">
+        <div className="mb-4">
+          <div className="h-7 bg-gray-200 rounded w-48"></div>
+        </div>
+        <div className="bg-white border border-gray-200 shadow-sm">
+          <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <div className="h-5 bg-gray-200 rounded w-32"></div>
+          </div>
+          <div className="p-4 space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+            </div>
+            <div className="h-10 bg-gray-200 rounded"></div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+            </div>
+            <div className="h-24 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -255,9 +267,9 @@ const ProductosEdit = () => {
         </div>
         
         <form onSubmit={handleSubmit} className="p-4">
-          {error && (
+          {displayError && (
             <div className="mb-3">
-              <ErrorAlert error={error} onClose={clearError} title="Error" />
+              <ErrorAlert error={displayError} onClose={clearError} title="Error" />
             </div>
           )}
 

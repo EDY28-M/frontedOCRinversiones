@@ -1,12 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productService } from '../services/productService';
 import { useNotification } from '../context/NotificationContext';
+import { useCallback } from 'react';
 
 // Query key factory para productos
 export const productKeys = {
   all: ['products'],
   lists: () => [...productKeys.all, 'list'],
   list: (filters) => [...productKeys.lists(), filters],
+  detail: (id) => [...productKeys.all, 'detail', id],
 };
 
 /**
@@ -19,6 +21,76 @@ export function useProducts(filters = {}) {
     queryFn: () => productService.getAllProducts(),
     staleTime: 30000, // 30 segundos antes de considerar stale
     refetchOnWindowFocus: false,
+  });
+}
+
+/**
+ * Hook para obtener un producto por ID
+ */
+export function useProduct(id) {
+  return useQuery({
+    queryKey: productKeys.detail(id),
+    queryFn: () => productService.getProductById(id),
+    enabled: !!id,
+    staleTime: 60000, // 1 minuto - evitar refetch innecesario
+    refetchOnWindowFocus: false,
+  });
+}
+
+/**
+ * Hook para prefetch de producto (usado en hover del botón Editar)
+ * Evita el flash blanco al navegar
+ */
+export function usePrefetchProduct() {
+  const queryClient = useQueryClient();
+  
+  const prefetchProduct = useCallback((id) => {
+    if (!id) return;
+    queryClient.prefetchQuery({
+      queryKey: productKeys.detail(id),
+      queryFn: () => productService.getProductById(id),
+      staleTime: 60000,
+    });
+  }, [queryClient]);
+  
+  return prefetchProduct;
+}
+
+/**
+ * Hook para actualizar producto completo (desde formulario de edición)
+ * Invalida cache y navega sin pantalla blanca
+ */
+export function useUpdateProduct() {
+  const queryClient = useQueryClient();
+  const { success, error: showError } = useNotification();
+
+  return useMutation({
+    mutationFn: async ({ id, productData }) => {
+      return productService.updateProduct(id, productData);
+    },
+
+    onSuccess: (data, { id }) => {
+      // Invalidar queries para que al volver a la lista tenga datos frescos
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
+      queryClient.invalidateQueries({ queryKey: productKeys.detail(id) });
+      success('Producto actualizado exitosamente');
+    },
+
+    onError: (err) => {
+      console.error('Error al actualizar producto:', err);
+      let errorMessage = 'Error al actualizar el producto';
+      if (err.response?.data) {
+        if (err.response.data.errors) {
+          const errors = Object.values(err.response.data.errors).flat();
+          errorMessage = `Errores de validación: ${errors.join(', ')}`;
+        } else if (err.response.data.message) {
+          errorMessage = err.response.data.message;
+        } else if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data;
+        }
+      }
+      showError(errorMessage);
+    },
   });
 }
 

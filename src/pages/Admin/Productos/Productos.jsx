@@ -5,7 +5,7 @@ import { categoryService, nombreMarcaService } from '../../../services/productSe
 import { ErrorAlert, ConfirmModal, ImportProductsModal } from '../../../components/common';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { PERMISSIONS } from '../../../utils/permissions';
-import { useProducts, useToggleProductActive, useDeleteProduct, productKeys } from '../../../hooks/useProducts';
+import { useProducts, useToggleProductActive, useDeleteProduct, usePrefetchProduct, productKeys } from '../../../hooks/useProducts';
 
 const Productos = () => {
   const { can } = usePermissions();
@@ -15,6 +15,7 @@ const Productos = () => {
   const { data: productos = [], isLoading: loading, error: queryError, refetch } = useProducts();
   const toggleActiveMutation = useToggleProductActive();
   const deleteMutation = useDeleteProduct();
+  const prefetchProduct = usePrefetchProduct();
   
   const [filtroActivo, setFiltroActivo] = useState('todos');
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null, descripcion: '' });
@@ -343,13 +344,19 @@ const Productos = () => {
                           <Link 
                             to={`/admin/productos/editar/${producto.id}`}
                             className="p-2 bg-white border border-gray-200 hover:border-blue-500 hover:text-blue-600 text-slate-400 transition-colors shadow-sm"
+                            onClick={(e) => e.stopPropagation()}
+                            onMouseEnter={() => prefetchProduct(producto.id)}
                           >
                             <span className="material-symbols-outlined text-[18px]">edit</span>
                           </Link>
                         )}
                         {can(PERMISSIONS.PRODUCTOS_DELETE) && (
                           <button 
-                            onClick={() => handleDelete(producto.id, producto.marca)}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(producto.id, producto.marca);
+                            }}
                             className="p-2 bg-white border border-gray-200 hover:border-red-500 hover:text-red-500 text-slate-400 transition-colors shadow-sm"
                           >
                             <span className="material-symbols-outlined text-[18px]">delete</span>
