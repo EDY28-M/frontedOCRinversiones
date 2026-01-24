@@ -277,7 +277,7 @@ const Productos = () => {
                     </td>
                     <td className="p-4 py-3 text-center">
                       <span className="text-xs text-slate-500">
-                        {producto.category?.name || 'Sin categoría'}
+                        {producto.categoryName || 'Sin categoría'}
                       </span>
                     </td>
                     <td className="p-4 py-3 text-center align-middle">
