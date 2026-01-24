@@ -22,7 +22,7 @@ const VendedorLayout = () => {
 
   const getBreadcrumb = () => {
     const path = location.pathname;
-    if (path.includes('/productos/destacados')) return 'Productos Destacados';
+    if (path.includes('/productos/destacados')) return 'Productos';
     if (path.includes('/productos')) return 'Listado de Productos';
     return 'Vendedor';
   };
@@ -101,7 +101,7 @@ const VendedorLayout = () => {
                     star
                   </span>
                   <span className="text-sm font-medium">
-                    Productos Destacados
+                    Productos Disponibles
                   </span>
                 </button>
               </div>

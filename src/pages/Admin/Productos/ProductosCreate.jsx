@@ -127,6 +127,38 @@ const ProductosCreate = () => {
     try {
       setLoading(true);
       
+      // Convertir archivos File a Base64
+      const convertFileToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = error => reject(error);
+        });
+      };
+
+      // Procesar imágenes: convertir File a Base64 o mantener URL string
+      const processedImages = await Promise.all(
+        productImages.map(async (img) => {
+          if (!img) return null;
+          if (typeof img === 'string') return img; // Ya es URL
+          if (img instanceof File) {
+            try {
+              return await convertFileToBase64(img); // Convertir File a Base64
+            } catch (error) {
+              console.error('Error al convertir imagen a Base64:', error);
+              return null;
+            }
+          }
+          return null;
+        })
+      );
+
+      console.log('🖼️ Imágenes procesadas para crear:', {
+        total: processedImages.length,
+        tipos: processedImages.map(img => img ? (img.startsWith('data:') ? 'Base64' : 'URL') : 'null')
+      });
+      
       // Preparar payload con campos requeridos
       const productData = {
         Codigo: formData.codigo.trim(),
@@ -134,21 +166,34 @@ const ProductosCreate = () => {
         Producto: formData.producto.trim(),
         Descripcion: formData.descripcion.trim() || null,
         FichaTecnica: formData.fichaTecnica.trim() || null,
+        ImagenPrincipal: processedImages[0] || null,
+        Imagen2: processedImages[1] || null,
+        Imagen3: processedImages[2] || null,
+        Imagen4: processedImages[3] || null,
         MarcaId: parseInt(formData.marcaId),
         CategoryId: parseInt(formData.categoryId),
       };
-
-      // Las imágenes por ahora se omiten (backend espera URLs, no archivos)
-      // TODO: Implementar upload de archivos cuando el backend lo soporte
       
-      console.log(' Enviando producto:', productData);
+      console.log('📦 Creando producto con datos:', {
+        ...productData,
+        ImagenPrincipal: productData.ImagenPrincipal ? `${productData.ImagenPrincipal.substring(0, 50)}...` : null,
+        Imagen2: productData.Imagen2 ? `${productData.Imagen2.substring(0, 50)}...` : null,
+        Imagen3: productData.Imagen3 ? `${productData.Imagen3.substring(0, 50)}...` : null,
+        Imagen4: productData.Imagen4 ? `${productData.Imagen4.substring(0, 50)}...` : null
+      });
       
-      await productService.createProduct(productData);
+      const response = await productService.createProduct(productData);
+      console.log('✅ Producto creado exitosamente. Respuesta:', response);
       warning('Producto creado exitosamente');
       navigate('/admin/productos');
     } catch (err) {
-      console.error('❌ Error completo:', err);
-      console.error('❌ Error response:', err.response);
+      console.error('❌ ERROR AL CREAR PRODUCTO:', err);
+      console.error('❌ Detalles del error:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        statusText: err.response?.statusText
+      });
       
       // Extraer mensaje de error del backend
       let errorMessage = 'Error al crear el producto';
@@ -157,12 +202,14 @@ const ProductosCreate = () => {
         // Si el backend devuelve errores de validación (ModelState)
         if (err.response.data.errors) {
           const errors = Object.values(err.response.data.errors).flat();
-          errorMessage = errors.join(', ');
+          errorMessage = `Errores de validación: ${errors.join(', ')}`;
         } else if (err.response.data.message) {
           errorMessage = err.response.data.message;
         } else if (typeof err.response.data === 'string') {
           errorMessage = err.response.data;
         }
+      } else if (err.message) {
+        errorMessage = err.message;
       }
       
       setError(errorMessage);

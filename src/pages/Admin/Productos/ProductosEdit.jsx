@@ -154,55 +154,77 @@ const ProductosEdit = () => {
         IsActive: formData.isActive
       };
 
-      // Agregar imágenes al payload (URLs como strings)
-      // El backend espera: ImagenPrincipal, Imagen2, Imagen3, Imagen4
-      if (productImages[0]) {
-        // Si es File, por ahora enviamos null (backend no acepta archivos aún)
-        productData.ImagenPrincipal = typeof productImages[0] === 'string' ? productImages[0] : null;
-      } else {
-        productData.ImagenPrincipal = null;
-      }
+      // Convertir archivos File a Base64 antes de enviar
+      const convertFileToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = error => reject(error);
+        });
+      };
 
-      if (productImages[1]) {
-        productData.Imagen2 = typeof productImages[1] === 'string' ? productImages[1] : null;
-      } else {
-        productData.Imagen2 = null;
-      }
+      // Procesar imágenes: convertir File a Base64 o mantener URL string
+      const processedImages = await Promise.all(
+        productImages.map(async (img) => {
+          if (!img) return null;
+          if (typeof img === 'string') return img; // Ya es URL
+          if (img instanceof File) {
+            try {
+              return await convertFileToBase64(img); // Convertir File a Base64
+            } catch (error) {
+              console.error('Error al convertir imagen a Base64:', error);
+              return null;
+            }
+          }
+          return null;
+        })
+      );
 
-      if (productImages[2]) {
-        productData.Imagen3 = typeof productImages[2] === 'string' ? productImages[2] : null;
-      } else {
-        productData.Imagen3 = null;
-      }
+      console.log('🖼️ Imágenes procesadas:', {
+        total: processedImages.length,
+        tipos: processedImages.map(img => img ? (img.startsWith('data:') ? 'Base64' : 'URL') : 'null')
+      });
 
-      if (productImages[3]) {
-        productData.Imagen4 = typeof productImages[3] === 'string' ? productImages[3] : null;
-      } else {
-        productData.Imagen4 = null;
-      }
+      // Agregar imágenes al payload
+      productData.ImagenPrincipal = processedImages[0] || null;
+      productData.Imagen2 = processedImages[1] || null;
+      productData.Imagen3 = processedImages[2] || null;
+      productData.Imagen4 = processedImages[3] || null;
       
-      console.log('📦 Actualizando producto:', productData);
-      console.log('📸 Imágenes a enviar:', { 
-        ImagenPrincipal: productData.ImagenPrincipal, 
-        Imagen2: productData.Imagen2,
-        Imagen3: productData.Imagen3,
-        Imagen4: productData.Imagen4
+      console.log('📦 Datos completos del producto a actualizar:', {
+        ...productData,
+        ImagenPrincipal: productData.ImagenPrincipal ? `${productData.ImagenPrincipal.substring(0, 50)}...` : null,
+        Imagen2: productData.Imagen2 ? `${productData.Imagen2.substring(0, 50)}...` : null,
+        Imagen3: productData.Imagen3 ? `${productData.Imagen3.substring(0, 50)}...` : null,
+        Imagen4: productData.Imagen4 ? `${productData.Imagen4.substring(0, 50)}...` : null
       });
       
-      await productService.updateProduct(id, productData);
+      const response = await productService.updateProduct(id, productData);
+      console.log('✅ Producto actualizado exitosamente. Respuesta:', response);
       info('Producto actualizado exitosamente');
       navigate('/admin/productos');
     } catch (err) {
-      console.error('Error al actualizar producto:', err);
+      console.error('❌ ERROR AL ACTUALIZAR PRODUCTO:', err);
+      console.error('❌ Detalles del error:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        statusText: err.response?.statusText
+      });
       
       let errorMessage = 'Error al actualizar el producto';
       if (err.response?.data) {
         if (err.response.data.errors) {
           const errors = Object.values(err.response.data.errors).flat();
-          errorMessage = errors.join(', ');
+          errorMessage = `Errores de validación: ${errors.join(', ')}`;
         } else if (err.response.data.message) {
           errorMessage = err.response.data.message;
+        } else if (typeof err.response.data === 'string') {
+          errorMessage = err.response.data;
         }
+      } else if (err.message) {
+        errorMessage = err.message;
       }
       setError(errorMessage);
     } finally {

@@ -103,7 +103,7 @@ const AdminLayout = () => {
     if (can(PERMISSIONS.PRODUCTOS_VIEW)) {
       const productosChildren = [
         { path: '/admin/productos', icon: 'list', label: 'Listado de Productos', permission: PERMISSIONS.PRODUCTOS_VIEW },
-        { path: '/admin/productos/destacados', icon: 'star', label: 'Productos Destacados', permission: PERMISSIONS.PRODUCTOS_VIEW },
+        { path: '/admin/productos/destacados', icon: 'star', label: 'Productos Disponibles', permission: PERMISSIONS.PRODUCTOS_VIEW },
       ];
       
       // Solo Admin puede crear productos

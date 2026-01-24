@@ -24,14 +24,48 @@ const ProductosDestacados = () => {
         categoryService.getAllCategories()
       ]);
       
+      console.log('📦 Total productos cargados:', productsData.length);
+      
+      // Debug: mostrar estructura del primer producto
+      if (productsData.length > 0) {
+        console.log('🔍 Estructura del primer producto:', productsData[0]);
+        console.log('🔍 Campos de imagen del primer producto:', {
+          imagenPrincipal: productsData[0].imagenPrincipal,
+          imagen2: productsData[0].imagen2,
+          imagen3: productsData[0].imagen3,
+          imagen4: productsData[0].imagen4,
+          imagenes: productsData[0].imagenes
+        });
+      }
+      
+      // Debug: mostrar productos con imágenes
+      const productsWithImages = productsData.filter(p => 
+        (p.imagenes && p.imagenes.length > 0) || 
+        p.imagenPrincipal || 
+        p.imagen2 || 
+        p.imagen3 || 
+        p.imagen4
+      );
+      console.log('🖼️ Productos CON imágenes:', productsWithImages.length);
+      if (productsWithImages.length > 0) {
+        console.log('🖼️ Primer producto con imagen:', productsWithImages[0]);
+      }
+      
       // Ordenar productos: primero los que tienen imagen
       const sortedProducts = productsData.sort((a, b) => {
-        const aHasImage = a.imagenes && a.imagenes.length > 0;
-        const bHasImage = b.imagenes && b.imagenes.length > 0;
+        const aHasImage = (a.imagenes && a.imagenes.length > 0) || a.imagenPrincipal || a.imagen2 || a.imagen3 || a.imagen4;
+        const bHasImage = (b.imagenes && b.imagenes.length > 0) || b.imagenPrincipal || b.imagen2 || b.imagen3 || b.imagen4;
         if (aHasImage && !bHasImage) return -1;
         if (!aHasImage && bHasImage) return 1;
         return 0;
       });
+      
+      console.log('✅ Productos ordenados. Primeros 3:', sortedProducts.slice(0, 3).map(p => ({
+        id: p.id,
+        producto: p.producto,
+        hasImages: p.imagenes && p.imagenes.length > 0,
+        imageCount: p.imagenes?.length || 0
+      })));
       
       setProductos(sortedProducts);
       setCategories(categoriesData);
@@ -83,9 +117,17 @@ const ProductosDestacados = () => {
 
   // Obtener URL de primera imagen o null
   const getFirstImageUrl = (producto) => {
+    // Primero intentar con array de imágenes (si existe)
     if (producto.imagenes && producto.imagenes.length > 0) {
       return producto.imagenes[0].url || producto.imagenes[0].imagenUrl;
     }
+    
+    // Luego intentar con campos individuales (orden: imagenPrincipal, imagen2, imagen3, imagen4)
+    if (producto.imagenPrincipal) return producto.imagenPrincipal;
+    if (producto.imagen2) return producto.imagen2;
+    if (producto.imagen3) return producto.imagen3;
+    if (producto.imagen4) return producto.imagen4;
+    
     return null;
   };
 
@@ -106,12 +148,24 @@ const ProductosDestacados = () => {
       <div className="flex flex-col md:flex-row gap-4 mb-6 items-start md:items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-900 uppercase tracking-wide">
-            Productos Destacados
+            Productos Disponibles
           </h1>
           <p className="text-slate-500 text-sm mt-1">
-            Gestiona los productos destacados que se mostrarán en la página principal
+            Gestiona los productos  que se mostrarán en la página principal
           </p>
         </div>
+        
+        {/* Botón de Refresh */}
+        <button
+          onClick={loadData}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors shadow-sm"
+          disabled={loading}
+        >
+          <span className="material-symbols-outlined text-[20px]">
+            {loading ? 'progress_activity' : 'refresh'}
+          </span>
+          <span className="font-medium">Actualizar</span>
+        </button>
       </div>
 
       {/* Búsqueda */}
