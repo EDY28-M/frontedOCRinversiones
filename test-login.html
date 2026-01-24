@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login - ORC Inversiones</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        h1 {
+            color: #ffff00;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #00ffff;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            background: #2a2a2a;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+        .output {
+            background: #0a0a0a;
+            border: 1px solid #00ff00;
+            padding: 15px;
+            margin-top: 20px;
+            min-height: 200px;
+            overflow-x: auto;
+        }
+        .success {
+            color: #00ff00;
+        }
+        .error {
+            color: #ff0000;
+        }
+        .info {
+            color: #00ffff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Test de Login - ORC Inversiones Backend</h1>
+    
+    <div class="form-group">
+        <label>Backend URL:</label>
+        <input type="text" id="apiUrl" value="http://localhost:5095/api">
+    </div>
+    
+    <div class="form-group">
+        <label>Username:</label>
+        <input type="text" id="username" value="admin" placeholder="admin">
+    </div>
+    
+    <div class="form-group">
+        <label>Password:</label>
+        <input type="password" id="password" value="Admin123" placeholder="Admin123">
+    </div>
+    
+    <button onclick="testLogin()">🚀 Test Login</button>
+    <button onclick="testGetProducts()">📦 Test Get Products</button>
+    <button onclick="clearOutput()">🗑️ Limpiar</button>
+    
+    <div class="output" id="output">
+        <div class="info">Logs aparecerán aquí...</div>
+    </div>
+
+    <script>
+        let authToken = null;
+
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const line = document.createElement('div');
+            line.className = type;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '<div class="info">Logs limpiados...</div>';
+            authToken = null;
+        }
+
+        async function testLogin() {
+            const apiUrl = document.getElementById('apiUrl').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            log('═══════════════════════════════════════════', 'info');
+            log('🔐 INICIANDO TEST DE LOGIN', 'info');
+            log('═══════════════════════════════════════════', 'info');
+            log(`API URL: ${apiUrl}/auth/login`, 'info');
+            log(`Username: ${username}`, 'info');
+            log(`Password: ${'*'.repeat(password.length)}`, 'info');
+
+            try {
+                log('📡 Enviando request al backend...', 'info');
+                
+                const response = await fetch(`${apiUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                log(`📊 Status Code: ${response.status} ${response.statusText}`, 
+                    response.ok ? 'success' : 'error');
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.token;
+                    log('✅ LOGIN EXITOSO!', 'success');
+                    log('═══════════════════════════════════════════', 'success');
+                    log(`Token: ${data.token.substring(0, 50)}...`, 'success');
+                    log(`Username: ${data.username}`, 'success');
+                    log(`Email: ${data.email}`, 'success');
+                    log(`Role: ${data.role}`, 'success');
+                    log(`Expires At: ${data.expiresAt}`, 'success');
+                    log('═══════════════════════════════════════════', 'success');
+                    log('💡 Ahora puedes probar "Test Get Products"', 'info');
+                } else {
+                    log('❌ ERROR EN LOGIN', 'error');
+                    log(`Message: ${data.message || JSON.stringify(data)}`, 'error');
+                }
+            } catch (error) {
+                log('❌ ERROR DE CONEXIÓN', 'error');
+                log(`Error: ${error.message}`, 'error');
+                log('Verifica que el backend esté corriendo en: http://localhost:5095', 'error');
+            }
+        }
+
+        async function testGetProducts() {
+            if (!authToken) {
+                log('⚠️ Primero debes hacer login exitoso!', 'error');
+                return;
+            }
+
+            const apiUrl = document.getElementById('apiUrl').value;
+
+            log('═══════════════════════════════════════════', 'info');
+            log('📦 INICIANDO TEST DE GET PRODUCTS', 'info');
+            log('═══════════════════════════════════════════', 'info');
+
+            try {
+                log('📡 Enviando request con token...', 'info');
+                
+                const response = await fetch(`${apiUrl}/products`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                log(`📊 Status Code: ${response.status} ${response.statusText}`, 
+                    response.ok ? 'success' : 'error');
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('✅ PRODUCTOS OBTENIDOS!', 'success');
+                    log('═══════════════════════════════════════════', 'success');
+                    log(`Total de productos: ${data.length}`, 'success');
+                    
+                    if (data.length > 0) {
+                        log('Primeros 3 productos:', 'success');
+                        data.slice(0, 3).forEach((p, i) => {
+                            log(`${i + 1}. ${p.descripcion} (${p.codigoOEM})`, 'success');
+                        });
+                    } else {
+                        log('No hay productos en la base de datos', 'info');
+                    }
+                    
+                    log('═══════════════════════════════════════════', 'success');
+                } else {
+                    log('❌ ERROR AL OBTENER PRODUCTOS', 'error');
+                    log(`Message: ${data.message || JSON.stringify(data)}`, 'error');
+                }
+            } catch (error) {
+                log('❌ ERROR DE CONEXIÓN', 'error');
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-cargar credenciales de ejemplo
+        window.addEventListener('load', () => {
+            log('🚀 Test de Login Cargado', 'success');
+            log('📝 Credenciales por defecto cargadas: admin / Admin123', 'info');
+            log('Click en "Test Login" para probar la conexión', 'info');
+        });
+    </script>
+</body>
+</html>
