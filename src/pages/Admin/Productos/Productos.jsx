@@ -123,8 +123,11 @@ const Productos = () => {
       // Buscar en Marca
       const matchMarca = producto.marcaNombre?.toLowerCase().includes(term);
       
-      // Buscar en Categoría
-      const matchCategoria = producto.categoryName?.toLowerCase().includes(term);
+      // Buscar en Categoría (múltiples opciones de campo)
+      const matchCategoria = producto.categoryName?.toLowerCase().includes(term) ||
+                            producto.categoria?.toLowerCase().includes(term) ||
+                            producto.category?.nombre?.toLowerCase().includes(term) ||
+                            producto.category?.toLowerCase().includes(term);
       
       // Si no coincide con ninguno, excluir el producto
       if (!matchCodigo && !matchCodigoComer && !matchProducto && !matchMarca && !matchCategoria) {
