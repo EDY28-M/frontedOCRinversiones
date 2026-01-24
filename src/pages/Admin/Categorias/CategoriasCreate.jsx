@@ -2,9 +2,11 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { categoryService } from '../../../services/productService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
+import { useNotification } from '../../../context/NotificationContext';
 
 const CategoriasCreate = () => {
   const navigate = useNavigate();
+  const { warning } = useNotification();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -42,6 +44,7 @@ const CategoriasCreate = () => {
       console.log('📦 Enviando categoría:', payload);
       
       await categoryService.createCategory(payload);
+      warning('Categoría creada exitosamente');
       navigate('/admin/categorias');
     } catch (err) {
       console.error('❌ Error completo:', err);

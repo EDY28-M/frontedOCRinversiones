@@ -5,7 +5,7 @@ import { usePermissions } from '../../hooks/usePermissions';
 import { PERMISSIONS } from '../../utils/permissions';
 
 // Componente de menú acordeón expandible
-const AccordionMenuItem = ({ item, isExpanded, onToggle, currentPath }) => {
+const AccordionMenuItem = ({ item, isExpanded, onToggle, currentPath, onNavigate }) => {
   // El padre está "expandido" si alguna ruta hija está activa
   // PERO NO se marca como "activo" - solo como expandido
   const hasActiveChild = item.children.some(child => currentPath === child.path);
@@ -44,6 +44,7 @@ const AccordionMenuItem = ({ item, isExpanded, onToggle, currentPath }) => {
                 key={child.path}
                 to={child.path}
                 end // Importante: coincidencia exacta
+                onClick={onNavigate}
                 className={`flex items-center gap-3 px-4 py-2 transition-colors text-sm ${
                   isChildActive
                     ? 'bg-blue-600 text-white font-bold'
@@ -77,6 +78,9 @@ const AdminLayout = () => {
     return 'productos'; // Por defecto abrir productos
   });
 
+  // Estado para controlar el sidebar en móvil
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const handleLogout = () => {
     logout();
     navigate('/admin/login');
@@ -84,6 +88,11 @@ const AdminLayout = () => {
 
   const toggleMenu = (menuKey) => {
     setExpandedMenu(expandedMenu === menuKey ? null : menuKey);
+  };
+
+  // Cerrar sidebar al navegar en móvil
+  const closeSidebar = () => {
+    setSidebarOpen(false);
   };
 
   // Menú jerárquico con submenús - Filtrado por permisos
@@ -94,6 +103,7 @@ const AdminLayout = () => {
     if (can(PERMISSIONS.PRODUCTOS_VIEW)) {
       const productosChildren = [
         { path: '/admin/productos', icon: 'list', label: 'Listado de Productos', permission: PERMISSIONS.PRODUCTOS_VIEW },
+        { path: '/admin/productos/destacados', icon: 'star', label: 'Productos Destacados', permission: PERMISSIONS.PRODUCTOS_VIEW },
       ];
       
       // Solo Admin puede crear productos
@@ -172,8 +182,21 @@ const AdminLayout = () => {
 
   return (
     <div className="flex h-screen w-screen bg-slate-50 font-display overflow-hidden">
+      {/* Backdrop para móvil */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="hidden md:flex flex-col w-72 h-full bg-[#0F172A] shadow-2xl z-20 text-white border-r border-[#1e293b] shrink-0">
+      <aside className={`
+        fixed md:relative
+        flex flex-col w-72 h-full bg-[#0F172A] shadow-2xl z-40 text-white border-r border-[#1e293b] shrink-0
+        transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
         {/* Logo Section */}
         <div className="flex items-center justify-center py-3 px-6 border-b border-[#1e293b]">
           <img 
@@ -192,6 +215,7 @@ const AdminLayout = () => {
               isExpanded={expandedMenu === item.key}
               onToggle={() => toggleMenu(item.key)}
               currentPath={location.pathname}
+              onNavigate={closeSidebar}
             />
           ))}
         </nav>
@@ -229,18 +253,27 @@ const AdminLayout = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* Header */}
-        <header className="h-16 flex items-center justify-between px-8 border-b border-gray-200 bg-white z-10 shrink-0">
+        <header className="h-16 flex items-center justify-between px-4 md:px-8 border-b border-gray-200 bg-white z-10 shrink-0">
           <div className="flex items-center gap-4">
-            <div className="flex items-center text-xs font-mono text-slate-500 gap-2">
+            {/* Botón Hamburguesa - Solo móvil */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-2 hover:bg-gray-100 transition-colors"
+              aria-label="Abrir menú"
+            >
+              <span className="material-symbols-outlined text-slate-700">menu</span>
+            </button>
+
+            <div className="hidden md:flex items-center text-xs font-mono text-slate-500 gap-2">
               <span className="w-2 h-2 bg-emerald-500"></span>
               <span>ONLINE</span>
             </div>
-            <div className="h-4 w-px bg-gray-300"></div>
+            <div className="hidden md:block h-4 w-px bg-gray-300"></div>
             <nav className="flex items-center gap-2 text-sm text-slate-500">
-              <NavLink to="/admin/productos" className="hover:text-blue-600 cursor-pointer transition-colors">
+              <NavLink to="/admin/productos" className="hover:text-blue-600 cursor-pointer transition-colors hidden md:inline">
                 Admin
               </NavLink>
-              <span className="material-symbols-outlined text-[12px] pt-0.5">chevron_right</span>
+              <span className="material-symbols-outlined text-[12px] pt-0.5 hidden md:inline">chevron_right</span>
               <span className="text-slate-900 font-bold">{getBreadcrumb()}</span>
             </nav>
           </div>

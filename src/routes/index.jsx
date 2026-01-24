@@ -25,6 +25,7 @@ import VendedorAccessDenied from '../pages/Vendedor/VendedorAccessDenied';
 import ProductosList from '../pages/Admin/Productos/Productos';
 import ProductosCreate from '../pages/Admin/Productos/ProductosCreate';
 import ProductosEdit from '../pages/Admin/Productos/ProductosEdit';
+import ProductosDestacados from '../pages/Admin/ProductosDestacados/ProductosDestacados';
 
 // Categorías
 import CategoriasList from '../pages/Admin/Categorias/CategoriasList';
@@ -89,6 +90,11 @@ const AppRoutes = () => {
             <Route path="productos" element={
               <ProtectedRoute permission={PERMISSIONS.PRODUCTOS_VIEW}>
                 <ProductosList />
+              </ProtectedRoute>
+            } />
+            <Route path="productos/destacados" element={
+              <ProtectedRoute permission={PERMISSIONS.PRODUCTOS_VIEW}>
+                <ProductosDestacados />
               </ProtectedRoute>
             } />
             <Route path="productos/crear" element={
@@ -176,6 +182,11 @@ const AppRoutes = () => {
             <Route path="productos" element={
               <ProtectedRoute permission={PERMISSIONS.PRODUCTOS_VIEW}>
                 <ProductosList />
+              </ProtectedRoute>
+            } />
+            <Route path="productos/destacados" element={
+              <ProtectedRoute permission={PERMISSIONS.PRODUCTOS_VIEW}>
+                <ProductosDestacados />
               </ProtectedRoute>
             } />
           </Route>

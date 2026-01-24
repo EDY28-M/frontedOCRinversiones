@@ -2,10 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { categoryService } from '../../../services/productService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
+import { useNotification } from '../../../context/NotificationContext';
 
 const CategoriasEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { info } = useNotification();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -56,6 +58,7 @@ const CategoriasEdit = () => {
     try {
       setSaving(true);
       await categoryService.updateCategory(id, formData);
+      info('Categoría actualizada exitosamente');
       navigate('/admin/categorias');
     } catch (err) {
       console.error('Error al actualizar categoría:', err);

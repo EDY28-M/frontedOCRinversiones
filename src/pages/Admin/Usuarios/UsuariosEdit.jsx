@@ -2,10 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { userService } from '../../../services/userService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
+import { useNotification } from '../../../context/NotificationContext';
 
 const UsuariosEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { info } = useNotification();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -62,6 +64,7 @@ const UsuariosEdit = () => {
     try {
       setSaving(true);
       await userService.updateUser(id, formData);
+      info('Usuario actualizado exitosamente');
       navigate('/admin/usuarios');
     } catch (err) {
       console.error('Error al actualizar usuario:', err);

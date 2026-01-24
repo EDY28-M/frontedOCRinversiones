@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { nombreMarcaService } from '../../../services/productService';
 import { ErrorAlert, ConfirmModal } from '../../../components/common';
+import { useNotification } from '../../../context/NotificationContext';
 
 const NombreMarcaList = () => {
+  const { error: showErrorNotif } = useNotification();
   const [nombreMarcas, setNombreMarcas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,6 +38,7 @@ const NombreMarcaList = () => {
   const confirmDeleteAction = async () => {
     try {
       await nombreMarcaService.deleteNombreMarca(confirmDelete.id);
+      showErrorNotif('Marca eliminada exitosamente');
       await loadNombreMarcas();
     } catch (err) {
       console.error('Error al eliminar marca:', err);

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -5,55 +6,106 @@ const VendedorLayout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Estado para controlar el sidebar en móvil
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/admin/login');
   };
 
+  // Cerrar sidebar al navegar en móvil
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  };
+
   const getBreadcrumb = () => {
     const path = location.pathname;
+    if (path.includes('/productos/destacados')) return 'Productos Destacados';
     if (path.includes('/productos')) return 'Listado de Productos';
     return 'Vendedor';
   };
 
   return (
     <div className="flex h-screen w-screen bg-slate-50 font-display overflow-hidden">
+      {/* Backdrop para móvil */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="hidden md:flex flex-col w-72 h-full bg-[#0F172A] shadow-2xl z-20 text-white border-r border-[#1e293b] shrink-0">
+      <aside className={`
+        fixed md:relative
+        flex flex-col w-72 h-full bg-[#0F172A] shadow-2xl z-40 text-white border-r border-[#1e293b] shrink-0
+        transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
         {/* Logo Section */}
-        <div className="flex items-center gap-3 p-6 border-b border-[#1e293b]">
-          <div className="bg-[#F5C344]/10 p-2 flex items-center justify-center">
-            <span className="material-symbols-outlined text-[#F5C344]" style={{ fontSize: '24px' }}>
-              store
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <h1 className="text-white text-base font-bold uppercase tracking-wider leading-none">
-              ORC INV.
-            </h1>
-            <p className="text-slate-400 text-xs font-mono mt-1">VENDEDOR</p>
-          </div>
+        <div className="flex items-center justify-center py-3 px-6 border-b border-[#1e293b]">
+          <img 
+            src="/logo_orc-removebg-preview.png" 
+            alt="ORC Inversiones" 
+            className="h-20 w-auto object-contain"
+          />
         </div>
 
         {/* Navigation - Solo productos para vendedor */}
         <nav className="flex-1 flex flex-col gap-1 p-4 overflow-y-auto">
           <div className="flex flex-col">
-            <button
-              onClick={() => navigate('/vendedor/productos')}
-              className={`flex items-center gap-3 px-4 py-3 transition-colors group w-full text-left ${
-                location.pathname.includes('/productos')
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <span className="material-symbols-outlined group-hover:text-[#F5C344] transition-colors">
-                inventory_2
-              </span>
-              <span className="text-sm font-medium">
-                Productos
-              </span>
-            </button>
+            {/* Menú de Productos con submenú */}
+            <div className="mb-2">
+              <div className="flex items-center gap-3 px-4 py-2 text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                <span className="material-symbols-outlined text-base">
+                  inventory_2
+                </span>
+                <span>Productos</span>
+              </div>
+              
+              {/* Submenú */}
+              <div className="flex flex-col gap-1 mt-1">
+                <button
+                  onClick={() => {
+                    navigate('/vendedor/productos');
+                    closeSidebar();
+                  }}
+                  className={`flex items-center gap-3 px-4 py-3 ml-4 transition-colors group w-full text-left ${
+                    location.pathname === '/vendedor/productos'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base group-hover:text-[#F5C344] transition-colors">
+                    list
+                  </span>
+                  <span className="text-sm font-medium">
+                    Listado de Productos
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    navigate('/vendedor/productos/destacados');
+                    closeSidebar();
+                  }}
+                  className={`flex items-center gap-3 px-4 py-3 ml-4 transition-colors group w-full text-left ${
+                    location.pathname === '/vendedor/productos/destacados'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base group-hover:text-[#F5C344] transition-colors">
+                    star
+                  </span>
+                  <span className="text-sm font-medium">
+                    Productos Destacados
+                  </span>
+                </button>
+              </div>
+            </div>
           </div>
         </nav>
 
@@ -90,18 +142,27 @@ const VendedorLayout = () => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* Header */}
-        <header className="h-16 flex items-center justify-between px-8 border-b border-gray-200 bg-white z-10 shrink-0">
+        <header className="h-16 flex items-center justify-between px-4 md:px-8 border-b border-gray-200 bg-white z-10 shrink-0">
           <div className="flex items-center gap-4">
-            <div className="flex items-center text-xs font-mono text-slate-500 gap-2">
+            {/* Botón Hamburguesa - Solo móvil */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-2 hover:bg-gray-100 transition-colors"
+              aria-label="Abrir menú"
+            >
+              <span className="material-symbols-outlined text-slate-700">menu</span>
+            </button>
+
+            <div className="hidden md:flex items-center text-xs font-mono text-slate-500 gap-2">
               <span className="w-2 h-2 bg-emerald-500"></span>
               <span>ONLINE</span>
             </div>
-            <div className="h-4 w-px bg-gray-300"></div>
+            <div className="hidden md:block h-4 w-px bg-gray-300"></div>
             <nav className="flex items-center gap-2 text-sm text-slate-500">
-              <span className="hover:text-blue-600 cursor-pointer transition-colors">
+              <span className="hover:text-blue-600 cursor-pointer transition-colors hidden md:inline">
                 Vendedor
               </span>
-              <span className="material-symbols-outlined text-[12px] pt-0.5">chevron_right</span>
+              <span className="material-symbols-outlined text-[12px] pt-0.5 hidden md:inline">chevron_right</span>
               <span className="text-slate-900 font-bold">{getBreadcrumb()}</span>
             </nav>
           </div>

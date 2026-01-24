@@ -2,9 +2,11 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userService } from '../../../services/userService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
+import { useNotification } from '../../../context/NotificationContext';
 
 const UsuariosCreate = () => {
   const navigate = useNavigate();
+  const { warning } = useNotification();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -64,6 +66,7 @@ const UsuariosCreate = () => {
       console.log('📦 Enviando usuario:', { ...payload, Password: '***' });
       
       await userService.createUser(payload);
+      warning('Usuario creado exitosamente');
       navigate('/admin/usuarios');
     } catch (err) {
       console.error('❌ Error completo:', err);

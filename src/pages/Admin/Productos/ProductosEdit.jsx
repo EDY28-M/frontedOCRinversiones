@@ -3,10 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { productService, categoryService, nombreMarcaService } from '../../../services/productService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
 import ImageUploader from '../../../components/common/ImageUploader';
+import { useNotification } from '../../../context/NotificationContext';
 
 const ProductosEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { info } = useNotification();
   const [categorias, setCategorias] = useState([]);
   const [marcas, setMarcas] = useState([]);
   const [formData, setFormData] = useState({
@@ -188,6 +190,7 @@ const ProductosEdit = () => {
       });
       
       await productService.updateProduct(id, productData);
+      info('Producto actualizado exitosamente');
       navigate('/admin/productos');
     } catch (err) {
       console.error('Error al actualizar producto:', err);

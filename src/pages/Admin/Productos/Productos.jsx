@@ -4,9 +4,11 @@ import { productService, categoryService, nombreMarcaService } from '../../../se
 import { ErrorAlert, ConfirmModal, ImportProductsModal } from '../../../components/common';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { PERMISSIONS } from '../../../utils/permissions';
+import { useNotification } from '../../../context/NotificationContext';
 
 const Productos = () => {
   const { can } = usePermissions();
+  const { error: showErrorNotif } = useNotification();
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,6 +21,9 @@ const Productos = () => {
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(7);
+
+  // Estado para búsqueda
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Función para limpiar error - solo por acción del usuario
   const clearError = useCallback(() => {
@@ -70,6 +75,7 @@ const Productos = () => {
   const confirmDeleteAction = async () => {
     try {
       await productService.deleteProduct(confirmDelete.id);
+      showErrorNotif('Producto eliminado exitosamente');
       await loadProducts();
     } catch (err) {
       console.error('Error al eliminar producto:', err);
@@ -97,8 +103,35 @@ const Productos = () => {
   };
 
   const filteredProducts = productos.filter(producto => {
-    if (filtroActivo === 'publicados') return producto.isActive;
-    if (filtroActivo === 'borradores') return !producto.isActive;
+    // Filtro por estado (todos/publicados/borradores)
+    if (filtroActivo === 'publicados' && !producto.isActive) return false;
+    if (filtroActivo === 'borradores' && producto.isActive) return false;
+    
+    // Filtro por búsqueda
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      
+      // Buscar en Código
+      const matchCodigo = producto.codigo?.toString().toLowerCase().includes(term);
+      
+      // Buscar en Código Comercial
+      const matchCodigoComer = producto.codigoComer?.toString().toLowerCase().includes(term);
+      
+      // Buscar en Producto (nombre/descripción)
+      const matchProducto = producto.producto?.toLowerCase().includes(term);
+      
+      // Buscar en Marca
+      const matchMarca = producto.marcaNombre?.toLowerCase().includes(term);
+      
+      // Buscar en Categoría
+      const matchCategoria = producto.categoryName?.toLowerCase().includes(term);
+      
+      // Si no coincide con ninguno, excluir el producto
+      if (!matchCodigo && !matchCodigoComer && !matchProducto && !matchMarca && !matchCategoria) {
+        return false;
+      }
+    }
+    
     return true;
   });
 
@@ -109,10 +142,10 @@ const Productos = () => {
     currentPage * pageSize
   );
 
-  // Reset página al cambiar filtro
+  // Reset página al cambiar filtro o búsqueda
   useEffect(() => {
     setCurrentPage(1);
-  }, [filtroActivo, pageSize]);
+  }, [filtroActivo, pageSize, searchTerm]);
 
   const getIconForCategory = (categoryName) => {
     const icons = {
@@ -188,8 +221,10 @@ const Productos = () => {
           </div>
           <input
             className="bg-white border border-gray-300 text-slate-900 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 block w-full pl-11 p-3 placeholder-slate-400 transition-all font-mono shadow-sm"
-            placeholder="BUSCAR ID, SKU, CATEGORÍA..."
+            placeholder="BUSCAR CÓDIGO, SKU, PRODUCTO, MARCA, CATEGORÍA..."
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>

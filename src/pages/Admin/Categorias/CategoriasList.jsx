@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { categoryService } from '../../../services/productService';
 import { ErrorAlert, ConfirmModal } from '../../../components/common';
+import { useNotification } from '../../../context/NotificationContext';
 
 const CategoriasList = () => {
+  const { error: showErrorNotif } = useNotification();
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,6 +38,7 @@ const CategoriasList = () => {
   const confirmDeleteAction = async () => {
     try {
       await categoryService.deleteCategory(confirmDelete.id);
+      showErrorNotif('Categoría eliminada exitosamente');
       await loadCategorias();
     } catch (err) {
       console.error('Error al eliminar categoría:', err);

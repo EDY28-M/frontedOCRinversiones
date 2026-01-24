@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { productService, categoryService, nombreMarcaService } from '../../../services/productService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
 import ImageUploader from '../../../components/common/ImageUploader';
+import { useNotification } from '../../../context/NotificationContext';
 
 const ProductosCreate = () => {
   const navigate = useNavigate();
+  const { warning } = useNotification();
   const [categorias, setCategorias] = useState([]);
   const [marcas, setMarcas] = useState([]);
   const [formData, setFormData] = useState({
@@ -139,9 +141,10 @@ const ProductosCreate = () => {
       // Las imágenes por ahora se omiten (backend espera URLs, no archivos)
       // TODO: Implementar upload de archivos cuando el backend lo soporte
       
-      console.log('📦 Enviando producto:', productData);
+      console.log(' Enviando producto:', productData);
       
       await productService.createProduct(productData);
+      warning('Producto creado exitosamente');
       navigate('/admin/productos');
     } catch (err) {
       console.error('❌ Error completo:', err);

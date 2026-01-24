@@ -2,8 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { userService } from '../../../services/userService';
 import { ErrorAlert, ConfirmModal } from '../../../components/common';
+import { useNotification } from '../../../context/NotificationContext';
 
 const UsuariosList = () => {
+  const { error: showErrorNotif } = useNotification();
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,6 +38,7 @@ const UsuariosList = () => {
   const confirmDeleteAction = async () => {
     try {
       await userService.deleteUser(confirmDelete.id);
+      showErrorNotif('Usuario eliminado exitosamente');
       await loadUsuarios();
     } catch (err) {
       console.error('Error al eliminar usuario:', err);

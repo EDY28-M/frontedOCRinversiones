@@ -2,9 +2,11 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { nombreMarcaService } from '../../../services/productService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
+import { useNotification } from '../../../context/NotificationContext';
 
 const NombreMarcaCreate = () => {
   const navigate = useNavigate();
+  const { warning } = useNotification();
   const [formData, setFormData] = useState({
     nombre: '',
   });
@@ -39,6 +41,7 @@ const NombreMarcaCreate = () => {
       console.log('📦 Enviando marca:', payload);
       
       await nombreMarcaService.createNombreMarca(payload);
+      warning('Marca creada exitosamente');
       navigate('/admin/nombre-marca');
     } catch (err) {
       console.error('❌ Error completo:', err);
