@@ -175,18 +175,12 @@ const AdminLayout = () => {
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-72 h-full bg-[#0F172A] shadow-2xl z-20 text-white border-r border-[#1e293b] shrink-0">
         {/* Logo Section */}
-        <div className="flex items-center gap-3 p-6 border-b border-[#1e293b]">
-          <div className="bg-[#F5C344]/10 p-2 flex items-center justify-center">
-            <span className="material-symbols-outlined text-[#F5C344]" style={{ fontSize: '24px' }}>
-              engineering
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <h1 className="text-white text-base font-bold uppercase tracking-wider leading-none">
-              ORC INV.
-            </h1>
-            <p className="text-slate-400 text-xs font-mono mt-1">SYS.V3.0.0</p>
-          </div>
+        <div className="flex items-center justify-center py-3 px-6 border-b border-[#1e293b]">
+          <img 
+            src="/logo_orc-removebg-preview.png" 
+            alt="ORC Inversiones" 
+            className="h-20 w-auto object-contain"
+          />
         </div>
 
         {/* Navigation - Menú Acordeón */}
