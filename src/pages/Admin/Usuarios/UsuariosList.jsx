@@ -1,55 +1,41 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { userService } from '../../../services/userService';
 import { ErrorAlert, ConfirmModal } from '../../../components/common';
-import { useNotification } from '../../../context/NotificationContext';
+import { useUsers, useDeleteUser } from '../../../hooks/useUsers';
 
 const UsuariosList = () => {
-  const { error: showErrorNotif } = useNotification();
-  const [usuarios, setUsuarios] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: usuarios = [], isLoading: loading, error: queryError } = useUsers();
+  const deleteMutation = useDeleteUser();
+  
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null, username: '' });
+  const [error, setError] = useState(null);
 
   const clearError = useCallback(() => setError(null), []);
-
-  useEffect(() => {
-    loadUsuarios();
-  }, []);
-
-  const loadUsuarios = async () => {
-    try {
-      setLoading(true);
-      const data = await userService.getAllUsers();
-      setUsuarios(data);
-      setError(null);
-    } catch (err) {
-      console.error('Error al cargar usuarios:', err);
-      setError('Error al cargar usuarios. Verifica que el backend esté corriendo.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDelete = async (id, username) => {
     setConfirmDelete({ isOpen: true, id, username });
   };
 
   const confirmDeleteAction = async () => {
-    try {
-      await userService.deleteUser(confirmDelete.id);
-      showErrorNotif('Usuario eliminado exitosamente');
-      await loadUsuarios();
-    } catch (err) {
-      console.error('Error al eliminar usuario:', err);
-      setError('Error al eliminar el usuario.');
-    }
+    deleteMutation.mutate(confirmDelete.id);
+    setConfirmDelete({ isOpen: false, id: null, username: '' });
   };
 
-
+  const displayError = error || (queryError ? 'Error al cargar usuarios. Verifica que el backend esté corriendo.' : null);
 
   if (loading) {
-    return null;
+    return (
+      <div className="p-4 animate-pulse">
+        <div className="h-8 bg-gray-200 rounded w-48 mb-6"></div>
+        <div className="bg-white border border-gray-200 shadow-sm">
+          <div className="p-4 space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-12 bg-gray-100 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -72,8 +58,8 @@ const UsuariosList = () => {
       </div>
 
       {/* Error */}
-      {error && (
-        <ErrorAlert error={error} onClose={clearError} title="Error" />
+      {displayError && (
+        <ErrorAlert error={displayError} onClose={clearError} title="Error" />
       )}
 
       {/* Tabla */}

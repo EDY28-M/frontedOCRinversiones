@@ -1,43 +1,32 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { nombreMarcaService } from '../../../services/productService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
-import { useNotification } from '../../../context/NotificationContext';
+import { useBrand, useUpdateBrand } from '../../../hooks/useBrands';
 
 const NombreMarcaEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { info } = useNotification();
+  
+  const { data: marca, isLoading: loadingData, error: queryError } = useBrand(id);
+  const updateMutation = useUpdateBrand();
+  
   const [formData, setFormData] = useState({
     nombre: '',
     isActive: true,
   });
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
   const clearError = useCallback(() => setError(null), []);
 
+  // Poblar formulario cuando carga la marca
   useEffect(() => {
-    loadMarca();
-  }, [id]);
-
-  const loadMarca = async () => {
-    try {
-      setLoading(true);
-      const data = await nombreMarcaService.getNombreMarcaById(id);
+    if (marca) {
       setFormData({
-        nombre: data.nombre || '',
-        isActive: data.isActive ?? true,
+        nombre: marca.nombre || '',
+        isActive: marca.isActive ?? true,
       });
-      setError(null);
-    } catch (err) {
-      console.error('Error al cargar marca:', err);
-      setError('Error al cargar la marca');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [marca]);
 
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -56,27 +45,37 @@ const NombreMarcaEdit = () => {
       return;
     }
 
-    try {
-      setSaving(true);
-      
-      const payload = {
-        Nombre: formData.nombre.trim(),
-        IsActive: formData.isActive
-      };
-      
-      await nombreMarcaService.updateNombreMarca(id, payload);
-      info('Marca actualizada exitosamente');
-      navigate('/admin/nombre-marca');
-    } catch (err) {
-      console.error('Error al actualizar marca:', err);
-      setError(err.response?.data?.message || 'Error al actualizar la marca');
-    } finally {
-      setSaving(false);
-    }
+    const payload = {
+      Nombre: formData.nombre.trim(),
+      IsActive: formData.isActive
+    };
+    
+    updateMutation.mutate(
+      { id, brandData: payload },
+      {
+        onSuccess: () => {
+          navigate('/admin/nombre-marca');
+        },
+        onError: (err) => {
+          setError(err.response?.data?.message || 'Error al actualizar la marca');
+        },
+      }
+    );
   };
 
+  const loading = loadingData;
+  const saving = updateMutation.isPending;
+  const displayError = error || (queryError ? 'Error al cargar la marca' : null);
+
   if (loading) {
-    return null;
+    return (
+      <div className="p-4 animate-pulse">
+        <div className="h-8 bg-gray-200 rounded w-48 mb-6"></div>
+        <div className="bg-white border border-gray-200 shadow-sm p-6 space-y-4">
+          <div className="h-10 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -98,8 +97,8 @@ const NombreMarcaEdit = () => {
         </div>
         
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {error && (
-            <ErrorAlert error={error} onClose={clearError} title="Error de Validación" />
+          {displayError && (
+            <ErrorAlert error={displayError} onClose={clearError} title="Error de Validación" />
           )}
 
           <div>

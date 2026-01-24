@@ -1,45 +1,34 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { userService } from '../../../services/userService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
-import { useNotification } from '../../../context/NotificationContext';
+import { useUser, useUpdateUser } from '../../../hooks/useUsers';
 
 const UsuariosEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { info } = useNotification();
+  
+  const { data: usuario, isLoading: loadingData, error: queryError } = useUser(id);
+  const updateMutation = useUpdateUser();
+  
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     role: 'Vendedor',
   });
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
   const clearError = useCallback(() => setError(null), []);
 
+  // Poblar formulario cuando carga el usuario
   useEffect(() => {
-    loadUsuario();
-  }, [id]);
-
-  const loadUsuario = async () => {
-    try {
-      setLoading(true);
-      const data = await userService.getUserById(id);
+    if (usuario) {
       setFormData({
-        username: data.username || '',
-        email: data.email || '',
-        role: data.role || 'Vendedor',
+        username: usuario.username || '',
+        email: usuario.email || '',
+        role: usuario.role || 'Vendedor',
       });
-      setError(null);
-    } catch (err) {
-      console.error('Error al cargar usuario:', err);
-      setError('Error al cargar el usuario');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [usuario]);
 
   const handleChange = (e) => {
     setFormData({
@@ -61,21 +50,36 @@ const UsuariosEdit = () => {
       return;
     }
 
-    try {
-      setSaving(true);
-      await userService.updateUser(id, formData);
-      info('Usuario actualizado exitosamente');
-      navigate('/admin/usuarios');
-    } catch (err) {
-      console.error('Error al actualizar usuario:', err);
-      setError(err.response?.data?.message || 'Error al actualizar el usuario');
-    } finally {
-      setSaving(false);
-    }
+    updateMutation.mutate(
+      { id, userData: formData },
+      {
+        onSuccess: () => {
+          navigate('/admin/usuarios');
+        },
+        onError: (err) => {
+          setError(err.response?.data?.message || 'Error al actualizar el usuario');
+        },
+      }
+    );
   };
 
+  const loading = loadingData;
+  const saving = updateMutation.isPending;
+  const displayError = error || (queryError ? 'Error al cargar el usuario' : null);
+
   if (loading) {
-    return null;
+    return (
+      <div className="p-4 animate-pulse">
+        <div className="h-8 bg-gray-200 rounded w-48 mb-6"></div>
+        <div className="bg-white border border-gray-200 shadow-sm p-6 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="h-10 bg-gray-200 rounded"></div>
+            <div className="h-10 bg-gray-200 rounded"></div>
+          </div>
+          <div className="h-10 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -85,7 +89,7 @@ const UsuariosEdit = () => {
         <h1 className="text-xl font-bold text-slate-900 uppercase tracking-wide">
           Editar Usuario
         </h1>
-        <p className="text-slate-500 text-sm mt-1">Modificar datos del usuario #{id}</p>
+        <p className="text-slate-500 text-sm mt-1">Modificar datos del usuario</p>
       </div>
 
       {/* Formulario */}
@@ -97,8 +101,8 @@ const UsuariosEdit = () => {
         </div>
         
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {error && (
-            <ErrorAlert error={error} onClose={clearError} title="Error" />
+          {displayError && (
+            <ErrorAlert error={displayError} onClose={clearError} title="Error" />
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

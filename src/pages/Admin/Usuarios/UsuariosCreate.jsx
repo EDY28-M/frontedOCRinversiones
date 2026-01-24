@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { userService } from '../../../services/userService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
-import { useNotification } from '../../../context/NotificationContext';
+import { useCreateUser } from '../../../hooks/useUsers';
 
 const UsuariosCreate = () => {
   const navigate = useNavigate();
-  const { warning } = useNotification();
+  const createMutation = useCreateUser();
+  
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -14,7 +14,6 @@ const UsuariosCreate = () => {
     confirmPassword: '',
     roleId: 2, // Default: Vendedor role (ID 2)
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const clearError = useCallback(() => setError(null), []);
@@ -52,45 +51,33 @@ const UsuariosCreate = () => {
       return;
     }
 
-    try {
-      setLoading(true);
-      
-      // Asegurar capitalización correcta para el backend
-      const payload = {
-        Username: formData.username.trim(),
-        Email: formData.email.trim(),
-        Password: formData.password,
-        RoleId: parseInt(formData.roleId),
-      };
-      
-      console.log('📦 Enviando usuario:', { ...payload, Password: '***' });
-      
-      await userService.createUser(payload);
-      warning('Usuario creado exitosamente');
-      navigate('/admin/usuarios');
-    } catch (err) {
-      console.error('❌ Error completo:', err);
-      console.error('❌ Error response:', err.response);
-      
-      // Extraer mensaje de error del backend
-      let errorMessage = 'Error al crear el usuario';
-      
-      if (err.response?.data) {
-        if (err.response.data.errors) {
-          const errors = Object.values(err.response.data.errors).flat();
-          errorMessage = errors.join(', ');
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        } else if (typeof err.response.data === 'string') {
-          errorMessage = err.response.data;
+    const payload = {
+      Username: formData.username.trim(),
+      Email: formData.email.trim(),
+      Password: formData.password,
+      RoleId: parseInt(formData.roleId),
+    };
+    
+    createMutation.mutate(payload, {
+      onSuccess: () => {
+        navigate('/admin/usuarios');
+      },
+      onError: (err) => {
+        let errorMessage = 'Error al crear el usuario';
+        if (err.response?.data) {
+          if (err.response.data.errors) {
+            const errors = Object.values(err.response.data.errors).flat();
+            errorMessage = errors.join(', ');
+          } else if (err.response.data.message) {
+            errorMessage = err.response.data.message;
+          }
         }
-      }
-      
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+        setError(errorMessage);
+      },
+    });
   };
+
+  const loading = createMutation.isPending;
 
   return (
     <div className="p-4">

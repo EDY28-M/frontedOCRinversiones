@@ -254,7 +254,7 @@ const ProductosEdit = () => {
       {/* Header compacto */}
       <div className="mb-4">
         <h1 className="text-xl font-bold text-slate-900 uppercase tracking-wide">
-          Editar Producto #{id}
+          Editar Producto
         </h1>
       </div>
 

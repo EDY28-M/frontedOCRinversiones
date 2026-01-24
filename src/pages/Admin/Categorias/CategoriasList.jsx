@@ -1,53 +1,41 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { categoryService } from '../../../services/productService';
 import { ErrorAlert, ConfirmModal } from '../../../components/common';
-import { useNotification } from '../../../context/NotificationContext';
+import { useCategories, useDeleteCategory } from '../../../hooks/useCategories';
 
 const CategoriasList = () => {
-  const { error: showErrorNotif } = useNotification();
-  const [categorias, setCategorias] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: categorias = [], isLoading: loading, error: queryError } = useCategories();
+  const deleteMutation = useDeleteCategory();
+  
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null, nombre: '' });
+  const [error, setError] = useState(null);
 
   const clearError = useCallback(() => setError(null), []);
-
-  useEffect(() => {
-    loadCategorias();
-  }, []);
-
-  const loadCategorias = async () => {
-    try {
-      setLoading(true);
-      const data = await categoryService.getAllCategories();
-      setCategorias(data);
-      setError(null);
-    } catch (err) {
-      console.error('Error al cargar categorías:', err);
-      setError('Error al cargar categorías. Verifica que el backend esté corriendo.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDelete = async (id, nombre) => {
     setConfirmDelete({ isOpen: true, id, nombre });
   };
 
   const confirmDeleteAction = async () => {
-    try {
-      await categoryService.deleteCategory(confirmDelete.id);
-      showErrorNotif('Categoría eliminada exitosamente');
-      await loadCategorias();
-    } catch (err) {
-      console.error('Error al eliminar categoría:', err);
-      setError('Error al eliminar la categoría. Puede tener productos asociados.');
-    }
+    deleteMutation.mutate(confirmDelete.id);
+    setConfirmDelete({ isOpen: false, id: null, nombre: '' });
   };
 
+  const displayError = error || (queryError ? 'Error al cargar categorías. Verifica que el backend esté corriendo.' : null);
+
   if (loading) {
-    return null;
+    return (
+      <div className="p-4 animate-pulse">
+        <div className="h-8 bg-gray-200 rounded w-48 mb-6"></div>
+        <div className="bg-white border border-gray-200 shadow-sm">
+          <div className="p-4 space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-12 bg-gray-100 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -70,8 +58,8 @@ const CategoriasList = () => {
       </div>
 
       {/* Error */}
-      {error && (
-        <ErrorAlert error={error} onClose={clearError} title="Error" />
+      {displayError && (
+        <ErrorAlert error={displayError} onClose={clearError} title="Error" />
       )}
 
       {/* Tabla */}

@@ -1,53 +1,41 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { nombreMarcaService } from '../../../services/productService';
 import { ErrorAlert, ConfirmModal } from '../../../components/common';
-import { useNotification } from '../../../context/NotificationContext';
+import { useBrands, useDeleteBrand } from '../../../hooks/useBrands';
 
 const NombreMarcaList = () => {
-  const { error: showErrorNotif } = useNotification();
-  const [nombreMarcas, setNombreMarcas] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: nombreMarcas = [], isLoading: loading, error: queryError } = useBrands();
+  const deleteMutation = useDeleteBrand();
+  
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null, nombre: '' });
+  const [error, setError] = useState(null);
 
   const clearError = useCallback(() => setError(null), []);
-
-  useEffect(() => {
-    loadNombreMarcas();
-  }, []);
-
-  const loadNombreMarcas = async () => {
-    try {
-      setLoading(true);
-      const data = await nombreMarcaService.getAllNombreMarcas();
-      setNombreMarcas(data);
-      setError(null);
-    } catch (err) {
-      console.error('Error al cargar marcas:', err);
-      setError('Error al cargar las marcas. Verifica que el backend esté corriendo.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDelete = async (id, nombre) => {
     setConfirmDelete({ isOpen: true, id, nombre });
   };
 
   const confirmDeleteAction = async () => {
-    try {
-      await nombreMarcaService.deleteNombreMarca(confirmDelete.id);
-      showErrorNotif('Marca eliminada exitosamente');
-      await loadNombreMarcas();
-    } catch (err) {
-      console.error('Error al eliminar marca:', err);
-      setError('Error al eliminar la marca.');
-    }
+    deleteMutation.mutate(confirmDelete.id);
+    setConfirmDelete({ isOpen: false, id: null, nombre: '' });
   };
 
+  const displayError = error || (queryError ? 'Error al cargar las marcas. Verifica que el backend esté corriendo.' : null);
+
   if (loading) {
-    return null;
+    return (
+      <div className="p-4 animate-pulse">
+        <div className="h-8 bg-gray-200 rounded w-48 mb-6"></div>
+        <div className="bg-white border border-gray-200 shadow-sm">
+          <div className="p-4 space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-12 bg-gray-100 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -70,8 +58,8 @@ const NombreMarcaList = () => {
       </div>
 
       {/* Error */}
-      {error && (
-        <ErrorAlert error={error} onClose={clearError} title="Error" />
+      {displayError && (
+        <ErrorAlert error={displayError} onClose={clearError} title="Error" />
       )}
 
       {/* Tabla */}

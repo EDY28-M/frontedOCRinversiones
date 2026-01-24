@@ -1,43 +1,32 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { categoryService } from '../../../services/productService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
-import { useNotification } from '../../../context/NotificationContext';
+import { useCategory, useUpdateCategory } from '../../../hooks/useCategories';
 
 const CategoriasEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { info } = useNotification();
+  
+  const { data: categoria, isLoading: loadingData, error: queryError } = useCategory(id);
+  const updateMutation = useUpdateCategory();
+  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
   });
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
   const clearError = useCallback(() => setError(null), []);
 
+  // Poblar formulario cuando carga la categoría
   useEffect(() => {
-    loadCategoria();
-  }, [id]);
-
-  const loadCategoria = async () => {
-    try {
-      setLoading(true);
-      const data = await categoryService.getCategoryById(id);
+    if (categoria) {
       setFormData({
-        name: data.name || '',
-        description: data.description || '',
+        name: categoria.name || '',
+        description: categoria.description || '',
       });
-      setError(null);
-    } catch (err) {
-      console.error('Error al cargar categoría:', err);
-      setError('Error al cargar la categoría');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [categoria]);
 
   const handleChange = (e) => {
     setFormData({
@@ -55,21 +44,33 @@ const CategoriasEdit = () => {
       return;
     }
 
-    try {
-      setSaving(true);
-      await categoryService.updateCategory(id, formData);
-      info('Categoría actualizada exitosamente');
-      navigate('/admin/categorias');
-    } catch (err) {
-      console.error('Error al actualizar categoría:', err);
-      setError(err.response?.data?.message || 'Error al actualizar la categoría');
-    } finally {
-      setSaving(false);
-    }
+    updateMutation.mutate(
+      { id, categoryData: formData },
+      {
+        onSuccess: () => {
+          navigate('/admin/categorias');
+        },
+        onError: (err) => {
+          setError(err.response?.data?.message || 'Error al actualizar la categoría');
+        },
+      }
+    );
   };
 
+  const loading = loadingData;
+  const saving = updateMutation.isPending;
+  const displayError = error || (queryError ? 'Error al cargar la categoría' : null);
+
   if (loading) {
-    return null;
+    return (
+      <div className="p-4 animate-pulse">
+        <div className="h-8 bg-gray-200 rounded w-48 mb-6"></div>
+        <div className="bg-white border border-gray-200 shadow-sm p-6 space-y-4">
+          <div className="h-10 bg-gray-200 rounded"></div>
+          <div className="h-24 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -79,7 +80,7 @@ const CategoriasEdit = () => {
         <h1 className="text-xl font-bold text-slate-900 uppercase tracking-wide">
           Editar Categoría
         </h1>
-        <p className="text-slate-500 text-sm mt-1">Modificar datos de la categoría #{id}</p>
+        <p className="text-slate-500 text-sm mt-1">Modificar datos de la categoría</p>
       </div>
 
       {/* Formulario */}
@@ -91,8 +92,8 @@ const CategoriasEdit = () => {
         </div>
         
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {error && (
-            <ErrorAlert error={error} onClose={clearError} title="Error" />
+          {displayError && (
+            <ErrorAlert error={displayError} onClose={clearError} title="Error" />
           )}
 
           <div>

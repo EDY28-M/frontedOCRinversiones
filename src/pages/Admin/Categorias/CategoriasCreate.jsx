@@ -1,17 +1,16 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { categoryService } from '../../../services/productService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
-import { useNotification } from '../../../context/NotificationContext';
+import { useCreateCategory } from '../../../hooks/useCategories';
 
 const CategoriasCreate = () => {
   const navigate = useNavigate();
-  const { warning } = useNotification();
+  const createMutation = useCreateCategory();
+  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const clearError = useCallback(() => setError(null), []);
@@ -32,43 +31,31 @@ const CategoriasCreate = () => {
       return;
     }
 
-    try {
-      setLoading(true);
-      
-      // Asegurar que se envían los campos correctos con capitalización
-      const payload = {
-        Name: formData.name.trim(),
-        Description: formData.description?.trim() || null
-      };
-      
-      console.log('📦 Enviando categoría:', payload);
-      
-      await categoryService.createCategory(payload);
-      warning('Categoría creada exitosamente');
-      navigate('/admin/categorias');
-    } catch (err) {
-      console.error('❌ Error completo:', err);
-      console.error('❌ Error response:', err.response);
-      
-      // Extraer mensaje de error del backend
-      let errorMessage = 'Error al crear la categoría';
-      
-      if (err.response?.data) {
-        if (err.response.data.errors) {
-          const errors = Object.values(err.response.data.errors).flat();
-          errorMessage = errors.join(', ');
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        } else if (typeof err.response.data === 'string') {
-          errorMessage = err.response.data;
+    const payload = {
+      Name: formData.name.trim(),
+      Description: formData.description?.trim() || null
+    };
+    
+    createMutation.mutate(payload, {
+      onSuccess: () => {
+        navigate('/admin/categorias');
+      },
+      onError: (err) => {
+        let errorMessage = 'Error al crear la categoría';
+        if (err.response?.data) {
+          if (err.response.data.errors) {
+            const errors = Object.values(err.response.data.errors).flat();
+            errorMessage = errors.join(', ');
+          } else if (err.response.data.message) {
+            errorMessage = err.response.data.message;
+          }
         }
-      }
-      
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+        setError(errorMessage);
+      },
+    });
   };
+
+  const loading = createMutation.isPending;
 
   return (
     <div className="p-4 ">
