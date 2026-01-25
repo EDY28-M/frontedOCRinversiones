@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { productService, categoryService } from '../../../services/productService';
+import { categoryService } from '../../../services/productService';
+import { useAvailableProducts } from '../../../hooks/useProducts';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 
 const ProductosDestacados = () => {
-  const [productos, setProductos] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
   
@@ -14,116 +14,54 @@ const ProductosDestacados = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(12);
 
+  // Debounce para búsqueda
   useEffect(() => {
-    loadData();
-  }, []);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1); // Reset página al buscar
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [productsData, categoriesData] = await Promise.all([
-        productService.getAllProducts(),
-        categoryService.getAllCategories()
-      ]);
-      
-      console.log('📦 Total productos cargados:', productsData.length);
-      
-      // Debug: mostrar estructura del primer producto
-      if (productsData.length > 0) {
-        console.log('🔍 Estructura del primer producto:', productsData[0]);
-        console.log('🔍 Campos de imagen del primer producto:', {
-          imagenPrincipal: productsData[0].imagenPrincipal,
-          imagen2: productsData[0].imagen2,
-          imagen3: productsData[0].imagen3,
-          imagen4: productsData[0].imagen4,
-          imagenes: productsData[0].imagenes
-        });
-      }
-      
-      // Debug: mostrar productos con imágenes
-      const productsWithImages = productsData.filter(p => 
-        (p.imagenes && p.imagenes.length > 0) || 
-        p.imagenPrincipal || 
-        p.imagen2 || 
-        p.imagen3 || 
-        p.imagen4
-      );
-      console.log('🖼️ Productos CON imágenes:', productsWithImages.length);
-      if (productsWithImages.length > 0) {
-        console.log('🖼️ Primer producto con imagen:', productsWithImages[0]);
-      }
-      
-      // Ordenar productos: primero los que tienen imagen
-      const sortedProducts = productsData.sort((a, b) => {
-        const aHasImage = (a.imagenes && a.imagenes.length > 0) || a.imagenPrincipal || a.imagen2 || a.imagen3 || a.imagen4;
-        const bHasImage = (b.imagenes && b.imagenes.length > 0) || b.imagenPrincipal || b.imagen2 || b.imagen3 || b.imagen4;
-        if (aHasImage && !bHasImage) return -1;
-        if (!aHasImage && bHasImage) return 1;
-        return 0;
-      });
-      
-      console.log('✅ Productos ordenados. Primeros 3:', sortedProducts.slice(0, 3).map(p => ({
-        id: p.id,
-        producto: p.producto,
-        hasImages: p.imagenes && p.imagenes.length > 0,
-        imageCount: p.imagenes?.length || 0
-      })));
-      
-      setProductos(sortedProducts);
-      setCategories(categoriesData);
-    } catch (err) {
-      console.error('Error al cargar datos:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Filtrado de productos
-  const filteredProducts = productos.filter(producto => {
-    // Filtro por categoría
-    if (selectedCategory) {
-      const productCategory = producto.categoryName || producto.categoria || producto.category?.nombre || producto.category;
-      if (productCategory !== selectedCategory) {
-        return false;
-      }
-    }
-    
-    // Filtro por búsqueda
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      const matchCodigo = producto.codigo?.toString().toLowerCase().includes(term);
-      const matchCodigoComer = producto.codigoComer?.toString().toLowerCase().includes(term);
-      const matchProducto = producto.producto?.toLowerCase().includes(term);
-      const matchMarca = producto.marcaNombre?.toLowerCase().includes(term);
-      const matchCategoria = (producto.categoryName || producto.categoria || producto.category?.nombre || producto.category)?.toLowerCase().includes(term);
-      
-      if (!matchCodigo && !matchCodigoComer && !matchProducto && !matchMarca && !matchCategoria) {
-        return false;
-      }
-    }
-    
-    return true;
-  });
-
-  // Paginación
-  const totalPages = Math.ceil(filteredProducts.length / pageSize);
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
-
-  // Reset página al cambiar filtros
+  // Reset página al cambiar categoría
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedCategory]);
+  }, [selectedCategory]);
+
+  // Obtener categoryId desde nombre
+  const getCategoryId = () => {
+    if (!selectedCategory) return null;
+    const cat = categories.find(c => (c.name || c.nombre) === selectedCategory);
+    return cat?.id || null;
+  };
+
+  // Query de productos disponibles con paginación del backend
+  const { 
+    data: productsData, 
+    isLoading, 
+    isFetching,
+    refetch 
+  } = useAvailableProducts({
+    page: currentPage,
+    pageSize,
+    q: debouncedSearch,
+    categoryId: getCategoryId(),
+  });
+
+  // Cargar categorías al montar
+  useEffect(() => {
+    categoryService.getAllCategories()
+      .then(setCategories)
+      .catch(err => console.error('Error al cargar categorías:', err));
+  }, []);
+
+  // Datos de la respuesta paginada
+  const productos = productsData?.items || [];
+  const total = productsData?.total || 0;
+  const totalPages = productsData?.totalPages || 1;
 
   // Obtener URL de primera imagen o null
   const getFirstImageUrl = (producto) => {
-    // Primero intentar con array de imágenes (si existe)
-    if (producto.imagenes && producto.imagenes.length > 0) {
-      return producto.imagenes[0].url || producto.imagenes[0].imagenUrl;
-    }
-    
     // Luego intentar con campos individuales (orden: imagenPrincipal, imagen2, imagen3, imagen4)
     if (producto.imagenPrincipal) return producto.imagenPrincipal;
     if (producto.imagen2) return producto.imagen2;
@@ -133,12 +71,31 @@ const ProductosDestacados = () => {
     return null;
   };
 
-  if (loading) {
+  // Skeleton loader mientras carga inicialmente
+  if (isLoading && !productsData) {
     return (
-      <div className="p-4 flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">Cargando productos...</p>
+      <div className="p-4">
+        <div className="flex flex-col md:flex-row gap-4 mb-6 items-start md:items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-slate-900 uppercase tracking-wide">
+              Productos Disponibles
+            </h1>
+            <p className="text-slate-500 text-sm mt-1">
+              Gestiona los productos que se mostrarán en la página principal
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="bg-white rounded-lg border border-gray-100 shadow-sm animate-pulse">
+              <div className="w-full pt-[100%] bg-gray-200"></div>
+              <div className="p-4">
+                <div className="h-3 bg-gray-200 rounded w-1/3 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -159,12 +116,12 @@ const ProductosDestacados = () => {
         
         {/* Botón de Refresh */}
         <button
-          onClick={loadData}
+          onClick={() => refetch()}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors shadow-sm"
-          disabled={loading}
+          disabled={isFetching}
         >
-          <span className="material-symbols-outlined text-[20px]">
-            {loading ? 'progress_activity' : 'refresh'}
+          <span className={`material-symbols-outlined text-[20px] ${isFetching ? 'animate-spin' : ''}`}>
+            {isFetching ? 'progress_activity' : 'refresh'}
           </span>
           <span className="font-medium">Actualizar</span>
         </button>
@@ -202,8 +159,9 @@ const ProductosDestacados = () => {
       <div className="bg-white border border-gray-200 shadow-sm flex flex-col">
         {/* Header interno con paginación */}
         <div className="p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4 bg-gray-50/50">
-          <div className="text-sm text-slate-600 font-mono">
-            Mostrando <span className="font-bold">{paginatedProducts.length}</span> de <span className="font-bold">{filteredProducts.length}</span> productos
+        <div className="text-sm text-slate-600 font-mono">
+            Mostrando <span className="font-bold">{productos.length}</span> de <span className="font-bold">{total}</span> productos
+            {isFetching && <span className="ml-2 text-blue-600">Actualizando...</span>}
           </div>
           
           {/* Paginación */}
@@ -293,14 +251,14 @@ const ProductosDestacados = () => {
 
         {/* Grid de productos */}
         <div className="p-6">
-          {paginatedProducts.length === 0 ? (
+          {productos.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-slate-500 text-lg">No se encontraron productos</p>
+              <p className="text-slate-500 text-lg">No se encontraron productos con imágenes</p>
               <p className="text-slate-400 text-sm mt-2">Intenta con otros filtros de búsqueda</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {paginatedProducts.map((producto) => {
+              {productos.map((producto) => {
                 const imageUrl = getFirstImageUrl(producto);
                 const hasImage = imageUrl !== null;
                 

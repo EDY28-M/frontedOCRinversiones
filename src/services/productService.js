@@ -61,6 +61,16 @@ export const productService = {
     });
     return response.data;
   },
+
+  // Obtener productos disponibles (con imágenes) paginados
+  getAvailableProducts: async ({ page = 1, pageSize = 12, q = '', categoryId = null, onlyWithImages = true } = {}) => {
+    const params = { page, pageSize, onlyWithImages };
+    if (q) params.q = q;
+    if (categoryId) params.categoryId = categoryId;
+    
+    const response = await axiosInstance.get('/products/available', { params });
+    return response.data;
+  },
 };
 
 export const categoryService = {

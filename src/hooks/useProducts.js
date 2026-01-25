@@ -9,7 +9,23 @@ export const productKeys = {
   lists: () => [...productKeys.all, 'list'],
   list: (filters) => [...productKeys.lists(), filters],
   detail: (id) => [...productKeys.all, 'detail', id],
+  available: () => [...productKeys.all, 'available'],
+  availableList: (filters) => [...productKeys.available(), filters],
 };
+
+/**
+ * Hook para obtener productos disponibles (con imágenes) con paginación del backend
+ * Usado en ProductosDestacados
+ */
+export function useAvailableProducts({ page = 1, pageSize = 12, q = '', categoryId = null } = {}) {
+  return useQuery({
+    queryKey: productKeys.availableList({ page, pageSize, q, categoryId }),
+    queryFn: () => productService.getAvailableProducts({ page, pageSize, q, categoryId }),
+    staleTime: 30000,
+    refetchOnWindowFocus: false,
+    placeholderData: (previousData) => previousData, // Mantener data anterior durante transición
+  });
+}
 
 /**
  * Hook para obtener productos con React Query
