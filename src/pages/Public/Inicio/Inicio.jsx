@@ -17,11 +17,11 @@ export default function Inicio() {
       <div className="relative flex flex-col w-full">
         
         {/* ==================== HEADER ==================== */}
-        <header className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-sm border-b border-border-light">
-          <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-            <div className="flex items-center justify-between h-24 header-container">
+        <header className="fixed top-0 left-0 w-full z-10 bg-white/95 backdrop-blur-sm border-b border-border-light">
+          <div className="page-container">
+            <div className="flex items-center justify-between h-20 header-container">
               {/* Logo */}
-              <Link to="/" className="flex items-center gap-3">
+              <Link to="/" className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary text-4xl">settings_b_roll</span>
                 <div>
                   <h2 className="text-primary text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h2>
@@ -72,14 +72,14 @@ export default function Inicio() {
         </header>
 
         {/* ==================== HERO SECTION ==================== */}
-        <section className="relative pt-24 w-full flex items-center bg-gray-50 hero-section min-h-[520px] md:min-h-[560px] lg:min-h-[620px]">
+        <section className="relative pt-20 w-full flex items-center bg-gray-50 hero-section min-h-[440px] md:min-h-[480px] lg:min-h-[520px]">
           <div 
             className="absolute inset-0 bg-cover bg-right-top lg:bg-center"
             style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD6aAXIdmyLI-VmCXw3ei_O2zxFd3rS23EzoNgVy2bM29doMxteKy20xdnHGoyxgk3v6WTCBHQV3_4Qu6wUXCNuEJ_z74Uwou0NfbTNsLj9y7FkqjljGkoy-dD_YFD0VoE3u9sr-5eZig13qFKJlVICqakLnr_XhnClKNmm9NL-ly8QQV2BTpyXoOmegxS1ERjSJGJPJem1L8oO4Q6raqhn4EoVcs7PB0opGaRNkq179ClmDVzPV2UN2S3RQF4EAWBBAVOHnWjPnVQ")', backgroundSize: 'cover'}}
           >
             <div className="absolute inset-0 bg-white/80"></div>
           </div>
-          <div className="relative z-10 w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+          <div className="relative z-10 w-full page-container py-10 md:py-12">
             <div className="max-w-[580px]">
               <div className="inline-block px-3 py-1 bg-blue-50 border border-blue-100 text-xs font-bold uppercase tracking-wider text-primary mb-4">
                 Líderes en Importación
@@ -104,7 +104,7 @@ export default function Inicio() {
 
         {/* ==================== FEATURES SECTION ==================== */}
         <section className="w-full bg-white border-b border-gray-100">
-          <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-14">
+          <div className="page-container py-10 md:py-12">
             <div className="grid md:grid-cols-3 gap-6 md:gap-8">
               {/* Feature 1 */}
               <div className="flex items-start gap-4">
@@ -141,8 +141,8 @@ export default function Inicio() {
         </section>
 
         {/* ==================== PRODUCTS SECTION ==================== */}
-        <section className="bg-surface-alt py-16 md:py-20 border-t border-border-light">
-          <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="bg-surface-alt py-14 md:py-16 border-t border-border-light">
+          <div className="page-container">
             {/* Section Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 md:mb-12 gap-4">
               <div>
@@ -326,8 +326,8 @@ export default function Inicio() {
         </section>
 
         {/* ==================== FOOTER ==================== */}
-        <footer className="bg-primary text-white pt-12 md:pt-14 pb-6 border-t-4 border-accent">
-          <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+        <footer className="bg-primary text-white pt-10 md:pt-12 pb-6 border-t-4 border-accent">
+          <div className="page-container">
             <div className="grid md:grid-cols-4 gap-8 md:gap-10 mb-10 md:mb-12 footer-grid">
               {/* Logo Column */}
               <div className="col-span-1 md:col-span-1">

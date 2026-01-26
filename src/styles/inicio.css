@@ -7,10 +7,41 @@
 /* ========================================
    WRAPPER PRINCIPAL - SCROLL GARANTIZADO
    ======================================== */
+
+   
 .inicio-wrapper {
   width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+/* ========================================
+   CONTAINER GLOBAL - ALINEACIÓN CONSISTENTE
+   Un solo container para todo el contenido.
+   Reduce gutters y alinea logo con hero.
+   ======================================== */
+.page-container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;    /* 16px móvil */
+  padding-right: 1rem;
+}
+
+
+@media (min-width: 640px) {
+  .page-container {
+    padding-left: 1.5rem;  /* 24px tablet */
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-container {
+    padding-left: 2rem;    /* 32px desktop */
+    padding-right: 2rem;
+  }
 }
 
 /* ========================================
@@ -98,7 +129,7 @@
    ======================================== */
 @media (min-width: 1024px) {
   .hero-section {
-    min-height: 560px;
+    min-height: 480px;
   }
 }
 
@@ -107,6 +138,6 @@
    ======================================== */
 @media (min-width: 1440px) {
   .hero-section {
-    min-height: 620px;
+    min-height: 540px;
   }
 }
