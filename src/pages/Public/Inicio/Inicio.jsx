@@ -85,7 +85,7 @@ export default function Inicio() {
                 Líderes en Importación
               </div>
               <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium uppercase text-black tracking-tight leading-none mb-4 md:mb-5">
-                Expertos en <br/><span className="text-primary">Repuestos</span> Coreanos, <span className="text-primary">Japoneses</span> y Chinos
+                Expertos en <br/><span className="text-primary">Repuestos</span> <br/>Coreanos y <br/><span className="text-primary">Chinos</span>
               </h1>
               <p className="text-base md:text-lg text-gray-700 max-w-md font-normal mb-6 md:mb-8 leading-relaxed border-l-4 border-accent pl-5">
                 Más de 15 años de experiencia atendiendo talleres y flotas en Ate, Lima. Calidad garantizada para tu motor.
