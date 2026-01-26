@@ -9,6 +9,10 @@ import AdminLayout from '../layouts/AdminLayout/AdminLayout';
 import VendedorLayout from '../layouts/VendedorLayout/VendedorLayout';
 
 // Public Pages
+import Inicio from '../pages/Public/Inicio/Inicio';
+import Productos from '../pages/Public/Productos/Productos';
+import Servicios from '../pages/Public/Servicios/Servicios';
+import Nosotros from '../pages/Public/Nosotros/Nosotros';
 import Home from '../pages/Public/Home/Home';
 import About from '../pages/Public/About/About';
 import Contact from '../pages/Public/Contact/Contact';
@@ -57,11 +61,17 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* PUBLIC ROUTES */}
-        <Route path="/" element={<PublicLayout />}>
-          <Route index element={<Home />} />
-          <Route path="nosotros" element={<About />} />
-          <Route path="servicios" element={<Home />} />
+        {/* ========================================
+            RUTAS PÚBLICAS - Diseño Pixel-Perfect
+            Sin layout wrapper (cada página tiene header/footer propio)
+            ======================================== */}
+        <Route path="/" element={<Inicio />} />
+        <Route path="/productos" element={<Productos />} />
+        <Route path="/servicios" element={<Servicios />} />
+        <Route path="/nosotros" element={<Nosotros />} />
+
+        {/* Rutas legacy con PublicLayout (contacto usa el diseño antiguo) */}
+        <Route element={<PublicLayout />}>
           <Route path="contacto" element={<Contact />} />
         </Route>
 

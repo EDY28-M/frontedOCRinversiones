@@ -1,16 +1,9 @@
 /* 
  * App.css - Estilos específicos de la aplicación
- * NOTA: No usar max-width, margin:auto o padding en #root para admin panels
+ * NO agregar max-width, margin:auto o padding a #root
  */
 
-#root {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-/* Estilos para logos (si se usan) */
+/* Estilos para logos legacy (si se usan) */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -37,12 +30,4 @@
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }

@@ -1,0 +1,102 @@
+/* ========================================
+   ESTILOS PIXEL-PERFECT PARA INICIO
+   Migración fiel del HTML original (Google Stitch)
+   ======================================== */
+
+/* ========================================
+   WRAPPER PRINCIPAL - SCROLL GARANTIZADO
+   ======================================== */
+.inicio-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* NO overflow:hidden, NO height fija */
+}
+
+/* ========================================
+   HOVER EFFECTS
+   ======================================== */
+.grid-card:hover .card-img {
+  transform: scale(1.05);
+}
+
+/* ========================================
+   ELEMENTOS DECORATIVOS
+   ======================================== */
+.asymmetrical-line {
+  height: 120%;
+  width: 4px;
+  background-color: #001aff;
+  position: absolute;
+  left: -20px;
+  top: -10%;
+}
+
+/* ========================================
+   NEWSLETTER INPUT (FOOTER)
+   ======================================== */
+.newsletter-input {
+  background-color: transparent;
+  width: 100%;
+  outline: none;
+  color: white;
+  border: none;
+  padding: 0;
+}
+
+.newsletter-input::placeholder {
+  color: #93c5fd;
+}
+
+.newsletter-input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE (<=640px)
+   ======================================== */
+@media (max-width: 640px) {
+  .hero-section {
+    min-height: auto;
+    height: auto;
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+  }
+  
+  .product-card-content {
+    padding: 1.25rem;
+  }
+  
+  .header-container {
+    height: 4rem;
+  }
+  
+  .mobile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 0;
+    border-top: 1px solid #e5e7eb;
+  }
+}
+
+/* ========================================
+   RESPONSIVE - TABLET (641-1023px)
+   ======================================== */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .hero-section {
+    min-height: 65vh;
+    height: auto;
+  }
+}
+
+/* ========================================
+   RESPONSIVE - DESKTOP (>=1024px)
+   ======================================== */
+@media (min-width: 1024px) {
+  .hero-section {
+    min-height: 85vh;
+    height: auto;
+  }
+}

@@ -8,16 +8,24 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#F5C344", // Yellow Accent
-        secondary: "#002060", // Deep Blue
+        // Colores del diseño HTML (Google Stitch) - pixel-perfect
+        primary: "#001aff",
+        "primary-dark": "#0014cc",
+        accent: "#facc15",
+        "accent-hover": "#eab308",
+        surface: "#ffffff",
+        "surface-alt": "#f9fafb",
+        "text-main": "#111827",
+        "text-muted": "#6b7280",
+        "border-light": "#e5e7eb",
+        // Legacy
+        secondary: "#002060",
         "background-light": "#F3F4F6",
         "background-dark": "#111827",
-        "surface": "#ffffff",
-        "surface-alt": "#f8fafc",
       },
       fontFamily: {
-        sans: ['Montserrat', 'sans-serif'],
-        display: ['Inter', 'sans-serif'],
+        display: ['Oswald', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       boxShadow: {
