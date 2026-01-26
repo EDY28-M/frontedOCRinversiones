@@ -1,6 +1,7 @@
 /* ========================================
    ESTILOS PIXEL-PERFECT PARA INICIO
    Migración fiel del HTML original (Google Stitch)
+   Ajustes de escala para laptop sin cambiar diseño
    ======================================== */
 
 /* ========================================
@@ -10,7 +11,6 @@
   width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
-  /* NO overflow:hidden, NO height fija */
 }
 
 /* ========================================
@@ -59,25 +59,28 @@
 @media (max-width: 640px) {
   .hero-section {
     min-height: auto;
-    height: auto;
     padding-top: 5rem;
-    padding-bottom: 3rem;
+    padding-bottom: 2rem;
   }
   
   .product-card-content {
-    padding: 1.25rem;
+    padding: 1rem;
   }
   
   .header-container {
-    height: 4rem;
+    height: 3.5rem;
   }
   
   .mobile-menu {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    padding: 1rem 0;
+    padding: 0.75rem 0;
     border-top: 1px solid #e5e7eb;
+  }
+
+  .footer-grid {
+    gap: 1.5rem;
   }
 }
 
@@ -86,8 +89,7 @@
    ======================================== */
 @media (min-width: 641px) and (max-width: 1023px) {
   .hero-section {
-    min-height: 65vh;
-    height: auto;
+    min-height: 50vh;
   }
 }
 
@@ -96,7 +98,15 @@
    ======================================== */
 @media (min-width: 1024px) {
   .hero-section {
-    min-height: 85vh;
-    height: auto;
+    min-height: 560px;
+  }
+}
+
+/* ========================================
+   RESPONSIVE - LARGE DESKTOP (>=1440px)
+   ======================================== */
+@media (min-width: 1440px) {
+  .hero-section {
+    min-height: 620px;
   }
 }
