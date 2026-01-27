@@ -32,35 +32,51 @@ export default function Inicio() {
               <NavLink
                 to="/"
                 className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide relative pb-1 ${isActive ? 'text-primary font-bold nav-link-active' : 'hover:text-primary'}`
+                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
                 }
                 end
               >
-                INICIO
+                {({ isActive }) => (
+                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                    INICIO
+                  </span>
+                )}
               </NavLink>
               <NavLink
                 to="/productos"
                 className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide relative pb-1 ${isActive ? 'text-primary font-bold nav-link-active' : 'hover:text-primary'}`
+                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
                 }
               >
-                CATÁLOGO
+                {({ isActive }) => (
+                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                    CATÁLOGO
+                  </span>
+                )}
               </NavLink>
               <NavLink
                 to="/servicios"
                 className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide relative pb-1 ${isActive ? 'text-primary font-bold nav-link-active' : 'hover:text-primary'}`
+                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
                 }
               >
-                SERVICIOS
+                {({ isActive }) => (
+                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                    SERVICIOS
+                  </span>
+                )}
               </NavLink>
               <NavLink
                 to="/nosotros"
                 className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide relative pb-1 ${isActive ? 'text-primary font-bold nav-link-active' : 'hover:text-primary'}`
+                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
                 }
               >
-                EMPRESA
+                {({ isActive }) => (
+                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                    EMPRESA
+                  </span>
+                )}
               </NavLink>
             </nav>
             <div className="flex-1 max-w-sm hidden lg:block">
@@ -130,14 +146,14 @@ export default function Inicio() {
         )}
 
         {/* ==================== HERO SECTION ==================== */}
-        <section className="relative w-full flex items-center bg-gray-50 hero-section min-h-[440px] md:min-h-[480px] lg:min-h-[520px] pt-20">
+        <section className="relative w-full flex items-center bg-gray-50 hero-section min-h-[440px] md:min-h-[480px] lg:min-h-[520px] ">
           <div 
             className="absolute inset-0 bg-cover bg-right-top lg:bg-center"
             style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD6aAXIdmyLI-VmCXw3ei_O2zxFd3rS23EzoNgVy2bM29doMxteKy20xdnHGoyxgk3v6WTCBHQV3_4Qu6wUXCNuEJ_z74Uwou0NfbTNsLj9y7FkqjljGkoy-dD_YFD0VoE3u9sr-5eZig13qFKJlVICqakLnr_XhnClKNmm9NL-ly8QQV2BTpyXoOmegxS1ERjSJGJPJem1L8oO4Q6raqhn4EoVcs7PB0opGaRNkq179ClmDVzPV2UN2S3RQF4EAWBBAVOHnWjPnVQ")', backgroundSize: 'cover'}}
           >
             <div className="absolute inset-0 bg-white/80"></div>
           </div>
-          <div className="relative z-10 w-full page-container py-10 md:py-12">
+          <div className="relative z-10 w-full page-container py-10 md:py-1">
             <div className="max-w-[580px]">
               <div className="inline-block px-3 py-1 bg-blue-50 border border-blue-100 text-xs font-bold uppercase tracking-wider text-primary mb-4">
                 Líderes en Importación
@@ -384,7 +400,7 @@ export default function Inicio() {
         </section>
 
         {/* ==================== FOOTER ==================== */}
-        <footer className="bg-primary text-white pt-16 pb-8 border-t-4 border-accent">
+        <footer className="bg-primary text-white pt-8 pb-8 border-t-4 border-accent">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
               <div className="flex flex-col gap-6">

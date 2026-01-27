@@ -29,35 +29,51 @@ export default function Nosotros() {
               <NavLink
                 to="/"
                 className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide relative pb-1 ${isActive ? 'text-primary font-bold nav-link-active' : 'hover:text-primary'}`
+                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
                 }
                 end
               >
-                INICIO
+                {({ isActive }) => (
+                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                    INICIO
+                  </span>
+                )}
               </NavLink>
               <NavLink
                 to="/productos"
                 className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide relative pb-1 ${isActive ? 'text-primary font-bold nav-link-active' : 'hover:text-primary'}`
+                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
                 }
               >
-                CATÁLOGO
+                {({ isActive }) => (
+                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                    CATÁLOGO
+                  </span>
+                )}
               </NavLink>
               <NavLink
                 to="/servicios"
                 className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide relative pb-1 ${isActive ? 'text-primary font-bold nav-link-active' : 'hover:text-primary'}`
+                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
                 }
               >
-                SERVICIOS
+                {({ isActive }) => (
+                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                    SERVICIOS
+                  </span>
+                )}
               </NavLink>
               <NavLink
                 to="/nosotros"
                 className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide relative pb-1 ${isActive ? 'text-primary font-bold nav-link-active' : 'hover:text-primary'}`
+                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
                 }
               >
-                EMPRESA
+                {({ isActive }) => (
+                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                    EMPRESA
+                  </span>
+                )}
               </NavLink>
             </nav>
             <div className="flex-1 max-w-sm hidden lg:block">
