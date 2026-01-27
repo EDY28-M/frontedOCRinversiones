@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import '../../../styles/inicio.css';
 
 /**
@@ -17,62 +17,120 @@ export default function Inicio() {
       <div className="relative flex flex-col w-full">
         
         {/* ==================== HEADER ==================== */}
-        <header className="fixed top-0 left-0 w-full z-10 bg-white/95 backdrop-blur-sm border-b border-border-light">
-          <div className="page-container">
-            <div className="flex items-center justify-between h-20 header-container">
-              {/* Logo */}
-              <Link to="/" className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-4xl">settings_b_roll</span>
-                <div>
-                  <h2 className="text-primary text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h2>
-                  <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
-                </div>
-              </Link>
-              
-              {/* Nav Desktop */}
-              <nav className="hidden md:flex items-center gap-12">
-                <Link className="text-black hover:text-primary text-sm font-semibold uppercase tracking-widest transition-colors" to="/">Inicio</Link>
-                <Link className="text-gray-500 hover:text-primary text-sm font-semibold uppercase tracking-widest transition-colors" to="/productos">Productos</Link>
-                <Link className="text-gray-500 hover:text-primary text-sm font-semibold uppercase tracking-widest transition-colors" to="/servicios">Servicios</Link>
-              </nav>
-              
-              {/* Actions */}
-              <div className="flex items-center gap-6">
-                <button type="button" aria-label="Buscar">
-                  <span className="material-symbols-outlined text-gray-400 hover:text-primary cursor-pointer transition-colors text-xl">search</span>
-                </button>
-                <div className="relative cursor-pointer group">
-                  <span className="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors text-xl">shopping_bag</span>
-                  <span className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-accent rounded-full"></span>
-                </div>
-                
-                {/* Mobile menu button */}
-                <button
-                  type="button"
-                  className="md:hidden"
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  aria-label="Menú"
-                >
-                  <span className="material-symbols-outlined text-gray-600 text-2xl">
-                    {mobileMenuOpen ? 'close' : 'menu'}
-                  </span>
-                </button>
+        <header className="sticky top-0 z-50 w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+          <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
+            <div className="flex items-center gap-3 min-w-fit">
+              <div className="text-primary">
+                <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
+                <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
               </div>
             </div>
-            
-            {/* Mobile Nav */}
-            {mobileMenuOpen && (
-              <nav className="md:hidden mobile-menu">
-                <Link className="text-black hover:text-primary text-sm font-semibold uppercase tracking-widest py-2" to="/" onClick={() => setMobileMenuOpen(false)}>Inicio</Link>
-                <Link className="text-gray-500 hover:text-primary text-sm font-semibold uppercase tracking-widest py-2" to="/productos" onClick={() => setMobileMenuOpen(false)}>Productos</Link>
-                <Link className="text-gray-500 hover:text-primary text-sm font-semibold uppercase tracking-widest py-2" to="/servicios" onClick={() => setMobileMenuOpen(false)}>Servicios</Link>
-              </nav>
-            )}
+            <nav className="hidden md:flex items-center gap-8">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `text-xs font-semibold transition-colors tracking-wide relative pb-1 ${isActive ? 'text-primary font-bold nav-link-active' : 'hover:text-primary'}`
+                }
+                end
+              >
+                INICIO
+              </NavLink>
+              <NavLink
+                to="/productos"
+                className={({ isActive }) =>
+                  `text-xs font-semibold transition-colors tracking-wide relative pb-1 ${isActive ? 'text-primary font-bold nav-link-active' : 'hover:text-primary'}`
+                }
+              >
+                CATÁLOGO
+              </NavLink>
+              <NavLink
+                to="/servicios"
+                className={({ isActive }) =>
+                  `text-xs font-semibold transition-colors tracking-wide relative pb-1 ${isActive ? 'text-primary font-bold nav-link-active' : 'hover:text-primary'}`
+                }
+              >
+                SERVICIOS
+              </NavLink>
+              <NavLink
+                to="/nosotros"
+                className={({ isActive }) =>
+                  `text-xs font-semibold transition-colors tracking-wide relative pb-1 ${isActive ? 'text-primary font-bold nav-link-active' : 'hover:text-primary'}`
+                }
+              >
+                EMPRESA
+              </NavLink>
+            </nav>
+            <div className="flex-1 max-w-sm hidden lg:block">
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+                  <span className="material-symbols-outlined text-[20px]">search</span>
+                </div>
+                <input
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-100 rounded bg-gray-50 text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-primary/30 focus:ring-2 focus:ring-primary/10 transition-all"
+                  placeholder="Buscar refacción..."
+                  type="text"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 min-w-fit">
+              <button className="relative p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
+                <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
+                <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary ring-2 ring-white"></span>
+              </button>
+              <button className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
+                <span className="material-symbols-outlined text-[22px]">person</span>
+              </button>
+              <button
+                className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                <span className="material-symbols-outlined">menu</span>
+              </button>
+            </div>
           </div>
         </header>
 
+        {/* Mobile Filters Panel - Added for consistency with Productos page */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-white border-b border-border-light p-4">
+            <nav className="flex flex-col gap-2">
+              <Link
+                className="text-sm font-semibold py-2 hover:text-primary transition-colors"
+                to="/"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                INICIO
+              </Link>
+              <Link
+                className="text-sm font-semibold py-2 hover:text-primary transition-colors"
+                to="/productos"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                CATÁLOGO
+              </Link>
+              <Link
+                className="text-sm font-semibold py-2 hover:text-primary transition-colors"
+                to="/servicios"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                SERVICIOS
+              </Link>
+              <Link
+                className="text-sm font-semibold py-2 hover:text-primary transition-colors"
+                to="/nosotros"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                EMPRESA
+              </Link>
+            </nav>
+          </div>
+        )}
+
         {/* ==================== HERO SECTION ==================== */}
-        <section className="relative pt-20 w-full flex items-center bg-gray-50 hero-section min-h-[440px] md:min-h-[480px] lg:min-h-[520px]">
+        <section className="relative w-full flex items-center bg-gray-50 hero-section min-h-[440px] md:min-h-[480px] lg:min-h-[520px] pt-20">
           <div 
             className="absolute inset-0 bg-cover bg-right-top lg:bg-center"
             style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD6aAXIdmyLI-VmCXw3ei_O2zxFd3rS23EzoNgVy2bM29doMxteKy20xdnHGoyxgk3v6WTCBHQV3_4Qu6wUXCNuEJ_z74Uwou0NfbTNsLj9y7FkqjljGkoy-dD_YFD0VoE3u9sr-5eZig13qFKJlVICqakLnr_XhnClKNmm9NL-ly8QQV2BTpyXoOmegxS1ERjSJGJPJem1L8oO4Q6raqhn4EoVcs7PB0opGaRNkq179ClmDVzPV2UN2S3RQF4EAWBBAVOHnWjPnVQ")', backgroundSize: 'cover'}}
@@ -158,7 +216,7 @@ export default function Inicio() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 mb-5 md:mb-6">
               {/* Product 1 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/10] bg-gray-50 overflow-hidden relative">
+                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
                   <div className="absolute top-3 left-3 z-10 bg-primary text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide">Nuevo Ingreso</div>
                   <div 
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
@@ -176,7 +234,7 @@ export default function Inicio() {
               
               {/* Product 2 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/10] bg-gray-50 overflow-hidden relative">
+                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
                   <div 
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
                     style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWMAWvToIFkRoFwnnk91THA9_5-KISj2D2lLkINUUajOgny0MUJTRevcbFfE4ffled0VM9m2FiR7lPBmqbDrq7ZOyRyPx7CkpJc7ZsOq_jqJE5VSON8KmK9vNyYUCqj3P6pAqitBBfK5WjeS7jAzOjCvbRHDpMyhX8McZm8tASV3Z_qO8eZLfgtLa0oBASCgNBQFor6Qt1o3NVPBCyA_Lv240urrsbUok6MymoFe0QMjuYNHN4DCmteOS6tQXH3_qm8HtZYYVrQH8")'}}
@@ -193,7 +251,7 @@ export default function Inicio() {
               
               {/* Product 3 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/10] bg-gray-50 overflow-hidden relative">
+                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
                   <div 
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
                     style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuC9ZUK9avxLOWJMPmubQ7FSWpvK4v9FqGO9XByps9EwAABjTCrEGZ9LSpUb0A7hCOIzY13xLeTwFq-COOYilpizU7k3veeb9U2am24iQyn4z08dWbuK7He_DLfUdouNugD-fkoRxNq-m0rmroVDhTUo_M-PiBfn7H4-qQMyMf4oGNX1BeKYE1r2TjedKCAKjxLGrSNcjOvQuiEsUvVoy1cvbDIH1e3Vodc9bWM3ZmSfJakB2iGqztRv3EMa9O0JG-BPWQhwZiXt3l4")'}}
@@ -213,7 +271,7 @@ export default function Inicio() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 mb-5 md:mb-6">
               {/* Product 4 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/10] bg-gray-50 overflow-hidden relative">
+                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
                   <div 
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
                     style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCI4I3eZaFebtNXfF09qbIawl3RLDBWRPRrwUsTxy0PqBvJkkGMHcb8q6Kc5Ac0wGIbt7uaRT-fbJhQfUhS0seUIz42TrIDFo-ZL7LwAo7cTbOa0wkb4_HGYTuIu1wYkmnOOhHCN54lH9eeacQliY-2DEiIpVlAcq85LPX6x4trLT1xEv5ugDVJCwgsDalt0HU-9xJ1Wv-E7qCBGB6siN2YWWOjc41dgX77bzvuPMFLfMBz35POMYgqCWyieJe7GzcSK5KsCRxjaJw")'}}
@@ -230,7 +288,7 @@ export default function Inicio() {
               
               {/* Product 5 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/10] bg-gray-50 overflow-hidden relative">
+                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
                   <div className="absolute top-3 left-3 z-10 bg-accent text-black text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide">Oferta</div>
                   <div 
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
@@ -248,7 +306,7 @@ export default function Inicio() {
               
               {/* Product 6 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/10] bg-gray-50 overflow-hidden relative">
+                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
                   <div 
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
                     style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCI4I3eZaFebtNXfF09qbIawl3RLDBWRPRrwUsTxy0PqBvJkkGMHcb8q6Kc5Ac0wGIbt7uaRT-fbJhQfUhS0seUIz42TrIDFo-ZL7LwAo7cTbOa0wkb4_HGYTuIu1wYkmnOOhHCN54lH9eeacQliY-2DEiIpVlAcq85LPX6x4trLT1xEv5ugDVJCwgsDalt0HU-9xJ1Wv-E7qCBGB6siN2YWWOjc41dgX77bzvuPMFLfMBz35POMYgqCWyieJe7GzcSK5KsCRxjaJw")'}}
@@ -268,7 +326,7 @@ export default function Inicio() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
               {/* Product 7 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/10] bg-gray-50 overflow-hidden relative">
+                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
                   <div 
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
                     style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAZrZnjIbfruTcQ67At8BnfOhwm0LdgFGKAxmh0KeaO7o1rvRGBccicqZdET1-qF0NpFs34xbf9OEHKxruLtbFj1McFrZk32hNO7TgIyFGBgGOGH1JcDggh544mmzKO-TCeuOmoeIQ9k7BYL-9ErS5S2IiwxWysdybGWLAO5WUpVItN-FeDnHNi4YjF7aIQZP7E9W7dyRoc3T1yxWdFzQKyIjalYpmtlNS57H7OxOSmoqqMf1KlK_2849hx6w9SeF47z5s77UFMv0Q")'}}
@@ -285,7 +343,7 @@ export default function Inicio() {
               
               {/* Product 8 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/10] bg-gray-50 overflow-hidden relative">
+                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
                   <div 
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
                     style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDC2wkKD1tTrebuIADqe4wsmcbuo8iwOn2EkC9GcZ4KXeqgTYm6yiP1sbLiMtpnlthbUoMdhfNRvqXzqdMK63iSnruSPHSEaJueHdhsG_kN_VhJ2agV4g6EfuVskybENJ_kQb5tR_KVXjaRU4VrjJXgk6Dcqa5-c9HfvwXgea0n5piQaHjoL3bL1cdAQf4qZyjMYPZNcPcdUIKN96qmDYZlj3Lr5-dtJOqWGeJV8dfM09T43y6AARGTYctu0-MVSKum0b5S4bRSuaw")'}}
@@ -302,7 +360,7 @@ export default function Inicio() {
               
               {/* Product 9 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/10] bg-gray-50 overflow-hidden relative">
+                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
                   <div 
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
                     style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWMAWvToIFkRoFwnnk91THA9_5-KISj2D2lLkINUUajOgny0MUJTRevcbFfE4ffled0VM9m2FiR7lPBmqbDrq7ZOyRyPx7CkpJc7ZsOq_jqJE5VSON8KmK9vNyYUCqj3P6pAqitBBfK5WjeS7jAzOjCvbRHDpMyhX8McZm8tASV3Z_qO8eZLfgtLa0oBASCgNBQFor6Qt1o3NVPBCyA_Lv240urrsbUok6MymoFe0QMjuYNHN4DCmteOS6tQXH3_qm8HtZYYVrQH8")'}}
@@ -326,59 +384,71 @@ export default function Inicio() {
         </section>
 
         {/* ==================== FOOTER ==================== */}
-        <footer className="bg-primary text-white pt-10 md:pt-12 pb-6 border-t-4 border-accent">
-          <div className="page-container">
-            <div className="grid md:grid-cols-4 gap-8 md:gap-10 mb-10 md:mb-12 footer-grid">
-              {/* Logo Column */}
-              <div className="col-span-1 md:col-span-1">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="material-symbols-outlined text-accent text-2xl">settings_b_roll</span>
-                  <span className="text-xl font-display font-bold uppercase tracking-tight text-white">ORC <span className="text-accent text-xs align-middle">Inversiones</span></span>
+        <footer className="bg-primary text-white pt-16 pb-8 border-t-4 border-accent">
+          <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center gap-3">
+                  <div className="text-accent">
+                    <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
+                  </div>
+                  <h1 className="text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
+                  <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
                 </div>
-                <p className="text-blue-100 text-sm leading-relaxed">
-                  Soluciones integrales en repuestos automotrices. <br/>Calidad y confianza en cada kilómetro.
+                <p className="text-sm text-gray-200 leading-relaxed">
+                  Líderes en refacciones de alto rendimiento para entusiastas del motor. Calidad garantizada en cada pieza.
                 </p>
+                <div className="flex gap-4">
+                  <a className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
+                    <span className="text-xs font-bold">IG</span>
+                  </a>
+                  <a className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
+                    <span className="text-xs font-bold">FB</span>
+                  </a>
+                  <a className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
+                    <span className="text-xs font-bold">TW</span>
+                  </a>
+                </div>
               </div>
-              
-              {/* Navigation Column */}
               <div>
-                <h4 className="font-bold uppercase mb-4 text-xs tracking-widest text-accent">Navegación</h4>
-                <ul className="space-y-2 text-sm text-blue-100">
-                  <li><Link className="hover:text-white transition-colors" to="/">Inicio</Link></li>
-                  <li><Link className="hover:text-white transition-colors" to="/productos">Productos</Link></li>
-                  <li><Link className="hover:text-white transition-colors" to="/servicios">Servicios</Link></li>
+                <h4 className="text-sm font-bold text-accent uppercase tracking-wider mb-6">Nuestra Empresa</h4>
+                <ul className="space-y-4">
+                  <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/nosotros">Sobre Nosotros</Link></li>
+                  <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/contacto">Carreras</Link></li>
+                  <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Blog Automotriz</a></li>
+                  <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Socios Comerciales</a></li>
                 </ul>
               </div>
-              
-              {/* Contact Column */}
               <div>
-                <h4 className="font-bold uppercase mb-4 text-xs tracking-widest text-accent">Contacto</h4>
-                <ul className="space-y-2 text-sm text-blue-100">
-                  <li><a className="hover:text-white transition-colors" href="#">Ate, Lima - Perú</a></li>
-                  <li><a className="hover:text-white transition-colors" href="mailto:ventas@orcinversiones.com">ventas@orcinversiones.com</a></li>
-                  <li><a className="hover:text-white transition-colors" href="tel:+51999999999">+51 999 999 999</a></li>
+                <h4 className="text-sm font-bold text-accent uppercase tracking-wider mb-6">Políticas</h4>
+                <ul className="space-y-4">
+                  <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Envíos y Entregas</a></li>
+                  <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Devoluciones</a></li>
+                  <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Garantía de Piezas</a></li>
+                  <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Términos de Servicio</a></li>
                 </ul>
               </div>
-              
-              {/* Newsletter Column */}
               <div>
-                <h4 className="font-bold uppercase mb-4 text-xs tracking-widest text-accent">Boletín</h4>
-                <form className="flex border-b border-blue-400 pb-2">
-                  <input 
-                    className="newsletter-input text-sm" 
-                    placeholder="Correo electrónico" 
-                    type="email"
-                    aria-label="Correo electrónico para boletín"
-                  />
-                  <button className="text-accent font-bold uppercase text-xs hover:text-white transition-colors whitespace-nowrap" type="submit">Suscribir</button>
-                </form>
+                <h4 className="text-sm font-bold text-accent uppercase tracking-wider mb-6">Contacto</h4>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <span className="material-symbols-outlined text-accent text-lg mt-0.5">location_on</span>
+                    <span className="text-sm text-gray-200">Av. Revolución 1234, CDMX, México</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-accent text-lg">mail</span>
+                    <a className="text-sm text-gray-200 hover:text-white" href="mailto:ventas@estructurapro.com">ventas@estructurapro.com</a>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-accent text-lg">call</span>
+                    <span className="text-sm text-gray-200">+52 55 1234 5678</span>
+                  </li>
+                </ul>
               </div>
             </div>
-            
-            {/* Footer Bottom */}
-            <div className="flex flex-col md:flex-row justify-between items-center border-t border-blue-800 pt-6 text-[10px] text-blue-200 uppercase tracking-widest gap-3">
+            <div className="flex flex-col md:flex-row justify-between items-center border-t border-blue-800 pt-8 text-[10px] text-blue-200 uppercase tracking-widest gap-4">
               <p>© 2024 ORC Inversiones Perú. Todos los derechos reservados.</p>
-              <div className="flex gap-5">
+              <div className="flex gap-6">
                 <a className="hover:text-white transition-colors" href="#">Facebook</a>
                 <a className="hover:text-white transition-colors" href="#">Instagram</a>
                 <a className="hover:text-white transition-colors" href="#">WhatsApp</a>

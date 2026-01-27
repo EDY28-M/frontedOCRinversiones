@@ -181,7 +181,7 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen bg-slate-50 font-display overflow-hidden">
+    <div className="flex h-screen w-screen bg-slate-50 font-admin overflow-hidden">
       {/* Backdrop para móvil */}
       {sidebarOpen && (
         <div 

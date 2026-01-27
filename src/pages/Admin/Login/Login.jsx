@@ -64,7 +64,7 @@ const Login = () => {
   };
 
   return (
-    <div className="h-screen w-full font-sans overflow-hidden bg-gray-900">
+    <div className="h-screen w-full font-admin overflow-hidden bg-gray-900">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
@@ -91,7 +91,7 @@ const Login = () => {
                 <h1 className="text-3xl font-extrabold text-secondary tracking-wide">
                   ORC
                 </h1>
-                <h2 className="text-lg font-bold text-primary tracking-tight">
+                <h2 className="text-lg font-bold text-accent tracking-tight">
                   INVERSIONES
                 </h2>
                 <h3 className="text-[0.6rem] font-bold text-gray-500 tracking-[0.3em] uppercase w-full">
@@ -187,7 +187,7 @@ const Login = () => {
               {/* Submit Button */}
               <div className="pt-2">
                 <button
-                  className="w-full flex justify-center py-4 px-4 border border-transparent text-sm font-extrabold text-secondary bg-primary hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 uppercase tracking-widest rounded-none shadow-md hover:shadow-lg active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex justify-center py-4 px-4 border border-transparent text-sm font-extrabold text-black bg-accent hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-all duration-200 uppercase tracking-widest rounded-none shadow-md hover:shadow-lg active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
                   type="submit"
                   disabled={isLoading}
                 >
