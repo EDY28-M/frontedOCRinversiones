@@ -67,6 +67,7 @@ const AppRoutes = () => {
             ======================================== */}
         <Route path="/" element={<Inicio />} />
         <Route path="/productos" element={<Productos />} />
+        <Route path="/catalogo" element={<Navigate to="/productos" replace />} />
         <Route path="/servicios" element={<Servicios />} />
         <Route path="/nosotros" element={<Nosotros />} />
 
