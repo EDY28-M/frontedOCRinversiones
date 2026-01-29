@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { categoryService } from '../../../services/productService';
 import { useAvailableProducts } from '../../../hooks/useProducts';
 import ProductDetailModal from '../../../components/ProductDetailModal';
@@ -6,46 +6,24 @@ import ProductDetailModal from '../../../components/ProductDetailModal';
 const ProductosDestacados = () => {
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
-  
-  // Paginación
+
+  // Paginación CLIENT-SIDE
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(12);
 
-  // Debounce para búsqueda
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-      setCurrentPage(1); // Reset página al buscar
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  // Reset página al cambiar categoría
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory]);
-
-  // Obtener categoryId desde nombre
-  const getCategoryId = () => {
-    if (!selectedCategory) return null;
-    const cat = categories.find(c => (c.name || c.nombre) === selectedCategory);
-    return cat?.id || null;
-  };
-
-  // Query de productos disponibles con paginación del backend
-  const { 
-    data: productsData, 
-    isLoading, 
+  // ✅ CARGAR TODOS LOS PRODUCTOS UNA SOLA VEZ (sin filtros en backend)
+  const {
+    data: productsData,
+    isLoading,
     isFetching,
-    refetch 
+    refetch
   } = useAvailableProducts({
-    page: currentPage,
-    pageSize,
-    q: debouncedSearch,
-    categoryId: getCategoryId(),
+    page: 1,
+    pageSize: 9999, // Traer TODOS los productos
+    q: '', // Sin búsqueda en backend
+    categoryId: null, // Sin filtro de categoría en backend
   });
 
   // Cargar categorías al montar
@@ -55,10 +33,48 @@ const ProductosDestacados = () => {
       .catch(err => console.error('Error al cargar categorías:', err));
   }, []);
 
-  // Datos de la respuesta paginada
-  const productos = productsData?.items || [];
-  const total = productsData?.total || 0;
-  const totalPages = productsData?.totalPages || 1;
+  // Todos los productos del backend
+  const allProducts = productsData?.items || [];
+
+  // ✅ FILTRADO CLIENT-SIDE - INSTANTÁNEO
+  const filteredProducts = useMemo(() => {
+    let filtered = [...allProducts];
+
+    // Filtro por búsqueda (nombre, código, categoría, marca)
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(producto => {
+        const matchProducto = producto.producto?.toLowerCase().includes(term);
+        const matchCodigo = producto.codigo?.toLowerCase().includes(term);
+        const matchCategoria = producto.categoryName?.toLowerCase().includes(term);
+        const matchMarca = producto.marcaNombre?.toLowerCase().includes(term);
+        return matchProducto || matchCodigo || matchCategoria || matchMarca;
+      });
+    }
+
+    // Filtro por categoría seleccionada
+    if (selectedCategory) {
+      const cat = categories.find(c => (c.name || c.nombre) === selectedCategory);
+      if (cat) {
+        filtered = filtered.filter(p => p.categoryId === cat.id);
+      }
+    }
+
+    return filtered;
+  }, [allProducts, searchTerm, selectedCategory, categories]);
+
+  // ✅ PAGINACIÓN CLIENT-SIDE
+  const total = filteredProducts.length;
+  const totalPages = Math.ceil(total / pageSize) || 1;
+  const productos = filteredProducts.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  // Reset página al cambiar filtros
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory]);
 
   // Obtener URL de primera imagen o null
   const getFirstImageUrl = (producto) => {
@@ -161,7 +177,6 @@ const ProductosDestacados = () => {
         <div className="p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4 bg-gray-50/50">
         <div className="text-sm text-slate-600 font-mono">
             Mostrando <span className="font-bold">{productos.length}</span> de <span className="font-bold">{total}</span> productos
-            {isFetching && <span className="ml-2 text-blue-600">Actualizando...</span>}
           </div>
           
           {/* Paginación */}

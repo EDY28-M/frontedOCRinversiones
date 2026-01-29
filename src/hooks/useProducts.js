@@ -16,12 +16,14 @@ export const productKeys = {
 /**
  * Hook para obtener productos disponibles (con imágenes) con paginación del backend
  * Usado en ProductosDestacados
+ * BÚSQUEDA INSTANTÁNEA: Sin debounce, sin staleTime - busca en nombre, categoría y marca
  */
 export function useAvailableProducts({ page = 1, pageSize = 12, q = '', categoryId = null } = {}) {
   return useQuery({
     queryKey: productKeys.availableList({ page, pageSize, q, categoryId }),
     queryFn: () => productService.getAvailableProducts({ page, pageSize, q, categoryId }),
-    staleTime: 30000,
+    staleTime: 0, // ✅ Sin caché - búsqueda instantánea
+    gcTime: 0, // ✅ No guardar en memoria - siempre datos frescos
     refetchOnWindowFocus: false,
     placeholderData: (previousData) => previousData, // Mantener data anterior durante transición
   });
