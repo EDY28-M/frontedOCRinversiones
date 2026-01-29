@@ -22,8 +22,8 @@ export function useAvailableProducts({ page = 1, pageSize = 12, q = '', category
   return useQuery({
     queryKey: productKeys.availableList({ page, pageSize, q, categoryId }),
     queryFn: () => productService.getAvailableProducts({ page, pageSize, q, categoryId }),
-    staleTime: 0, // ✅ Sin caché - búsqueda instantánea
-    gcTime: 0, // ✅ No guardar en memoria - siempre datos frescos
+    staleTime: 30000, // 30 seconds
+    gcTime: 300000, // 5 minutes
     refetchOnWindowFocus: false,
     placeholderData: (previousData) => previousData, // Mantener data anterior durante transición
   });
