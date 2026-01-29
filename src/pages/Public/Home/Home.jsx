@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import MobileMenu from '../../../components/common/MobileMenu';
 
 const Home = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <div>
       {/* Header */}
@@ -41,12 +45,18 @@ const Home = () => {
             <button className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
               <span className="material-symbols-outlined text-[22px]">person</span>
             </button>
-            <button className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded">
+            <button
+              className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded"
+              onClick={() => setMobileMenuOpen(true)}
+            >
               <span className="material-symbols-outlined">menu</span>
             </button>
           </div>
         </div>
       </header>
+
+      {/* Mobile Menu Component */}
+      <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center justify-center overflow-hidden pt-20">

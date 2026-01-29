@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import MobileMenu from '../../../components/common/MobileMenu';
 import '../../../styles/inicio.css';
 
 /**
@@ -15,7 +16,7 @@ export default function Inicio() {
   return (
     <div className="inicio-wrapper bg-surface font-sans text-text-main antialiased">
       <div className="relative flex flex-col w-full">
-        
+
         {/* ==================== HEADER ==================== */}
         <header className="sticky top-0 z-50 w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
@@ -101,7 +102,7 @@ export default function Inicio() {
               </button>
               <button
                 className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                onClick={() => setMobileMenuOpen(true)}
               >
                 <span className="material-symbols-outlined">menu</span>
               </button>
@@ -109,47 +110,14 @@ export default function Inicio() {
           </div>
         </header>
 
-        {/* Mobile Filters Panel - Added for consistency with Productos page */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-b border-border-light p-4">
-            <nav className="flex flex-col gap-2">
-              <Link
-                className="text-sm font-semibold py-2 hover:text-primary transition-colors"
-                to="/"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                INICIO
-              </Link>
-              <Link
-                className="text-sm font-semibold py-2 hover:text-primary transition-colors"
-                to="/productos"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                CATÁLOGO
-              </Link>
-              <Link
-                className="text-sm font-semibold py-2 hover:text-primary transition-colors"
-                to="/servicios"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                SERVICIOS
-              </Link>
-              <Link
-                className="text-sm font-semibold py-2 hover:text-primary transition-colors"
-                to="/nosotros"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                EMPRESA
-              </Link>
-            </nav>
-          </div>
-        )}
+        {/* Mobile Menu Component */}
+        <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
         {/* ==================== HERO SECTION ==================== */}
         <section className="relative w-full flex items-center bg-gray-50 hero-section min-h-[440px] md:min-h-[480px] lg:min-h-[520px] ">
-          <div 
+          <div
             className="absolute inset-0 bg-cover bg-right-top lg:bg-center"
-            style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD6aAXIdmyLI-VmCXw3ei_O2zxFd3rS23EzoNgVy2bM29doMxteKy20xdnHGoyxgk3v6WTCBHQV3_4Qu6wUXCNuEJ_z74Uwou0NfbTNsLj9y7FkqjljGkoy-dD_YFD0VoE3u9sr-5eZig13qFKJlVICqakLnr_XhnClKNmm9NL-ly8QQV2BTpyXoOmegxS1ERjSJGJPJem1L8oO4Q6raqhn4EoVcs7PB0opGaRNkq179ClmDVzPV2UN2S3RQF4EAWBBAVOHnWjPnVQ")', backgroundSize: 'cover'}}
+            style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD6aAXIdmyLI-VmCXw3ei_O2zxFd3rS23EzoNgVy2bM29doMxteKy20xdnHGoyxgk3v6WTCBHQV3_4Qu6wUXCNuEJ_z74Uwou0NfbTNsLj9y7FkqjljGkoy-dD_YFD0VoE3u9sr-5eZig13qFKJlVICqakLnr_XhnClKNmm9NL-ly8QQV2BTpyXoOmegxS1ERjSJGJPJem1L8oO4Q6raqhn4EoVcs7PB0opGaRNkq179ClmDVzPV2UN2S3RQF4EAWBBAVOHnWjPnVQ")', backgroundSize: 'cover' }}
           >
             <div className="absolute inset-0 bg-white/80"></div>
           </div>
@@ -159,7 +127,7 @@ export default function Inicio() {
                 Líderes en Importación
               </div>
               <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium uppercase text-black tracking-tight leading-none mb-4 md:mb-5">
-                Expertos en <br/><span className="text-primary">Repuestos</span> <br/>Coreanos y <br/><span className="text-primary">Chinos</span>
+                Expertos en <br /><span className="text-primary">Repuestos</span> <br />Coreanos y <br /><span className="text-primary">Chinos</span>
               </h1>
               <p className="text-base md:text-lg text-gray-700 max-w-md font-normal mb-6 md:mb-8 leading-relaxed border-l-4 border-accent pl-5">
                 Más de 15 años de experiencia atendiendo talleres y flotas en Ate, Lima. Calidad garantizada para tu motor.
@@ -234,9 +202,9 @@ export default function Inicio() {
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
                 <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
                   <div className="absolute top-3 left-3 z-10 bg-primary text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide">Nuevo Ingreso</div>
-                  <div 
+                  <div
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDC2wkKD1tTrebuIADqe4wsmcbuo8iwOn2EkC9GcZ4KXeqgTYm6yiP1sbLiMtpnlthbUoMdhfNRvqXzqdMK63iSnruSPHSEaJueHdhsG_kN_VhJ2agV4g6EfuVskybENJ_kQb5tR_KVXjaRU4VrjJXgk6Dcqa5-c9HfvwXgea0n5piQaHjoL3bL1cdAQf4qZyjMYPZNcPcdUIKN96qmDYZlj3Lr5-dtJOqWGeJV8dfM09T43y6AARGTYctu0-MVSKum0b5S4bRSuaw")'}}
+                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDC2wkKD1tTrebuIADqe4wsmcbuo8iwOn2EkC9GcZ4KXeqgTYm6yiP1sbLiMtpnlthbUoMdhfNRvqXzqdMK63iSnruSPHSEaJueHdhsG_kN_VhJ2agV4g6EfuVskybENJ_kQb5tR_KVXjaRU4VrjJXgk6Dcqa5-c9HfvwXgea0n5piQaHjoL3bL1cdAQf4qZyjMYPZNcPcdUIKN96qmDYZlj3Lr5-dtJOqWGeJV8dfM09T43y6AARGTYctu0-MVSKum0b5S4bRSuaw")' }}
                   ></div>
                 </div>
                 <div className="p-5 md:p-6 product-card-content">
@@ -247,13 +215,13 @@ export default function Inicio() {
                   </button>
                 </div>
               </div>
-              
+
               {/* Product 2 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
                 <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div 
+                  <div
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWMAWvToIFkRoFwnnk91THA9_5-KISj2D2lLkINUUajOgny0MUJTRevcbFfE4ffled0VM9m2FiR7lPBmqbDrq7ZOyRyPx7CkpJc7ZsOq_jqJE5VSON8KmK9vNyYUCqj3P6pAqitBBfK5WjeS7jAzOjCvbRHDpMyhX8McZm8tASV3Z_qO8eZLfgtLa0oBASCgNBQFor6Qt1o3NVPBCyA_Lv240urrsbUok6MymoFe0QMjuYNHN4DCmteOS6tQXH3_qm8HtZYYVrQH8")'}}
+                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWMAWvToIFkRoFwnnk91THA9_5-KISj2D2lLkINUUajOgny0MUJTRevcbFfE4ffled0VM9m2FiR7lPBmqbDrq7ZOyRyPx7CkpJc7ZsOq_jqJE5VSON8KmK9vNyYUCqj3P6pAqitBBfK5WjeS7jAzOjCvbRHDpMyhX8McZm8tASV3Z_qO8eZLfgtLa0oBASCgNBQFor6Qt1o3NVPBCyA_Lv240urrsbUok6MymoFe0QMjuYNHN4DCmteOS6tQXH3_qm8HtZYYVrQH8")' }}
                   ></div>
                 </div>
                 <div className="p-5 md:p-6 product-card-content">
@@ -264,13 +232,13 @@ export default function Inicio() {
                   </button>
                 </div>
               </div>
-              
+
               {/* Product 3 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
                 <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div 
+                  <div
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuC9ZUK9avxLOWJMPmubQ7FSWpvK4v9FqGO9XByps9EwAABjTCrEGZ9LSpUb0A7hCOIzY13xLeTwFq-COOYilpizU7k3veeb9U2am24iQyn4z08dWbuK7He_DLfUdouNugD-fkoRxNq-m0rmroVDhTUo_M-PiBfn7H4-qQMyMf4oGNX1BeKYE1r2TjedKCAKjxLGrSNcjOvQuiEsUvVoy1cvbDIH1e3Vodc9bWM3ZmSfJakB2iGqztRv3EMa9O0JG-BPWQhwZiXt3l4")'}}
+                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuC9ZUK9avxLOWJMPmubQ7FSWpvK4v9FqGO9XByps9EwAABjTCrEGZ9LSpUb0A7hCOIzY13xLeTwFq-COOYilpizU7k3veeb9U2am24iQyn4z08dWbuK7He_DLfUdouNugD-fkoRxNq-m0rmroVDhTUo_M-PiBfn7H4-qQMyMf4oGNX1BeKYE1r2TjedKCAKjxLGrSNcjOvQuiEsUvVoy1cvbDIH1e3Vodc9bWM3ZmSfJakB2iGqztRv3EMa9O0JG-BPWQhwZiXt3l4")' }}
                   ></div>
                 </div>
                 <div className="p-5 md:p-6 product-card-content">
@@ -288,9 +256,9 @@ export default function Inicio() {
               {/* Product 4 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
                 <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div 
+                  <div
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCI4I3eZaFebtNXfF09qbIawl3RLDBWRPRrwUsTxy0PqBvJkkGMHcb8q6Kc5Ac0wGIbt7uaRT-fbJhQfUhS0seUIz42TrIDFo-ZL7LwAo7cTbOa0wkb4_HGYTuIu1wYkmnOOhHCN54lH9eeacQliY-2DEiIpVlAcq85LPX6x4trLT1xEv5ugDVJCwgsDalt0HU-9xJ1Wv-E7qCBGB6siN2YWWOjc41dgX77bzvuPMFLfMBz35POMYgqCWyieJe7GzcSK5KsCRxjaJw")'}}
+                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCI4I3eZaFebtNXfF09qbIawl3RLDBWRPRrwUsTxy0PqBvJkkGMHcb8q6Kc5Ac0wGIbt7uaRT-fbJhQfUhS0seUIz42TrIDFo-ZL7LwAo7cTbOa0wkb4_HGYTuIu1wYkmnOOhHCN54lH9eeacQliY-2DEiIpVlAcq85LPX6x4trLT1xEv5ugDVJCwgsDalt0HU-9xJ1Wv-E7qCBGB6siN2YWWOjc41dgX77bzvuPMFLfMBz35POMYgqCWyieJe7GzcSK5KsCRxjaJw")' }}
                   ></div>
                 </div>
                 <div className="p-5 md:p-6 product-card-content">
@@ -301,14 +269,14 @@ export default function Inicio() {
                   </button>
                 </div>
               </div>
-              
+
               {/* Product 5 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
                 <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
                   <div className="absolute top-3 left-3 z-10 bg-accent text-black text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide">Oferta</div>
-                  <div 
+                  <div
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD6aAXIdmyLI-VmCXw3ei_O2zxFd3rS23EzoNgVy2bM29doMxteKy20xdnHGoyxgk3v6WTCBHQV3_4Qu6wUXCNuEJ_z74Uwou0NfbTNsLj9y7FkqjljGkoy-dD_YFD0VoE3u9sr-5eZig13qFKJlVICqakLnr_XhnClKNmm9NL-ly8QQV2BTpyXoOmegxS1ERjSJGJPJem1L8oO4Q6raqhn4EoVcs7PB0opGaRNkq179ClmDVzPV2UN2S3RQF4EAWBBAVOHnWjPnVQ")'}}
+                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD6aAXIdmyLI-VmCXw3ei_O2zxFd3rS23EzoNgVy2bM29doMxteKy20xdnHGoyxgk3v6WTCBHQV3_4Qu6wUXCNuEJ_z74Uwou0NfbTNsLj9y7FkqjljGkoy-dD_YFD0VoE3u9sr-5eZig13qFKJlVICqakLnr_XhnClKNmm9NL-ly8QQV2BTpyXoOmegxS1ERjSJGJPJem1L8oO4Q6raqhn4EoVcs7PB0opGaRNkq179ClmDVzPV2UN2S3RQF4EAWBBAVOHnWjPnVQ")' }}
                   ></div>
                 </div>
                 <div className="p-5 md:p-6 product-card-content">
@@ -319,13 +287,13 @@ export default function Inicio() {
                   </button>
                 </div>
               </div>
-              
+
               {/* Product 6 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
                 <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div 
+                  <div
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCI4I3eZaFebtNXfF09qbIawl3RLDBWRPRrwUsTxy0PqBvJkkGMHcb8q6Kc5Ac0wGIbt7uaRT-fbJhQfUhS0seUIz42TrIDFo-ZL7LwAo7cTbOa0wkb4_HGYTuIu1wYkmnOOhHCN54lH9eeacQliY-2DEiIpVlAcq85LPX6x4trLT1xEv5ugDVJCwgsDalt0HU-9xJ1Wv-E7qCBGB6siN2YWWOjc41dgX77bzvuPMFLfMBz35POMYgqCWyieJe7GzcSK5KsCRxjaJw")'}}
+                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCI4I3eZaFebtNXfF09qbIawl3RLDBWRPRrwUsTxy0PqBvJkkGMHcb8q6Kc5Ac0wGIbt7uaRT-fbJhQfUhS0seUIz42TrIDFo-ZL7LwAo7cTbOa0wkb4_HGYTuIu1wYkmnOOhHCN54lH9eeacQliY-2DEiIpVlAcq85LPX6x4trLT1xEv5ugDVJCwgsDalt0HU-9xJ1Wv-E7qCBGB6siN2YWWOjc41dgX77bzvuPMFLfMBz35POMYgqCWyieJe7GzcSK5KsCRxjaJw")' }}
                   ></div>
                 </div>
                 <div className="p-5 md:p-6 product-card-content">
@@ -343,9 +311,9 @@ export default function Inicio() {
               {/* Product 7 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
                 <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div 
+                  <div
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAZrZnjIbfruTcQ67At8BnfOhwm0LdgFGKAxmh0KeaO7o1rvRGBccicqZdET1-qF0NpFs34xbf9OEHKxruLtbFj1McFrZk32hNO7TgIyFGBgGOGH1JcDggh544mmzKO-TCeuOmoeIQ9k7BYL-9ErS5S2IiwxWysdybGWLAO5WUpVItN-FeDnHNi4YjF7aIQZP7E9W7dyRoc3T1yxWdFzQKyIjalYpmtlNS57H7OxOSmoqqMf1KlK_2849hx6w9SeF47z5s77UFMv0Q")'}}
+                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAZrZnjIbfruTcQ67At8BnfOhwm0LdgFGKAxmh0KeaO7o1rvRGBccicqZdET1-qF0NpFs34xbf9OEHKxruLtbFj1McFrZk32hNO7TgIyFGBgGOGH1JcDggh544mmzKO-TCeuOmoeIQ9k7BYL-9ErS5S2IiwxWysdybGWLAO5WUpVItN-FeDnHNi4YjF7aIQZP7E9W7dyRoc3T1yxWdFzQKyIjalYpmtlNS57H7OxOSmoqqMf1KlK_2849hx6w9SeF47z5s77UFMv0Q")' }}
                   ></div>
                 </div>
                 <div className="p-5 md:p-6 product-card-content">
@@ -356,13 +324,13 @@ export default function Inicio() {
                   </button>
                 </div>
               </div>
-              
+
               {/* Product 8 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
                 <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div 
+                  <div
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDC2wkKD1tTrebuIADqe4wsmcbuo8iwOn2EkC9GcZ4KXeqgTYm6yiP1sbLiMtpnlthbUoMdhfNRvqXzqdMK63iSnruSPHSEaJueHdhsG_kN_VhJ2agV4g6EfuVskybENJ_kQb5tR_KVXjaRU4VrjJXgk6Dcqa5-c9HfvwXgea0n5piQaHjoL3bL1cdAQf4qZyjMYPZNcPcdUIKN96qmDYZlj3Lr5-dtJOqWGeJV8dfM09T43y6AARGTYctu0-MVSKum0b5S4bRSuaw")'}}
+                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDC2wkKD1tTrebuIADqe4wsmcbuo8iwOn2EkC9GcZ4KXeqgTYm6yiP1sbLiMtpnlthbUoMdhfNRvqXzqdMK63iSnruSPHSEaJueHdhsG_kN_VhJ2agV4g6EfuVskybENJ_kQb5tR_KVXjaRU4VrjJXgk6Dcqa5-c9HfvwXgea0n5piQaHjoL3bL1cdAQf4qZyjMYPZNcPcdUIKN96qmDYZlj3Lr5-dtJOqWGeJV8dfM09T43y6AARGTYctu0-MVSKum0b5S4bRSuaw")' }}
                   ></div>
                 </div>
                 <div className="p-5 md:p-6 product-card-content">
@@ -373,13 +341,13 @@ export default function Inicio() {
                   </button>
                 </div>
               </div>
-              
+
               {/* Product 9 */}
               <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
                 <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div 
+                  <div
                     className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWMAWvToIFkRoFwnnk91THA9_5-KISj2D2lLkINUUajOgny0MUJTRevcbFfE4ffled0VM9m2FiR7lPBmqbDrq7ZOyRyPx7CkpJc7ZsOq_jqJE5VSON8KmK9vNyYUCqj3P6pAqitBBfK5WjeS7jAzOjCvbRHDpMyhX8McZm8tASV3Z_qO8eZLfgtLa0oBASCgNBQFor6Qt1o3NVPBCyA_Lv240urrsbUok6MymoFe0QMjuYNHN4DCmteOS6tQXH3_qm8HtZYYVrQH8")'}}
+                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWMAWvToIFkRoFwnnk91THA9_5-KISj2D2lLkINUUajOgny0MUJTRevcbFfE4ffled0VM9m2FiR7lPBmqbDrq7ZOyRyPx7CkpJc7ZsOq_jqJE5VSON8KmK9vNyYUCqj3P6pAqitBBfK5WjeS7jAzOjCvbRHDpMyhX8McZm8tASV3Z_qO8eZLfgtLa0oBASCgNBQFor6Qt1o3NVPBCyA_Lv240urrsbUok6MymoFe0QMjuYNHN4DCmteOS6tQXH3_qm8HtZYYVrQH8")' }}
                   ></div>
                 </div>
                 <div className="p-5 md:p-6 product-card-content">

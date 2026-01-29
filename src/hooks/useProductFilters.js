@@ -1,57 +1,91 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { usePublicProducts } from './usePublicProducts.js';
 import { usePublicBrands } from './usePublicBrands.js';
 import { usePublicCategories } from './usePublicCategories.js';
 
-// Hook para manejar el estado de filtros y productos
+// Hook para manejar el estado de filtros y productos con paginación CLIENT-SIDE
 export const useProductFilters = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedBrands, setSelectedBrands] = useState([]);
+  const pageSize = 12;
 
-  // Debounce para búsqueda
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-      setCurrentPage(1);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  // Hook que consume el endpoint público /api/products/public/active
+  // 1. Cargar TODOS los productos activos una sola vez
   const {
-    products,
-    total,
-    totalPages,
-    isLoading,
+    products: allProducts,
+    isLoading: isLoadingProducts,
     isError,
     error,
-    refetch
+    refetch: refetchProducts
   } = usePublicProducts({
-    page: currentPage,
-    pageSize: 16,
-    q: debouncedSearch,
-    categoryId: selectedCategory,
-    brandIds: selectedBrands.length > 0 ? selectedBrands.join(',') : undefined,
+    page: 1,
+    pageSize: 9999, // Obtener todos
+    q: '',
+    categoryId: null,
+    brandIds: undefined
   });
 
-  // Hook para obtener marcas públicas
-  const { brands, isLoading: isLoadingBrands, error: brandsError } = usePublicBrands();
+  // 2. Filtrado local (Memoizado para performance)
+  const filteredProducts = useMemo(() => {
+    if (!allProducts) return [];
 
-  // Hook para obtener categorías públicas
+    let result = [...allProducts];
+
+    // Filtro por Búsqueda
+    if (searchQuery) {
+      const term = searchQuery.toLowerCase();
+      result = result.filter(p =>
+        p.producto?.toLowerCase().includes(term) ||
+        p.codigo?.toLowerCase().includes(term) ||
+        p.categoryName?.toLowerCase().includes(term) ||
+        p.marcaNombre?.toLowerCase().includes(term)
+      );
+    }
+
+    // Filtro por Categoría
+    if (selectedCategory) {
+      // Necesitamos asegurar que categoryId sea numérico si viene como string
+      const categoryIdNum = Number(selectedCategory);
+      result = result.filter(p => p.categoryId === categoryIdNum);
+    }
+
+    // Filtro por Marcas
+    if (selectedBrands.length > 0) {
+      // Convertir a números para comparación segura
+      const brandIdsNum = selectedBrands.map(id => Number(id));
+      result = result.filter(p => brandIdsNum.includes(p.marcaId));
+    }
+
+    return result;
+  }, [allProducts, searchQuery, selectedCategory, selectedBrands]);
+
+  // 3. Resetear página cuando cambian los filtros
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, selectedBrands]);
+
+  // 4. Paginación de los resultados filtrados
+  const total = filteredProducts.length;
+  const totalPages = Math.ceil(total / pageSize) || 1;
+
+  // Slice para la página actual
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredProducts.slice(startIndex, startIndex + pageSize);
+  }, [filteredProducts, currentPage, pageSize]);
+
+  // Cargar datos adicionales (marcas/categorías)
+  const { brands, isLoading: isLoadingBrands, error: brandsError } = usePublicBrands();
   const { categories, isLoading: isLoadingCategories, error: categoriesError } = usePublicCategories();
 
   // Funciones de manejo de filtros
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId === selectedCategory ? null : categoryId);
-    setCurrentPage(1);
   };
 
   const handleBrandToggle = (brandId) => {
     if (brandId === 'all') {
-      // Limpiar todas las marcas
       setSelectedBrands([]);
     } else {
       setSelectedBrands(prev => {
@@ -62,14 +96,12 @@ export const useProductFilters = () => {
         }
       });
     }
-    setCurrentPage(1);
   };
 
   const handleClearFilters = () => {
     setSelectedCategory(null);
     setSelectedBrands([]);
     setSearchQuery('');
-    setDebouncedSearch('');
     setCurrentPage(1);
   };
 
@@ -88,14 +120,14 @@ export const useProductFilters = () => {
     brandsError,
     categoriesError,
 
-    // Datos
-    products,
+    // Datos procesados
+    products: paginatedProducts, // Solo los de la página actual
     total,
     totalPages,
-    isLoading,
+    isLoading: isLoadingProducts, // Solo carga inicial
     isError,
     error,
-    refetch,
+    refetch: refetchProducts,
 
     // Funciones
     handleCategoryChange,

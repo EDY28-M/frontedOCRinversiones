@@ -176,6 +176,11 @@ export function useToggleProductActive() {
     // Siempre refetch silencioso al terminar para sincronizar con backend
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.all });
+      queryClient.invalidateQueries({ queryKey: productKeys.available() });
+      // También invalidar queries públicas para actualizar /productos
+      queryClient.invalidateQueries({ queryKey: ['public-products'] });
+      queryClient.invalidateQueries({ queryKey: ['public-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['public-brands'] });
     },
   });
 }

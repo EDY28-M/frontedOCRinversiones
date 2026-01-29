@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import FiltersSidebar from '../../../components/products/FiltersSidebar.jsx';
 import ProductsGrid from '../../../components/products/ProductsGrid.jsx';
+import MobileMenu from '../../../components/common/MobileMenu';
 import { useProductFilters } from '../../../hooks/useProductFilters';
 
 /**
@@ -35,7 +36,7 @@ export default function Productos() {
     handleClearFilters,
   } = useProductFilters();
 
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -132,13 +133,16 @@ export default function Productos() {
               </button>
               <button
                 className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded"
-                onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+                onClick={() => setMobileMenuOpen(true)}
               >
                 <span className="material-symbols-outlined">menu</span>
               </button>
             </div>
           </div>
         </header>
+
+        {/* Mobile Menu Component */}
+        <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
         <main className="flex-1 w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row">
           <FiltersSidebar
@@ -156,25 +160,99 @@ export default function Productos() {
           />
 
           <section className="flex-1 p-6 lg:p-10 bg-white">
-            {/* Header con título y contador */}
+            {/* Header con título y paginador compacto */}
+            {/* Header con título y paginador compacto */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-gray-100">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Componentes Destacados</h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {total} productos disponibles
-                </p>
+                <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Productos Disponibles</h2>
               </div>
-              {/* Botón refresh */}
-              <button
-                onClick={refetch}
-                disabled={isLoading}
-                className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded transition-colors text-sm font-medium disabled:opacity-50"
-              >
-                <span className={`material-symbols-outlined text-[18px] ${isLoading ? 'animate-spin' : ''}`}>
-                  {isLoading ? 'progress_activity' : 'refresh'}
-                </span>
-                Actualizar
-              </button>
+
+              {/* Paginador estilo Admin */}
+              {!isLoading && total > 0 && (
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="text-sm text-slate-600 font-mono">
+                    Mostrando <span className="font-bold">{products.length}</span> de <span className="font-bold">{total}</span> productos
+                  </div>
+
+                  <nav className="flex items-center gap-2">
+                    <button
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                      className="w-8 h-8 flex items-center justify-center border border-gray-200 text-gray-500 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="material-symbols-outlined text-sm">west</span>
+                    </button>
+
+                    {/* Lógica de botones de página idéntica al admin */}
+                    {(() => {
+                      const maxVisiblePages = 5;
+                      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                      if (endPage - startPage < maxVisiblePages - 1) {
+                        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                      }
+
+                      const pages = [];
+
+                      if (startPage > 1) {
+                        pages.push(
+                          <button
+                            key={1}
+                            onClick={() => handlePageChange(1)}
+                            className="w-8 h-8 flex items-center justify-center text-xs font-bold shadow-sm transition-colors border border-gray-200 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50"
+                          >
+                            1
+                          </button>
+                        );
+                        if (startPage > 2) {
+                          pages.push(<span key="start-ellipsis" className="px-2 text-gray-400 text-xs">...</span>);
+                        }
+                      }
+
+                      for (let i = startPage; i <= endPage; i++) {
+                        pages.push(
+                          <button
+                            key={i}
+                            onClick={() => handlePageChange(i)}
+                            className={`w-8 h-8 flex items-center justify-center text-xs font-bold shadow-sm transition-colors ${currentPage === i
+                              ? 'bg-blue-600 text-white'
+                              : 'border border-gray-200 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50'
+                              }`}
+                          >
+                            {i}
+                          </button>
+                        );
+                      }
+
+                      if (endPage < totalPages) {
+                        if (endPage < totalPages - 1) {
+                          pages.push(<span key="end-ellipsis" className="px-2 text-gray-400 text-xs">...</span>);
+                        }
+                        pages.push(
+                          <button
+                            key={totalPages}
+                            onClick={() => handlePageChange(totalPages)}
+                            className="w-8 h-8 flex items-center justify-center text-xs font-bold shadow-sm transition-colors border border-gray-200 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50"
+                          >
+                            {totalPages}
+                          </button>
+                        );
+                      }
+
+                      return pages;
+                    })()}
+
+                    <button
+                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage >= totalPages}
+                      className="w-8 h-8 flex items-center justify-center border border-gray-200 text-gray-500 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="material-symbols-outlined text-sm">east</span>
+                    </button>
+                  </nav>
+                </div>
+              )}
             </div>
 
             {/* Grid de productos */}
@@ -186,136 +264,72 @@ export default function Productos() {
               refetch={refetch}
               total={total}
             />
-
-            {/* Paginación */}
-            {totalPages > 1 && (
-              <div className="mt-16 flex justify-center pb-8">
-                <nav className="flex items-center gap-2">
-                  <button
-                    className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-500 hover:border-primary hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1 || isLoading}
-                  >
-                    <span className="material-symbols-outlined text-sm">west</span>
-                  </button>
-
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-
-                    return (
-                      <button
-                        key={pageNum}
-                        className={`w-8 h-8 flex items-center justify-center rounded ${
-                          currentPage === pageNum
-                            ? 'bg-primary text-white text-xs font-bold shadow-md shadow-blue-200'
-                            : 'border border-gray-200 text-gray-700 hover:border-primary hover:text-primary text-xs font-medium'
-                        } transition-colors`}
-                        onClick={() => handlePageChange(pageNum)}
-                        disabled={isLoading}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-
-                  {totalPages > 5 && currentPage < totalPages - 2 && (
-                    <>
-                      <span className="px-2 text-gray-400 text-xs">...</span>
-                      <button
-                        className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-700 hover:border-primary hover:text-primary text-xs font-medium"
-                        onClick={() => handlePageChange(totalPages)}
-                        disabled={isLoading}
-                      >
-                        {totalPages}
-                      </button>
-                    </>
-                  )}
-
-                  <button
-                    className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-500 hover:border-primary hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                    disabled={currentPage === totalPages || isLoading}
-                  >
-                    <span className="material-symbols-outlined text-sm">east</span>
-                  </button>
-                </nav>
-              </div>
-            )}
           </section>
         </main>
 
-        <footer className="bg-primary text-white pt-16 pb-8 border-t-4 border-accent">
+        <footer className="bg-primary text-white pt-10 pb-6 border-t-4 border-accent">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-              <div className="flex flex-col gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+              <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3">
                   <div className="text-accent">
-                    <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
+                    <span className="material-symbols-outlined text-2xl">settings_b_roll</span>
                   </div>
-                  <h1 className="text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
-                  <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
+                  <h1 className="text-xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
+                  <p className="text-accent text-[10px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
                 </div>
-                <p className="text-sm text-gray-200 leading-relaxed">
+                <p className="text-xs text-gray-200 leading-relaxed">
                   Líderes en refacciones de alto rendimiento para entusiastas del motor. Calidad garantizada en cada pieza.
                 </p>
-                <div className="flex gap-4">
-                  <a className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
-                    <span className="text-xs font-bold">IG</span>
+                <div className="flex gap-3">
+                  <a className="w-7 h-7 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
+                    <span className="text-[10px] font-bold">IG</span>
                   </a>
-                  <a className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
-                    <span className="text-xs font-bold">FB</span>
+                  <a className="w-7 h-7 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
+                    <span className="text-[10px] font-bold">FB</span>
                   </a>
-                  <a className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
-                    <span className="text-xs font-bold">TW</span>
+                  <a className="w-7 h-7 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
+                    <span className="text-[10px] font-bold">TW</span>
                   </a>
                 </div>
               </div>
               <div>
-                <h4 className="text-sm font-bold text-accent uppercase tracking-wider mb-6">Nuestra Empresa</h4>
-                <ul className="space-y-4">
-                  <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/nosotros">Sobre Nosotros</Link></li>
-                  <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/contacto">Carreras</Link></li>
-                  <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Blog Automotriz</a></li>
-                  <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Socios Comerciales</a></li>
+                <h4 className="text-xs font-bold text-accent uppercase tracking-wider mb-4">Nuestra Empresa</h4>
+                <ul className="space-y-2">
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/nosotros">Sobre Nosotros</Link></li>
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/contacto">Carreras</Link></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Blog Automotriz</a></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Socios Comerciales</a></li>
                 </ul>
               </div>
               <div>
-                <h4 className="text-sm font-bold text-accent uppercase tracking-wider mb-6">Políticas</h4>
-                <ul className="space-y-4">
-                  <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Envíos y Entregas</a></li>
-                  <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Devoluciones</a></li>
-                  <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Garantía de Piezas</a></li>
-                  <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Términos de Servicio</a></li>
+                <h4 className="text-xs font-bold text-accent uppercase tracking-wider mb-4">Políticas</h4>
+                <ul className="space-y-2">
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Envíos y Entregas</a></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Devoluciones</a></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Garantía de Piezas</a></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Términos de Servicio</a></li>
                 </ul>
               </div>
               <div>
-                <h4 className="text-sm font-bold text-accent uppercase tracking-wider mb-6">Contacto</h4>
-                <ul className="space-y-4">
-                  <li className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-accent text-lg mt-0.5">location_on</span>
-                    <span className="text-sm text-gray-200">Av. Revolución 1234, CDMX, México</span>
+                <h4 className="text-xs font-bold text-accent uppercase tracking-wider mb-4">Contacto</h4>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="material-symbols-outlined text-accent text-base mt-0.5">location_on</span>
+                    <span className="text-xs text-gray-200">Av. Revolución 1234, CDMX, México</span>
                   </li>
-                  <li className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-accent text-lg">mail</span>
-                    <a className="text-sm text-gray-200 hover:text-white" href="mailto:ventas@estructurapro.com">ventas@estructurapro.com</a>
+                  <li className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-accent text-base">mail</span>
+                    <a className="text-xs text-gray-200 hover:text-white" href="mailto:ventas@estructurapro.com">ventas@estructurapro.com</a>
                   </li>
-                  <li className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-accent text-lg">call</span>
-                    <span className="text-sm text-gray-200">+52 55 1234 5678</span>
+                  <li className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-accent text-base">call</span>
+                    <span className="text-xs text-gray-200">+52 55 1234 5678</span>
                   </li>
                 </ul>
               </div>
             </div>
-            <div className="flex flex-col md:flex-row justify-between items-center border-t border-blue-800 pt-8 text-[10px] text-blue-200 uppercase tracking-widest gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-center border-t border-blue-800 pt-6 text-[10px] text-blue-200 uppercase tracking-widest gap-4">
               <p>© 2024 ORC Inversiones Perú. Todos los derechos reservados.</p>
               <div className="flex gap-6">
                 <a className="hover:text-white transition-colors" href="#">Facebook</a>

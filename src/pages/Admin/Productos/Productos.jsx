@@ -16,16 +16,16 @@ const Productos = () => {
   const toggleActiveMutation = useToggleProductActive();
   const deleteMutation = useDeleteProduct();
   const prefetchProduct = usePrefetchProduct();
-  
+
   const [filtroActivo, setFiltroActivo] = useState('todos');
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null, descripcion: '' });
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [marcas, setMarcas] = useState([]);
-  
-  // Track qué filas están en proceso de toggle (para mostrar loader por fila)
+
+  // Track qué filas están en proceso de toggle
   const [togglingRows, setTogglingRows] = useState(new Set());
-  
+
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(7);
@@ -68,18 +68,16 @@ const Productos = () => {
     setConfirmDelete({ isOpen: false, id: null, descripcion: '' });
   };
 
-  // Toggle con optimistic update - sin refresh de página
+  // Toggle con optimistic update - solo visible en pestaña PUBLICAR
   const handleToggleActive = useCallback((e, id, currentStatus) => {
-    // Prevenir propagación y navegación
     e.preventDefault();
     e.stopPropagation();
-    
+
     const product = productos.find(p => p.id === id);
     if (!product) return;
-    
-    // Marcar fila como "en proceso"
+
     setTogglingRows(prev => new Set(prev).add(id));
-    
+
     toggleActiveMutation.mutate(
       {
         productId: id,
@@ -88,7 +86,6 @@ const Productos = () => {
       },
       {
         onSettled: () => {
-          // Quitar fila del estado "en proceso"
           setTogglingRows(prev => {
             const next = new Set(prev);
             next.delete(id);
@@ -102,38 +99,47 @@ const Productos = () => {
   const error = queryError?.message || (queryError ? 'Error al cargar productos. Verifica que el backend esté corriendo.' : null);
 
   const filteredProducts = useMemo(() => productos.filter(producto => {
-    // Filtro por estado (todos/publicados/borradores)
-    if (filtroActivo === 'publicados' && !producto.isActive) return false;
-    if (filtroActivo === 'borradores' && producto.isActive) return false;
-    
+    // Helper: Verificar si tiene imágenes
+    const hasImages = producto.imagenPrincipal || producto.imagen2 || producto.imagen3 || producto.imagen4;
+
+    // Filtro por estado
+    if (filtroActivo === 'publicar') {
+      // PUBLICAR: Solo productos con imágenes (listos para publicar)
+      if (!hasImages) return false;
+    } else if (filtroActivo === 'borradores') {
+      // BORRADORES: Solo productos SIN imágenes
+      if (hasImages) return false;
+    }
+    // 'todos' no filtra nada
+
     // Filtro por búsqueda
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      
+
       // Buscar en Código
       const matchCodigo = producto.codigo?.toString().toLowerCase().includes(term);
-      
+
       // Buscar en Código Comercial
       const matchCodigoComer = producto.codigoComer?.toString().toLowerCase().includes(term);
-      
+
       // Buscar en Producto (nombre/descripción)
       const matchProducto = producto.producto?.toLowerCase().includes(term);
-      
+
       // Buscar en Marca
       const matchMarca = producto.marcaNombre?.toLowerCase().includes(term);
-      
+
       // Buscar en Categoría (múltiples opciones de campo)
       const matchCategoria = producto.categoryName?.toLowerCase().includes(term) ||
                             producto.categoria?.toLowerCase().includes(term) ||
                             producto.category?.nombre?.toLowerCase().includes(term) ||
                             producto.category?.toLowerCase().includes(term);
-      
+
       // Si no coincide con ninguno, excluir el producto
       if (!matchCodigo && !matchCodigoComer && !matchProducto && !matchMarca && !matchCategoria) {
         return false;
       }
     }
-    
+
     return true;
   }), [productos, filtroActivo, searchTerm]);
 
@@ -247,20 +253,20 @@ const Productos = () => {
               Todos
             </button>
             <button
-              onClick={() => setFiltroActivo('publicados')}
+              onClick={() => setFiltroActivo('publicar')}
               className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${
-                filtroActivo === 'publicados'
-                  ? 'text-blue-700 bg-blue-50 border border-blue-100'
+                filtroActivo === 'publicar'
+                  ? 'text-green-700 bg-green-50 border border-green-100'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
               }`}
             >
-              Publicados
+              Publicar
             </button>
             <button
               onClick={() => setFiltroActivo('borradores')}
               className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${
                 filtroActivo === 'borradores'
-                  ? 'text-blue-700 bg-blue-50 border border-blue-100'
+                  ? 'text-orange-700 bg-orange-50 border border-orange-100'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
               }`}
             >
@@ -282,14 +288,16 @@ const Productos = () => {
                 <th className="p-4 py-3 font-bold text-slate-500">Producto</th>
                 <th className="p-4 py-3 font-bold text-slate-500">Marca</th>
                 <th className="p-4 py-3 font-bold text-slate-500 text-center w-48">Categoría</th>
-                <th className="p-4 py-3 font-bold text-slate-500 text-center w-32">Activo</th>
+                {filtroActivo === 'publicar' && (
+                  <th className="p-4 py-3 font-bold text-slate-500 text-center w-32">Activo</th>
+                )}
                 <th className="p-4 py-3 font-bold text-slate-500 text-center w-32">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {paginatedProducts.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="p-8 text-center text-slate-500">
+                  <td colSpan={filtroActivo === 'publicar' ? "7" : "6"} className="p-8 text-center text-slate-500">
                     No hay productos para mostrar
                   </td>
                 </tr>
@@ -317,27 +325,29 @@ const Productos = () => {
                         {producto.categoryName || 'Sin categoría'}
                       </span>
                     </td>
-                    <td className="p-4 py-3 text-center align-middle">
-                      {can(PERMISSIONS.PRODUCTOS_EDIT) ? (
-                        <div className="relative inline-flex items-center">
-                          <input
-                            type="checkbox"
-                            className="sharp-switch"
-                            checked={producto.isActive}
-                            disabled={togglingRows.has(producto.id)}
-                            onChange={(e) => handleToggleActive(e, producto.id, producto.isActive)}
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                          {togglingRows.has(producto.id) && (
-                            <span className="absolute -right-5 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
-                          )}
-                        </div>
-                      ) : (
-                        <span className={`inline-block px-2 py-1 text-xs font-semibold rounded ${producto.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                          {producto.isActive ? 'Activo' : 'Inactivo'}
-                        </span>
-                      )}
-                    </td>
+                    {filtroActivo === 'publicar' && (
+                      <td className="p-4 py-3 text-center align-middle">
+                        {can(PERMISSIONS.PRODUCTOS_EDIT) ? (
+                          <div className="relative inline-flex items-center">
+                            <input
+                              type="checkbox"
+                              className="sharp-switch"
+                              checked={producto.isActive}
+                              disabled={togglingRows.has(producto.id)}
+                              onChange={(e) => handleToggleActive(e, producto.id, producto.isActive)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            {togglingRows.has(producto.id) && (
+                              <span className="absolute -right-5 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className={`inline-block px-2 py-1 text-xs font-semibold rounded ${producto.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                            {producto.isActive ? 'Activo' : 'Inactivo'}
+                          </span>
+                        )}
+                      </td>
+                    )}
                     <td className="p-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
                         {can(PERMISSIONS.PRODUCTOS_EDIT) && (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import MobileMenu from '../../../components/common/MobileMenu';
 import '../../../styles/inicio.css';
 
 /**
@@ -98,7 +99,7 @@ export default function Nosotros() {
               </button>
               <button
                 className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                onClick={() => setMobileMenuOpen(true)}
               >
                 <span className="material-symbols-outlined">menu</span>
               </button>
@@ -106,41 +107,8 @@ export default function Nosotros() {
           </div>
         </header>
 
-        {/* Mobile Filters Panel */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-b border-border-light p-4">
-            <nav className="flex flex-col gap-2">
-              <Link
-                className="text-sm font-semibold py-2 hover:text-primary transition-colors"
-                to="/"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                INICIO
-              </Link>
-              <Link
-                className="text-sm font-semibold py-2 hover:text-primary transition-colors"
-                to="/productos"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                CATÁLOGO
-              </Link>
-              <Link
-                className="text-sm font-semibold py-2 hover:text-primary transition-colors"
-                to="/servicios"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                SERVICIOS
-              </Link>
-              <Link
-                className="text-sm font-semibold py-2 hover:text-primary transition-colors"
-                to="/nosotros"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                EMPRESA
-              </Link>
-            </nav>
-          </div>
-        )}
+        {/* Mobile Menu Component */}
+        <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
         {/* Content */}
         <main className="pt-20">
