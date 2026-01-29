@@ -25,6 +25,12 @@ export const productService = {
     return response.data;
   },
 
+  // Actualizar estado (Activo/Inactivo) optimizado
+  updateProductStatus: async (id, isActive) => {
+    const response = await axiosInstance.patch(`/products/${id}/status`, { isActive });
+    return response.data;
+  },
+
   // Eliminar producto
   deleteProduct: async (id) => {
     const response = await axiosInstance.delete(`/products/${id}`);

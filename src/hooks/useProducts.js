@@ -122,11 +122,8 @@ export function useToggleProductActive() {
 
   return useMutation({
     mutationFn: async ({ productId, product, newActiveState }) => {
-      // Llamada al backend
-      return productService.updateProduct(productId, {
-        ...product,
-        isActive: newActiveState,
-      });
+      // Llamada al backend optimizada (PATCH)
+      return productService.updateProductStatus(productId, newActiveState);
     },
 
     // Optimistic update: cambiar UI inmediatamente
