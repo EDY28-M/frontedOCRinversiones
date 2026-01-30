@@ -176,8 +176,64 @@ export function useToggleProductActive() {
       queryClient.invalidateQueries({ queryKey: productKeys.available() });
       // También invalidar queries públicas para actualizar /productos
       queryClient.invalidateQueries({ queryKey: ['public-products'] });
+      queryClient.invalidateQueries({ queryKey: ['public-featured-products'] });
       queryClient.invalidateQueries({ queryKey: ['public-categories'] });
       queryClient.invalidateQueries({ queryKey: ['public-brands'] });
+    },
+  });
+}
+
+/**
+ * Hook para toggle de producto destacado con optimistic update
+ */
+export function useToggleProductFeatured() {
+  const queryClient = useQueryClient();
+  const { success, error: showError } = useNotification();
+
+  return useMutation({
+    mutationFn: async ({ productId, newFeaturedState }) => {
+      return productService.updateProductFeatured(productId, newFeaturedState);
+    },
+
+    onMutate: async ({ productId, newFeaturedState }) => {
+      await queryClient.cancelQueries({ queryKey: productKeys.all });
+
+      const previousQueries = queryClient.getQueriesData({ queryKey: productKeys.lists() });
+
+      queryClient.setQueriesData({ queryKey: productKeys.lists() }, (oldData) => {
+        if (!oldData) return oldData;
+        return oldData.map((product) =>
+          product.id === productId
+            ? { ...product, isFeatured: newFeaturedState }
+            : product
+        );
+      });
+
+      return { previousQueries };
+    },
+
+    onError: (err, variables, context) => {
+      console.error('Error al actualizar destacado del producto:', err);
+
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+
+      showError('Error al actualizar el destacado del producto. Se ha revertido el cambio.');
+    },
+
+    onSuccess: (data, { newFeaturedState }) => {
+      const mensaje = newFeaturedState
+        ? 'Producto destacado correctamente'
+        : 'Producto removido de destacados';
+      success(mensaje);
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['public-featured-products'] });
     },
   });
 }

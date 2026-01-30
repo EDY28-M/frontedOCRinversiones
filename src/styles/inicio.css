@@ -45,10 +45,25 @@
 }
 
 /* ========================================
-   HOVER EFFECTS
+   HOVER EFFECTS & CARD LAYOUT
    ======================================== */
+.grid-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .grid-card:hover .card-img {
   transform: scale(1.05);
+}
+
+/* Ensure grid items stretch to equal height */
+.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 {
+  align-items: stretch;
+}
+
+.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 > * {
+  height: 100%;
 }
 
 /* ========================================

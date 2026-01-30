@@ -31,6 +31,12 @@ export const productService = {
     return response.data;
   },
 
+  // Actualizar destacado (Producto destacado)
+  updateProductFeatured: async (id, isFeatured) => {
+    const response = await axiosInstance.patch(`/products/${id}/featured`, { isFeatured });
+    return response.data;
+  },
+
   // Eliminar producto
   deleteProduct: async (id) => {
     const response = await axiosInstance.delete(`/products/${id}`);

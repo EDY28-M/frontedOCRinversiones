@@ -5,7 +5,7 @@ import { categoryService, nombreMarcaService } from '../../../services/productSe
 import { ErrorAlert, ConfirmModal, ImportProductsModal } from '../../../components/common';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { PERMISSIONS } from '../../../utils/permissions';
-import { useProducts, useToggleProductActive, useDeleteProduct, usePrefetchProduct, productKeys } from '../../../hooks/useProducts';
+import { useProducts, useToggleProductActive, useToggleProductFeatured, useDeleteProduct, usePrefetchProduct, productKeys } from '../../../hooks/useProducts';
 
 const Productos = () => {
   const { can } = usePermissions();
@@ -14,6 +14,7 @@ const Productos = () => {
   // React Query hooks
   const { data: productos = [], isLoading: loading, error: queryError, refetch } = useProducts();
   const toggleActiveMutation = useToggleProductActive();
+  const toggleFeaturedMutation = useToggleProductFeatured();
   const deleteMutation = useDeleteProduct();
   const prefetchProduct = usePrefetchProduct();
 
@@ -25,6 +26,7 @@ const Productos = () => {
 
   // Track qué filas están en proceso de toggle
   const [togglingRows, setTogglingRows] = useState(new Set());
+  const [togglingFeaturedRows, setTogglingFeaturedRows] = useState(new Set());
 
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -95,6 +97,34 @@ const Productos = () => {
       }
     );
   }, [productos, toggleActiveMutation]);
+
+  // Toggle destacado con optimistic update - solo visible en pestaña PUBLICAR
+  const handleToggleFeatured = useCallback((e, id, currentStatus) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const product = productos.find(p => p.id === id);
+    if (!product) return;
+
+    setTogglingFeaturedRows(prev => new Set(prev).add(id));
+
+    toggleFeaturedMutation.mutate(
+      {
+        productId: id,
+        product,
+        newFeaturedState: !currentStatus,
+      },
+      {
+        onSettled: () => {
+          setTogglingFeaturedRows(prev => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+        },
+      }
+    );
+  }, [productos, toggleFeaturedMutation]);
 
   const error = queryError?.message || (queryError ? 'Error al cargar productos. Verifica que el backend esté corriendo.' : null);
 
@@ -345,13 +375,16 @@ const Productos = () => {
                 {filtroActivo === 'publicar' && (
                   <th className="p-4 py-3 font-bold text-slate-500 text-center w-32">Activo</th>
                 )}
+                {filtroActivo === 'publicar' && (
+                  <th className="p-4 py-3 font-bold text-slate-500 text-center w-40">Destacado</th>
+                )}
                 <th className="p-4 py-3 font-bold text-slate-500 text-center w-32">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {paginatedProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={filtroActivo === 'publicar' ? "7" : "6"} className="p-8 text-center text-slate-500">
+                  <td colSpan={filtroActivo === 'publicar' ? "8" : "6"} className="p-8 text-center text-slate-500">
                     No hay productos para mostrar
                   </td>
                 </tr>
@@ -398,6 +431,29 @@ const Productos = () => {
                         ) : (
                           <span className={`inline-block px-2 py-1 text-xs font-semibold rounded ${producto.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                             {producto.isActive ? 'Activo' : 'Inactivo'}
+                          </span>
+                        )}
+                      </td>
+                    )}
+                    {filtroActivo === 'publicar' && (
+                      <td className="p-4 py-3 text-center align-middle">
+                        {can(PERMISSIONS.PRODUCTOS_EDIT) ? (
+                          <div className="relative inline-flex items-center">
+                            <input
+                              type="checkbox"
+                              className="sharp-switch"
+                              checked={Boolean(producto.isFeatured)}
+                              disabled={togglingFeaturedRows.has(producto.id)}
+                              onChange={(e) => handleToggleFeatured(e, producto.id, Boolean(producto.isFeatured))}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            {togglingFeaturedRows.has(producto.id) && (
+                              <span className="absolute -right-5 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className={`inline-block px-2 py-1 text-xs font-semibold rounded ${producto.isFeatured ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600'}`}>
+                            {producto.isFeatured ? 'Destacado' : 'Normal'}
                           </span>
                         )}
                       </td>

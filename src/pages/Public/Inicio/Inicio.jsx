@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import MobileMenu from '../../../components/common/MobileMenu';
 import '../../../styles/inicio.css';
+import { usePublicFeaturedProducts } from '../../../hooks/usePublicFeaturedProducts';
 
 /**
  * Componente Inicio - Migración pixel-perfect del HTML original (Google Stitch)
@@ -12,6 +13,23 @@ import '../../../styles/inicio.css';
  */
 export default function Inicio() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { products: featuredProducts, isLoading: isLoadingFeatured } = usePublicFeaturedProducts({ page: 1, pageSize: 9 });
+
+  const featuredRows = useMemo(() => {
+    const rows = [];
+    for (let i = 0; i < featuredProducts.length; i += 3) {
+      rows.push(featuredProducts.slice(i, i + 3));
+    }
+    return rows;
+  }, [featuredProducts]);
+
+  const getFirstImageUrl = (producto) => {
+    if (producto?.imagenPrincipal) return producto.imagenPrincipal;
+    if (producto?.imagen2) return producto.imagen2;
+    if (producto?.imagen3) return producto.imagen3;
+    if (producto?.imagen4) return producto.imagen4;
+    return null;
+  };
 
   return (
     <div className="inicio-wrapper bg-surface font-sans text-text-main antialiased">
@@ -196,169 +214,67 @@ export default function Inicio() {
               </Link>
             </div>
 
-            {/* Products Grid Row 1 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 mb-5 md:mb-6">
-              {/* Product 1 */}
-              <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div className="absolute top-3 left-3 z-10 bg-primary text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide">Nuevo Ingreso</div>
-                  <div
-                    className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDC2wkKD1tTrebuIADqe4wsmcbuo8iwOn2EkC9GcZ4KXeqgTYm6yiP1sbLiMtpnlthbUoMdhfNRvqXzqdMK63iSnruSPHSEaJueHdhsG_kN_VhJ2agV4g6EfuVskybENJ_kQb5tR_KVXjaRU4VrjJXgk6Dcqa5-c9HfvwXgea0n5piQaHjoL3bL1cdAQf4qZyjMYPZNcPcdUIKN96qmDYZlj3Lr5-dtJOqWGeJV8dfM09T43y6AARGTYctu0-MVSKum0b5S4bRSuaw")' }}
-                  ></div>
-                </div>
-                <div className="p-5 md:p-6 product-card-content">
-                  <h3 className="font-display text-lg font-medium uppercase text-primary mb-1.5">Motor Diesel 2.5L Turbo</h3>
-                  <p className="text-sm text-gray-500 mb-4 font-light leading-relaxed">Compatible con Hyundai H1 / Porter. Rendimiento superior y bajo consumo.</p>
-                  <button className="w-full bg-accent hover:bg-accent-hover text-black py-2.5 font-bold uppercase text-xs tracking-wider transition-colors">
-                    Cotizar Ahora
-                  </button>
-                </div>
+            {isLoadingFeatured && featuredProducts.length === 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+                {Array.from({ length: 9 }).map((_, index) => (
+                  <div key={`skeleton-${index}`} className="bg-white border border-gray-200 group grid-card animate-pulse">
+                    <div className="aspect-[16/9] bg-gray-100"></div>
+                    <div className="p-5 md:p-6 product-card-content">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
+                      <div className="h-3 bg-gray-100 rounded w-full mb-4"></div>
+                      <div className="h-9 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              {/* Product 2 */}
-              <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div
-                    className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWMAWvToIFkRoFwnnk91THA9_5-KISj2D2lLkINUUajOgny0MUJTRevcbFfE4ffled0VM9m2FiR7lPBmqbDrq7ZOyRyPx7CkpJc7ZsOq_jqJE5VSON8KmK9vNyYUCqj3P6pAqitBBfK5WjeS7jAzOjCvbRHDpMyhX8McZm8tASV3Z_qO8eZLfgtLa0oBASCgNBQFor6Qt1o3NVPBCyA_Lv240urrsbUok6MymoFe0QMjuYNHN4DCmteOS6tQXH3_qm8HtZYYVrQH8")' }}
-                  ></div>
-                </div>
-                <div className="p-5 md:p-6 product-card-content">
-                  <h3 className="font-display text-lg font-medium uppercase text-primary mb-1.5">Kit de Reparación Motor</h3>
-                  <p className="text-sm text-gray-500 mb-4 font-light leading-relaxed">Juego completo de empaques y pistones para motores Isuzu serie N.</p>
-                  <button className="w-full bg-accent hover:bg-accent-hover text-black py-2.5 font-bold uppercase text-xs tracking-wider transition-colors">
-                    Cotizar Ahora
-                  </button>
-                </div>
+            ) : featuredRows.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                No hay productos destacados disponibles.
               </div>
-
-              {/* Product 3 */}
-              <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div
-                    className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuC9ZUK9avxLOWJMPmubQ7FSWpvK4v9FqGO9XByps9EwAABjTCrEGZ9LSpUb0A7hCOIzY13xLeTwFq-COOYilpizU7k3veeb9U2am24iQyn4z08dWbuK7He_DLfUdouNugD-fkoRxNq-m0rmroVDhTUo_M-PiBfn7H4-qQMyMf4oGNX1BeKYE1r2TjedKCAKjxLGrSNcjOvQuiEsUvVoy1cvbDIH1e3Vodc9bWM3ZmSfJakB2iGqztRv3EMa9O0JG-BPWQhwZiXt3l4")' }}
-                  ></div>
+            ) : (
+              featuredRows.map((row, rowIndex) => (
+                <div
+                  key={`row-${rowIndex}`}
+                  className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 ${rowIndex < featuredRows.length - 1 ? 'mb-5 md:mb-6' : ''}`}
+                >
+                  {row.map((producto) => {
+                    const imageUrl = getFirstImageUrl(producto);
+                    return (
+                      <div key={producto.id} className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300 flex flex-col h-full">
+                        {/* Image container with fixed aspect ratio */}
+                        <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative flex-shrink-0">
+                          {imageUrl ? (
+                            <div
+                              className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
+                              style={{ backgroundImage: `url("${imageUrl}")` }}
+                            ></div>
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-300">
+                              <span className="material-symbols-outlined text-4xl">image</span>
+                            </div>
+                          )}
+                        </div>
+                        {/* Content container with flex-grow to fill remaining space */}
+                        <div className="p-5 md:p-6 product-card-content flex flex-col flex-grow">
+                          {/* Title with fixed height (2 lines max) */}
+                          <h3 className="font-display text-lg font-medium uppercase text-primary mb-1.5 line-clamp-2 min-h-[3.5rem]">
+                            {producto.producto || 'Producto sin nombre'}
+                          </h3>
+                          {/* Description with fixed height (2 lines max) */}
+                          <p className="text-sm text-gray-500 mb-4 font-light leading-relaxed line-clamp-2 min-h-[2.5rem]">
+                            {producto.descripcion || 'Descripción no disponible.'}
+                          </p>
+                          {/* Button pushed to bottom with mt-auto */}
+                          <button className="w-full bg-accent hover:bg-accent-hover text-black py-2.5 font-bold uppercase text-xs tracking-wider transition-colors mt-auto">
+                            Cotizar Ahora
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="p-5 md:p-6 product-card-content">
-                  <h3 className="font-display text-lg font-medium uppercase text-primary mb-1.5">Culata Completa 3.0L</h3>
-                  <p className="text-sm text-gray-500 mb-4 font-light leading-relaxed">Para Toyota Hilux / Hiace. Material reforzado para trabajo pesado.</p>
-                  <button className="w-full bg-accent hover:bg-accent-hover text-black py-2.5 font-bold uppercase text-xs tracking-wider transition-colors">
-                    Cotizar Ahora
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Products Grid Row 2 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 mb-5 md:mb-6">
-              {/* Product 4 */}
-              <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div
-                    className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCI4I3eZaFebtNXfF09qbIawl3RLDBWRPRrwUsTxy0PqBvJkkGMHcb8q6Kc5Ac0wGIbt7uaRT-fbJhQfUhS0seUIz42TrIDFo-ZL7LwAo7cTbOa0wkb4_HGYTuIu1wYkmnOOhHCN54lH9eeacQliY-2DEiIpVlAcq85LPX6x4trLT1xEv5ugDVJCwgsDalt0HU-9xJ1Wv-E7qCBGB6siN2YWWOjc41dgX77bzvuPMFLfMBz35POMYgqCWyieJe7GzcSK5KsCRxjaJw")' }}
-                  ></div>
-                </div>
-                <div className="p-5 md:p-6 product-card-content">
-                  <h3 className="font-display text-lg font-medium uppercase text-primary mb-1.5">Set de Filtros Heavy Duty</h3>
-                  <p className="text-sm text-gray-500 mb-4 font-light leading-relaxed">Aire, Aceite y Combustible. Protección máxima para motores de carga.</p>
-                  <button className="w-full bg-accent hover:bg-accent-hover text-black py-2.5 font-bold uppercase text-xs tracking-wider transition-colors">
-                    Cotizar Ahora
-                  </button>
-                </div>
-              </div>
-
-              {/* Product 5 */}
-              <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div className="absolute top-3 left-3 z-10 bg-accent text-black text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide">Oferta</div>
-                  <div
-                    className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD6aAXIdmyLI-VmCXw3ei_O2zxFd3rS23EzoNgVy2bM29doMxteKy20xdnHGoyxgk3v6WTCBHQV3_4Qu6wUXCNuEJ_z74Uwou0NfbTNsLj9y7FkqjljGkoy-dD_YFD0VoE3u9sr-5eZig13qFKJlVICqakLnr_XhnClKNmm9NL-ly8QQV2BTpyXoOmegxS1ERjSJGJPJem1L8oO4Q6raqhn4EoVcs7PB0opGaRNkq179ClmDVzPV2UN2S3RQF4EAWBBAVOHnWjPnVQ")' }}
-                  ></div>
-                </div>
-                <div className="p-5 md:p-6 product-card-content">
-                  <h3 className="font-display text-lg font-medium uppercase text-primary mb-1.5">Filtro Separador Agua/Comb.</h3>
-                  <p className="text-sm text-gray-500 mb-4 font-light leading-relaxed">Sistema avanzado de filtración para camiones chinos Sinotruk / Jac.</p>
-                  <button className="w-full bg-accent hover:bg-accent-hover text-black py-2.5 font-bold uppercase text-xs tracking-wider transition-colors">
-                    Cotizar Ahora
-                  </button>
-                </div>
-              </div>
-
-              {/* Product 6 */}
-              <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div
-                    className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCI4I3eZaFebtNXfF09qbIawl3RLDBWRPRrwUsTxy0PqBvJkkGMHcb8q6Kc5Ac0wGIbt7uaRT-fbJhQfUhS0seUIz42TrIDFo-ZL7LwAo7cTbOa0wkb4_HGYTuIu1wYkmnOOhHCN54lH9eeacQliY-2DEiIpVlAcq85LPX6x4trLT1xEv5ugDVJCwgsDalt0HU-9xJ1Wv-E7qCBGB6siN2YWWOjc41dgX77bzvuPMFLfMBz35POMYgqCWyieJe7GzcSK5KsCRxjaJw")' }}
-                  ></div>
-                </div>
-                <div className="p-5 md:p-6 product-card-content">
-                  <h3 className="font-display text-lg font-medium uppercase text-primary mb-1.5">Pack Mantenimiento Flota</h3>
-                  <p className="text-sm text-gray-500 mb-4 font-light leading-relaxed">Kit x10 unidades de filtros de aceite. Precio especial para empresas.</p>
-                  <button className="w-full bg-accent hover:bg-accent-hover text-black py-2.5 font-bold uppercase text-xs tracking-wider transition-colors">
-                    Cotizar Ahora
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Products Grid Row 3 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-              {/* Product 7 */}
-              <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div
-                    className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAZrZnjIbfruTcQ67At8BnfOhwm0LdgFGKAxmh0KeaO7o1rvRGBccicqZdET1-qF0NpFs34xbf9OEHKxruLtbFj1McFrZk32hNO7TgIyFGBgGOGH1JcDggh544mmzKO-TCeuOmoeIQ9k7BYL-9ErS5S2IiwxWysdybGWLAO5WUpVItN-FeDnHNi4YjF7aIQZP7E9W7dyRoc3T1yxWdFzQKyIjalYpmtlNS57H7OxOSmoqqMf1KlK_2849hx6w9SeF47z5s77UFMv0Q")' }}
-                  ></div>
-                </div>
-                <div className="p-5 md:p-6 product-card-content">
-                  <h3 className="font-display text-lg font-medium uppercase text-primary mb-1.5">Discos de Freno Ventilados</h3>
-                  <p className="text-sm text-gray-500 mb-4 font-light leading-relaxed">Aleación de alta resistencia térmica para buses interprovinciales.</p>
-                  <button className="w-full bg-accent hover:bg-accent-hover text-black py-2.5 font-bold uppercase text-xs tracking-wider transition-colors">
-                    Cotizar Ahora
-                  </button>
-                </div>
-              </div>
-
-              {/* Product 8 */}
-              <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div
-                    className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDC2wkKD1tTrebuIADqe4wsmcbuo8iwOn2EkC9GcZ4KXeqgTYm6yiP1sbLiMtpnlthbUoMdhfNRvqXzqdMK63iSnruSPHSEaJueHdhsG_kN_VhJ2agV4g6EfuVskybENJ_kQb5tR_KVXjaRU4VrjJXgk6Dcqa5-c9HfvwXgea0n5piQaHjoL3bL1cdAQf4qZyjMYPZNcPcdUIKN96qmDYZlj3Lr5-dtJOqWGeJV8dfM09T43y6AARGTYctu0-MVSKum0b5S4bRSuaw")' }}
-                  ></div>
-                </div>
-                <div className="p-5 md:p-6 product-card-content">
-                  <h3 className="font-display text-lg font-medium uppercase text-primary mb-1.5">Pastillas de Freno Cerámicas</h3>
-                  <p className="text-sm text-gray-500 mb-4 font-light leading-relaxed">Frenado silencioso y eficaz. Larga duración para uso intensivo.</p>
-                  <button className="w-full bg-accent hover:bg-accent-hover text-black py-2.5 font-bold uppercase text-xs tracking-wider transition-colors">
-                    Cotizar Ahora
-                  </button>
-                </div>
-              </div>
-
-              {/* Product 9 */}
-              <div className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative">
-                  <div
-                    className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                    style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWMAWvToIFkRoFwnnk91THA9_5-KISj2D2lLkINUUajOgny0MUJTRevcbFfE4ffled0VM9m2FiR7lPBmqbDrq7ZOyRyPx7CkpJc7ZsOq_jqJE5VSON8KmK9vNyYUCqj3P6pAqitBBfK5WjeS7jAzOjCvbRHDpMyhX8McZm8tASV3Z_qO8eZLfgtLa0oBASCgNBQFor6Qt1o3NVPBCyA_Lv240urrsbUok6MymoFe0QMjuYNHN4DCmteOS6tQXH3_qm8HtZYYVrQH8")' }}
-                  ></div>
-                </div>
-                <div className="p-5 md:p-6 product-card-content">
-                  <h3 className="font-display text-lg font-medium uppercase text-primary mb-1.5">Cámaras de Aire (Brake)</h3>
-                  <p className="text-sm text-gray-500 mb-4 font-light leading-relaxed">Sistemas neumáticos de frenado. Repuestos para camiones americanos.</p>
-                  <button className="w-full bg-accent hover:bg-accent-hover text-black py-2.5 font-bold uppercase text-xs tracking-wider transition-colors">
-                    Cotizar Ahora
-                  </button>
-                </div>
-              </div>
-            </div>
+              ))
+            )}
 
             {/* Mobile CTA */}
             <div className="mt-8 text-center md:hidden">

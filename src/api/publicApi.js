@@ -51,6 +51,24 @@ export const publicProductsApi = {
   },
 
   /**
+   * Obtiene productos destacados públicos (solo activos con imágenes)
+   * @param {Object} params - Parámetros de consulta
+   * @param {number} params.page - Número de página (default: 1)
+   * @param {number} params.pageSize - Cantidad por página (default: 9)
+   * @returns {Promise<{items: Array, page: number, pageSize: number, total: number}>}
+   */
+  getFeaturedProducts: async ({ page = 1, pageSize = 9 } = {}) => {
+    try {
+      const params = { page, pageSize };
+      const response = await publicAxios.get('/products/public/featured', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener productos destacados públicos:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Obtiene todas las categorías activas (público)
    * @returns {Promise<Array>}
    */
