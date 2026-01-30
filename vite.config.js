@@ -31,7 +31,7 @@ export default defineConfig({
     // Proxy para redirigir peticiones /api al backend (evita Mixed Content)
     proxy: {
       '/api': {
-        target: 'http://192.168.1.68:5095',
+        target: 'http://localhost:5095',
         changeOrigin: true,
         secure: false,
       },
