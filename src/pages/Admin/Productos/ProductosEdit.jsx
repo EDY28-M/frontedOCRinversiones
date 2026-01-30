@@ -28,6 +28,7 @@ const ProductosEdit = () => {
   });
   const [autoGenCodigo, setAutoGenCodigo] = useState(false);
   const [autoGenCodigoComer, setAutoGenCodigoComer] = useState(false);
+  const [preloadedCodes, setPreloadedCodes] = useState(null);
   const [productImages, setProductImages] = useState([]);
   const [loadingMeta, setLoadingMeta] = useState(true);
   const [error, setError] = useState(null);
@@ -51,6 +52,15 @@ const ProductosEdit = () => {
       }
     };
     loadMeta();
+  }, []);
+
+  // Precargar códigos disponibles para AUTOGEN instantáneo
+  useEffect(() => {
+    let cancelled = false;
+    productService.generateCodes()
+      .then((codes) => { if (!cancelled) setPreloadedCodes(codes); })
+      .catch((err) => { if (!cancelled) console.error('Error al precargar códigos:', err); });
+    return () => { cancelled = true; };
   }, []);
 
   // Poblar formulario cuando el producto carga
@@ -85,32 +95,42 @@ const ProductosEdit = () => {
     });
   };
 
-  const handleAutoGenCodigoChange = async (e) => {
+  const handleAutoGenCodigoChange = (e) => {
     const checked = e.target.checked;
     setAutoGenCodigo(checked);
-    
     if (checked) {
-      try {
-        const codes = await productService.generateCodes();
-        setFormData(prev => ({ ...prev, codigo: codes.codigo }));
-      } catch (err) {
-        console.error('Error al generar código:', err);
-        setError('Error al generar código automático');
+      if (preloadedCodes) {
+        setFormData(prev => ({ ...prev, codigo: preloadedCodes.codigo }));
+      } else {
+        productService.generateCodes()
+          .then((codes) => {
+            setPreloadedCodes(codes);
+            setFormData(prev => ({ ...prev, codigo: codes.codigo }));
+          })
+          .catch((err) => {
+            console.error('Error al generar código:', err);
+            setError('Error al generar código automático');
+          });
       }
     }
   };
 
-  const handleAutoGenCodigoComChange = async (e) => {
+  const handleAutoGenCodigoComChange = (e) => {
     const checked = e.target.checked;
     setAutoGenCodigoComer(checked);
-    
     if (checked) {
-      try {
-        const codes = await productService.generateCodes();
-        setFormData(prev => ({ ...prev, codigoComer: codes.codigoComer }));
-      } catch (err) {
-        console.error('Error al generar código comercial:', err);
-        setError('Error al generar código comercial automático');
+      if (preloadedCodes) {
+        setFormData(prev => ({ ...prev, codigoComer: preloadedCodes.codigoComer }));
+      } else {
+        productService.generateCodes()
+          .then((codes) => {
+            setPreloadedCodes(codes);
+            setFormData(prev => ({ ...prev, codigoComer: codes.codigoComer }));
+          })
+          .catch((err) => {
+            console.error('Error al generar código comercial:', err);
+            setError('Error al generar código comercial automático');
+          });
       }
     }
   };

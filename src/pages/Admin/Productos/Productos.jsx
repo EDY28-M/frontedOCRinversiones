@@ -166,7 +166,64 @@ const Productos = () => {
   };
 
   if (loading) {
-    return null;
+    return (
+      <div className="p-4 animate-pulse">
+        <div className="flex flex-col md:flex-row gap-4 mb-6 items-start md:items-center justify-between">
+          <div>
+            <div className="h-6 w-32 bg-gray-200 rounded" />
+            <div className="h-4 w-56 bg-gray-100 rounded mt-2" />
+          </div>
+          <div className="flex gap-3">
+            <div className="h-11 w-28 bg-gray-200 rounded" />
+            <div className="h-11 w-36 bg-gray-200 rounded" />
+          </div>
+        </div>
+        <div className="mb-6">
+          <div className="h-11 w-full max-w-xl bg-gray-100 rounded" />
+        </div>
+        <div className="bg-white border border-gray-200 shadow-sm">
+          <div className="p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4 bg-gray-50/50">
+            <div className="flex gap-1">
+              <div className="h-8 w-16 bg-gray-200 rounded" />
+              <div className="h-8 w-20 bg-gray-200 rounded" />
+              <div className="h-8 w-24 bg-gray-200 rounded" />
+            </div>
+            <div className="h-4 w-24 bg-gray-200 rounded" />
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-100">
+                  <th className="p-4 py-3 w-40"><div className="h-4 bg-gray-300 rounded" /></th>
+                  <th className="p-4 py-3 w-48"><div className="h-4 bg-gray-300 rounded" /></th>
+                  <th className="p-4 py-3"><div className="h-4 bg-gray-300 rounded" /></th>
+                  <th className="p-4 py-3"><div className="h-4 bg-gray-300 rounded" /></th>
+                  <th className="p-4 py-3 w-48"><div className="h-4 bg-gray-300 rounded" /></th>
+                  <th className="p-4 py-3 w-32"><div className="h-4 bg-gray-300 rounded mx-auto" /></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                  <tr key={i}>
+                    <td className="p-4 py-3"><div className="h-4 w-20 bg-gray-100 rounded font-mono" /></td>
+                    <td className="p-4 py-3"><div className="h-4 w-24 bg-gray-100 rounded font-mono" /></td>
+                    <td className="p-4 py-3"><div className="h-4 w-40 bg-gray-100 rounded" /></td>
+                    <td className="p-4 py-3"><div className="h-4 w-28 bg-gray-100 rounded" /></td>
+                    <td className="p-4 py-3 text-center"><div className="h-4 w-24 bg-gray-100 rounded mx-auto" /></td>
+                    <td className="p-4 py-3 text-center"><div className="h-8 w-20 bg-gray-100 rounded mx-auto" /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="p-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+            <div className="h-4 w-24 bg-gray-200 rounded" />
+            <div className="h-8 w-32 bg-gray-200 rounded" />
+          </div>
+        </div>
+        <p className="text-center text-sm text-slate-500 mt-4">Cargando listado de productos...</p>
+      </div>
+    );
   }
 
   if (error) {

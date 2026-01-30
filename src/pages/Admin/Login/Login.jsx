@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../../../context/NotificationContext';
 import { isAdmin } from '../../../utils/permissions';
+import { productKeys } from '../../../hooks/useProducts';
+import { productService } from '../../../services/productService';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +17,7 @@ const Login = () => {
   
   const { login } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { error: showError, success: showSuccess } = useNotification();
 
   const handleChange = (e) => {
@@ -30,14 +34,17 @@ const Login = () => {
     try {
       const userData = await login(formData);
       
-      // Mostrar notificación de éxito
       showSuccess('¡Bienvenido! Iniciando sesión...');
       
-      // Redirigir según el rol del usuario
       if (isAdmin(userData.role)) {
+        // Prefetch listado de productos para que al llegar a /admin/productos cargue al instante o ya en caché
+        queryClient.prefetchQuery({
+          queryKey: productKeys.list({}),
+          queryFn: () => productService.getAllProducts(),
+          staleTime: 30000,
+        });
         navigate('/admin/', { replace: true });
       } else {
-        // Vendedor va a su propia interfaz
         navigate('/vendedor/productos', { replace: true });
       }
     } catch (err) {

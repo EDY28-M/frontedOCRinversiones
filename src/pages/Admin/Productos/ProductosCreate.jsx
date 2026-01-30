@@ -8,7 +8,7 @@ import { useNotification } from '../../../context/NotificationContext';
 
 const ProductosCreate = () => {
   const navigate = useNavigate();
-  const { warning } = useNotification();
+  const { success } = useNotification();
   const [categorias, setCategorias] = useState([]);
   const [marcas, setMarcas] = useState([]);
   const [formData, setFormData] = useState({
@@ -23,6 +23,7 @@ const ProductosCreate = () => {
   });
   const [autoGenCodigo, setAutoGenCodigo] = useState(false);
   const [autoGenCodigoComer, setAutoGenCodigoComer] = useState(false);
+  const [preloadedCodes, setPreloadedCodes] = useState(null); // Códigos precargados al montar (respuesta instantánea al marcar AUTOGEN)
   const [productImages, setProductImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -32,6 +33,15 @@ const ProductosCreate = () => {
   useEffect(() => {
     loadCategorias();
     loadMarcas();
+  }, []);
+
+  // Precargar códigos disponibles al montar para que al marcar AUTOGEN sea instantáneo
+  useEffect(() => {
+    let cancelled = false;
+    productService.generateCodes()
+      .then((codes) => { if (!cancelled) setPreloadedCodes(codes); })
+      .catch((err) => { if (!cancelled) console.error('Error al precargar códigos:', err); });
+    return () => { cancelled = true; };
   }, []);
 
   const loadCategorias = async () => {
@@ -61,34 +71,44 @@ const ProductosCreate = () => {
     });
   };
 
-  const handleAutoGenCodigoChange = async (e) => {
+  const handleAutoGenCodigoChange = (e) => {
     const checked = e.target.checked;
     setAutoGenCodigo(checked);
-    
     if (checked) {
-      try {
-        const codes = await productService.generateCodes();
-        setFormData(prev => ({ ...prev, codigo: codes.codigo }));
-      } catch (err) {
-        console.error('Error al generar código:', err);
-        setError('Error al generar código automático');
+      if (preloadedCodes) {
+        setFormData(prev => ({ ...prev, codigo: preloadedCodes.codigo }));
+      } else {
+        productService.generateCodes()
+          .then((codes) => {
+            setPreloadedCodes(codes);
+            setFormData(prev => ({ ...prev, codigo: codes.codigo }));
+          })
+          .catch((err) => {
+            console.error('Error al generar código:', err);
+            setError('Error al generar código automático');
+          });
       }
     } else {
       setFormData(prev => ({ ...prev, codigo: '' }));
     }
   };
 
-  const handleAutoGenCodigoComChange = async (e) => {
+  const handleAutoGenCodigoComChange = (e) => {
     const checked = e.target.checked;
     setAutoGenCodigoComer(checked);
-    
     if (checked) {
-      try {
-        const codes = await productService.generateCodes();
-        setFormData(prev => ({ ...prev, codigoComer: codes.codigoComer }));
-      } catch (err) {
-        console.error('Error al generar código comercial:', err);
-        setError('Error al generar código comercial automático');
+      if (preloadedCodes) {
+        setFormData(prev => ({ ...prev, codigoComer: preloadedCodes.codigoComer }));
+      } else {
+        productService.generateCodes()
+          .then((codes) => {
+            setPreloadedCodes(codes);
+            setFormData(prev => ({ ...prev, codigoComer: codes.codigoComer }));
+          })
+          .catch((err) => {
+            console.error('Error al generar código comercial:', err);
+            setError('Error al generar código comercial automático');
+          });
       }
     } else {
       setFormData(prev => ({ ...prev, codigoComer: '' }));
@@ -155,11 +175,6 @@ const ProductosCreate = () => {
         })
       );
 
-      console.log('🖼️ Imágenes procesadas para crear:', {
-        total: processedImages.length,
-        tipos: processedImages.map(img => img ? (img.startsWith('data:') ? 'Base64' : 'URL') : 'null')
-      });
-      
       // Preparar payload con campos requeridos
       const productData = {
         Codigo: formData.codigo.trim(),
@@ -175,17 +190,8 @@ const ProductosCreate = () => {
         CategoryId: parseInt(formData.categoryId),
       };
       
-      console.log('📦 Creando producto con datos:', {
-        ...productData,
-        ImagenPrincipal: productData.ImagenPrincipal ? `${productData.ImagenPrincipal.substring(0, 50)}...` : null,
-        Imagen2: productData.Imagen2 ? `${productData.Imagen2.substring(0, 50)}...` : null,
-        Imagen3: productData.Imagen3 ? `${productData.Imagen3.substring(0, 50)}...` : null,
-        Imagen4: productData.Imagen4 ? `${productData.Imagen4.substring(0, 50)}...` : null
-      });
-      
-      const response = await productService.createProduct(productData);
-      console.log('✅ Producto creado exitosamente. Respuesta:', response);
-      warning('Producto creado exitosamente');
+      await productService.createProduct(productData);
+      success('Producto creado exitosamente');
       navigate('/admin/productos');
     } catch (err) {
       console.error('❌ ERROR AL CREAR PRODUCTO:', err);
