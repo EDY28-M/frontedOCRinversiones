@@ -15,7 +15,7 @@ export default function Nosotros() {
       <div className="relative flex flex-col w-full">
 
         {/* Header */}
-        <header className="sticky top-0 z-50 w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+        <header className="w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
             <div className="flex items-center gap-3 min-w-fit">
               <div className="text-primary">

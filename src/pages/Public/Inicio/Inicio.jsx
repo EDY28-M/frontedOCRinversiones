@@ -18,7 +18,7 @@ export default function Inicio() {
       <div className="relative flex flex-col w-full">
 
         {/* ==================== HEADER ==================== */}
-        <header className="sticky top-0 z-50 w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+        <header className="w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
             <div className="flex items-center gap-3 min-w-fit">
               <div className="text-primary">
@@ -114,7 +114,7 @@ export default function Inicio() {
         <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
         {/* ==================== HERO SECTION ==================== */}
-        <section className="relative w-full flex items-center bg-gray-50 hero-section min-h-[440px] md:min-h-[480px] lg:min-h-[520px] ">
+        <section className="relative w-full flex items-center bg-gray-50 hero-section min-h-[440px] md:min-h-[480px] lg:min-h-[520px]">
           <div
             className="absolute inset-0 bg-cover bg-right-top lg:bg-center"
             style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuD6aAXIdmyLI-VmCXw3ei_O2zxFd3rS23EzoNgVy2bM29doMxteKy20xdnHGoyxgk3v6WTCBHQV3_4Qu6wUXCNuEJ_z74Uwou0NfbTNsLj9y7FkqjljGkoy-dD_YFD0VoE3u9sr-5eZig13qFKJlVICqakLnr_XhnClKNmm9NL-ly8QQV2BTpyXoOmegxS1ERjSJGJPJem1L8oO4Q6raqhn4EoVcs7PB0opGaRNkq179ClmDVzPV2UN2S3RQF4EAWBBAVOHnWjPnVQ")', backgroundSize: 'cover' }}
