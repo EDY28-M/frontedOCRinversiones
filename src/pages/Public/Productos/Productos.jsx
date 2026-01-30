@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import FiltersSidebar from '../../../components/products/FiltersSidebar.jsx';
 import ProductsGrid from '../../../components/products/ProductsGrid.jsx';
+import ProductDetailModal from '../../../components/ProductDetailModal';
 import MobileMenu from '../../../components/common/MobileMenu';
 import { useProductFilters } from '../../../hooks/useProductFilters';
 
@@ -37,6 +38,7 @@ export default function Productos() {
   } = useProductFilters();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -263,6 +265,7 @@ export default function Productos() {
               error={error}
               refetch={refetch}
               total={total}
+              onProductClick={(product) => setSelectedProduct(product)}
             />
           </section>
         </main>
@@ -340,6 +343,14 @@ export default function Productos() {
           </div>
         </footer>
       </div>
+
+      {/* Modal de Detalle del Producto */}
+      {selectedProduct && (
+        <ProductDetailModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </div>
   );
 }

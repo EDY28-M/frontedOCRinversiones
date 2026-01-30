@@ -8,7 +8,7 @@
    WRAPPER PRINCIPAL - SCROLL GARANTIZADO
    ======================================== */
 
-   
+
 .inicio-wrapper {
   width: 100%;
   min-height: 100vh;
@@ -25,21 +25,24 @@
   max-width: 1500px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 1rem;    /* 16px móvil */
+  padding-left: 1rem;
+  /* 16px móvil */
   padding-right: 1rem;
 }
 
 
 @media (min-width: 640px) {
   .page-container {
-    padding-left: 1rem;  /* 24px tablet */
+    padding-left: 1rem;
+    /* 24px tablet */
     padding-right: 1rem;
   }
 }
 
 @media (min-width: 1024px) {
   .page-container {
-    padding-left: 2rem;    /* 32px desktop */
+    padding-left: 2rem;
+    /* 32px desktop */
     padding-right: 2rem;
   }
 }
@@ -62,7 +65,7 @@
   align-items: stretch;
 }
 
-.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 > * {
+.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3>* {
   height: 100%;
 }
 
@@ -71,7 +74,8 @@
    ======================================== */
 .nav-link {
   position: relative;
-  padding-bottom: 12px; /* Space for the underline bar */
+  padding-bottom: 12px;
+  /* Space for the underline bar */
 }
 
 .nav-link::after {
@@ -80,14 +84,17 @@
   bottom: 0;
   left: 50%;
   transform: translateX(-50%) scaleX(0);
-  width: 100%; /* Match the text width exactly */
-  max-width: 60px; /* Maximum width to prevent oversized bars */
+  width: 100%;
+  /* Match the text width exactly */
+  max-width: 60px;
+  /* Maximum width to prevent oversized bars */
   height: 3px;
   background-color: #001aff;
   transform-origin: center;
   transition: transform 220ms ease, opacity 220ms ease;
   opacity: 0;
-  border-radius: 1px; /* Slightly rounded edges if desired */
+  border-radius: 1px;
+  /* Slightly rounded edges if desired */
 }
 
 .nav-link.active::after,
@@ -144,15 +151,15 @@ a[aria-current="page"] .nav-link::after {
     padding-top: 0rem;
     padding-bottom: 1rem;
   }
-  
+
   .product-card-content {
     padding: 1rem;
   }
-  
+
   .header-container {
     height: 3.5rem;
   }
-  
+
   .mobile-menu {
     display: flex;
     flex-direction: column;
@@ -190,5 +197,98 @@ a[aria-current="page"] .nav-link::after {
 @media (min-width: 1440px) {
   .hero-section {
     min-height: 540px;
+  }
+}
+
+/* ========================================
+   BRAND CAROUSEL - INFINITE SCROLL
+   ======================================== */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scroll-right {
+  0% {
+    transform: translateX(-50%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.brand-carousel {
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.brand-carousel::before,
+.brand-carousel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.brand-carousel::before {
+  left: 0;
+  background: linear-gradient(to right, white, transparent);
+}
+
+.brand-carousel::after {
+  right: 0;
+  background: linear-gradient(to left, white, transparent);
+}
+
+.brand-carousel-track {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  padding: 1rem 0;
+  animation: scroll-left 25s linear infinite;
+  width: max-content;
+}
+
+.brand-carousel-track:hover {
+  animation-play-state: paused;
+}
+
+.brand-carousel-track.reverse {
+  animation: scroll-right 25s linear infinite;
+}
+
+.brand-carousel-track img {
+  height: 3rem;
+  width: auto;
+  opacity: 0.7;
+  filter: grayscale(100%);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.brand-carousel-track img:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+  transform: scale(1.1);
+}
+
+@media (min-width: 768px) {
+  .brand-carousel-track {
+    gap: 4rem;
+  }
+
+  .brand-carousel-track img {
+    height: 4rem;
   }
 }

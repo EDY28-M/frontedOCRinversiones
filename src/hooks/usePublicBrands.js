@@ -10,10 +10,10 @@ export function usePublicBrands() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['public-brands'],
     queryFn: () => publicProductsApi.getBrands(),
-    staleTime: 1000 * 10, // 10 segundos - casi instantáneo
-    gcTime: 1000 * 60, // 1 minuto en memoria
-    refetchOnWindowFocus: true, // ✅ Refetch al cambiar de tab
-    refetchOnMount: false, // No refetch automático (solo cuando se invalida)
+    staleTime: 1000 * 60 * 5, // 5 minutos - mantiene caché al navegar
+    gcTime: 1000 * 60 * 10,   // 10 minutos en memoria
+    refetchOnWindowFocus: false, // No refetch al cambiar de tab
+    refetchOnMount: false,       // No refetch automático (usa caché)
     retry: 2,
   });
 

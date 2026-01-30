@@ -24,9 +24,10 @@ export function usePublicProducts({
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['public-products', { page, pageSize, q, categoryId, brandIds }],
     queryFn: () => publicProductsApi.getActiveProducts({ page, pageSize, q, categoryId, brandIds }),
-    staleTime: 10000,      // 10 seconds - casi instantáneo
-    gcTime: 60000,         // 1 minute
-    refetchOnWindowFocus: true, // ✅ Refetch al cambiar de tab
+    staleTime: 1000 * 60 * 5,   // 5 minutos - mantiene caché al navegar entre páginas
+    gcTime: 1000 * 60 * 10,     // 10 minutos en memoria
+    refetchOnWindowFocus: false, // No refetch automático al cambiar de tab
+    refetchOnMount: false,       // No refetch cuando el componente se monta (usa caché)
     placeholderData: (previousData) => previousData,
   });
 

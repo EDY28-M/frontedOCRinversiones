@@ -6,13 +6,13 @@ import { useCreateUser } from '../../../hooks/useUsers';
 const UsuariosCreate = () => {
   const navigate = useNavigate();
   const createMutation = useCreateUser();
-  
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
-    roleId: 2, // Default: Vendedor role (ID 2)
+    roleId: 1, // Default: Administrador (ID 1)
   });
   const [error, setError] = useState(null);
 
@@ -57,7 +57,7 @@ const UsuariosCreate = () => {
       Password: formData.password,
       RoleId: parseInt(formData.roleId),
     };
-    
+
     createMutation.mutate(payload, {
       onSuccess: () => {
         navigate('/admin/usuarios');
@@ -96,7 +96,7 @@ const UsuariosCreate = () => {
             Datos del Usuario
           </h2>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {error && (
             <ErrorAlert error={error} onClose={clearError} title="Error de Validación" />

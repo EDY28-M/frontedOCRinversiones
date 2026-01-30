@@ -11,9 +11,10 @@ export function usePublicFeaturedProducts({ page = 1, pageSize = 9 } = {}) {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['public-featured-products', { page, pageSize }],
     queryFn: () => publicProductsApi.getFeaturedProducts({ page, pageSize }),
-    staleTime: 10000,
-    gcTime: 60000,
-    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 5,   // 5 minutos - mantiene caché al navegar
+    gcTime: 1000 * 60 * 10,     // 10 minutos en memoria
+    refetchOnWindowFocus: false, // No refetch al cambiar de tab
+    refetchOnMount: false,       // No refetch automático (usa caché)
     placeholderData: (previousData) => previousData,
   });
 

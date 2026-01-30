@@ -221,7 +221,10 @@ export function useToggleProductFeatured() {
         });
       }
 
-      showError('Error al actualizar el destacado del producto. Se ha revertido el cambio.');
+      // Mostrar mensaje del backend si existe (ej: límite de 9 productos)
+      const errorMessage = err.response?.data?.message
+        || 'Error al actualizar el destacado del producto. Se ha revertido el cambio.';
+      showError(errorMessage);
     },
 
     onSuccess: (data, { newFeaturedState }) => {

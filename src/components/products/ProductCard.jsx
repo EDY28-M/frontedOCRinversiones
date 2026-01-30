@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onProductClick }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -14,10 +14,17 @@ const ProductCard = ({ product }) => {
 
   const imageUrl = getFirstImageUrl(product);
 
+  const handleClick = () => {
+    if (onProductClick) {
+      onProductClick(product);
+    }
+  };
+
   return (
     <article
       key={product.id}
-      className="group bg-white rounded-lg border border-gray-100 hover:border-blue-200 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 flex flex-col h-full"
+      onClick={handleClick}
+      className={`group bg-white rounded-lg border border-gray-100 hover:border-blue-200 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 flex flex-col h-full ${onProductClick ? 'cursor-pointer' : ''}`}
     >
       {/* Imagen con aspect-ratio estable */}
       <div className="relative w-full pt-[100%] overflow-hidden bg-gray-50">

@@ -1,12 +1,13 @@
 import ProductCard from './ProductCard.jsx';
 
-const ProductsGrid = ({ 
-  products, 
-  isLoading, 
-  isError, 
-  error, 
+const ProductsGrid = ({
+  products,
+  isLoading,
+  isError,
+  error,
   refetch,
-  total 
+  total,
+  onProductClick
 }) => {
   if (isLoading && products.length === 0) {
     return (
@@ -56,7 +57,7 @@ const ProductsGrid = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {products.map(product => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard key={product.id} product={product} onProductClick={onProductClick} />
       ))}
     </div>
   );
