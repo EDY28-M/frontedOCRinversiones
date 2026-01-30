@@ -168,78 +168,78 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-primary text-white pt-16 pb-8 border-t-4 border-accent">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-            <div className="flex flex-col gap-6">
-              <div className="flex items-center gap-3">
-                <div className="text-accent">
-                  <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
+      <footer className="bg-primary text-white pt-10 pb-6 border-t-4 border-accent">
+          <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="text-accent">
+                    <span className="material-symbols-outlined text-2xl">settings_b_roll</span>
+                  </div>
+                  <h1 className="text-xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
+                  <p className="text-accent text-[10px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
                 </div>
-                <h1 className="text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
-                <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
+                <p className="text-xs text-gray-200 leading-relaxed">
+                  Líderes en refacciones de alto rendimiento para entusiastas del motor. Calidad garantizada en cada pieza.
+                </p>
+                <div className="flex gap-3">
+                  <a className="w-7 h-7 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
+                    <span className="text-[10px] font-bold">IG</span>
+                  </a>
+                  <a className="w-7 h-7 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
+                    <span className="text-[10px] font-bold">FB</span>
+                  </a>
+                  <a className="w-7 h-7 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
+                    <span className="text-[10px] font-bold">TW</span>
+                  </a>
+                </div>
               </div>
-              <p className="text-sm text-gray-200 leading-relaxed">
-                Líderes en refacciones de alto rendimiento para entusiastas del motor. Calidad garantizada en cada pieza.
-              </p>
-              <div className="flex gap-4">
-                <a className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
-                  <span className="text-xs font-bold">IG</span>
-                </a>
-                <a className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
-                  <span className="text-xs font-bold">FB</span>
-                </a>
-                <a className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
-                  <span className="text-xs font-bold">TW</span>
-                </a>
+              <div>
+                <h4 className="text-xs font-bold text-accent uppercase tracking-wider mb-4">Nuestra Empresa</h4>
+                <ul className="space-y-2">
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/nosotros">Sobre Nosotros</Link></li>
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/contacto">Carreras</Link></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Blog Automotriz</a></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Socios Comerciales</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-accent uppercase tracking-wider mb-4">Políticas</h4>
+                <ul className="space-y-2">
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Envíos y Entregas</a></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Devoluciones</a></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Garantía de Piezas</a></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Términos de Servicio</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-accent uppercase tracking-wider mb-4">Contacto</h4>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="material-symbols-outlined text-accent text-base mt-0.5">location_on</span>
+                    <span className="text-xs text-gray-200">Av. Revolución 1234, CDMX, México</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-accent text-base">mail</span>
+                    <a className="text-xs text-gray-200 hover:text-white" href="mailto:ventas@estructurapro.com">ventas@estructurapro.com</a>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-accent text-base">call</span>
+                    <span className="text-xs text-gray-200">+52 55 1234 5678</span>
+                  </li>
+                </ul>
               </div>
             </div>
-            <div>
-              <h4 className="text-sm font-bold text-accent uppercase tracking-wider mb-6">Nuestra Empresa</h4>
-              <ul className="space-y-4">
-                <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/nosotros">Sobre Nosotros</Link></li>
-                <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/contacto">Carreras</Link></li>
-                <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Blog Automotriz</a></li>
-                <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Socios Comerciales</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-accent uppercase tracking-wider mb-6">Políticas</h4>
-              <ul className="space-y-4">
-                <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Envíos y Entregas</a></li>
-                <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Devoluciones</a></li>
-                <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Garantía de Piezas</a></li>
-                <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Términos de Servicio</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-accent uppercase tracking-wider mb-6">Contacto</h4>
-              <ul className="space-y-4">
-                <li className="flex items-start gap-3">
-                  <span className="material-symbols-outlined text-accent text-lg mt-0.5">location_on</span>
-                  <span className="text-sm text-gray-200">Av. Revolución 1234, CDMX, México</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-accent text-lg">mail</span>
-                  <a className="text-sm text-gray-200 hover:text-white" href="mailto:ventas@estructurapro.com">ventas@estructurapro.com</a>
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-accent text-lg">call</span>
-                  <span className="text-sm text-gray-200">+52 55 1234 5678</span>
-                </li>
-              </ul>
+            <div className="flex flex-col md:flex-row justify-between items-center border-t border-blue-800 pt-6 text-[10px] text-blue-200 uppercase tracking-widest gap-4">
+              <p>© 2024 ORC Inversiones Perú. Todos los derechos reservados.</p>
+              <div className="flex gap-6">
+                <a className="hover:text-white transition-colors" href="#">Facebook</a>
+                <a className="hover:text-white transition-colors" href="#">Instagram</a>
+                <a className="hover:text-white transition-colors" href="#">WhatsApp</a>
+              </div>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row justify-between items-center border-t border-blue-800 pt-8 text-[10px] text-blue-200 uppercase tracking-widest gap-4">
-            <p>© 2024 ORC Inversiones Perú. Todos los derechos reservados.</p>
-            <div className="flex gap-6">
-              <a className="hover:text-white transition-colors" href="#">Facebook</a>
-              <a className="hover:text-white transition-colors" href="#">Instagram</a>
-              <a className="hover:text-white transition-colors" href="#">WhatsApp</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+        </footer>
     </div>
   );
 };
