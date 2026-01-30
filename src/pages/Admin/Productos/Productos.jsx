@@ -10,7 +10,7 @@ import { useProducts, useToggleProductActive, useDeleteProduct, usePrefetchProdu
 const Productos = () => {
   const { can } = usePermissions();
   const queryClient = useQueryClient();
-  
+
   // React Query hooks
   const { data: productos = [], isLoading: loading, error: queryError, refetch } = useProducts();
   const toggleActiveMutation = useToggleProductActive();
@@ -130,9 +130,9 @@ const Productos = () => {
 
       // Buscar en Categoría (múltiples opciones de campo)
       const matchCategoria = producto.categoryName?.toLowerCase().includes(term) ||
-                            producto.categoria?.toLowerCase().includes(term) ||
-                            producto.category?.nombre?.toLowerCase().includes(term) ||
-                            producto.category?.toLowerCase().includes(term);
+        producto.categoria?.toLowerCase().includes(term) ||
+        producto.category?.nombre?.toLowerCase().includes(term) ||
+        producto.category?.toLowerCase().includes(term);
 
       // Si no coincide con ninguno, excluir el producto
       if (!matchCodigo && !matchCodigoComer && !matchProducto && !matchMarca && !matchCategoria) {
@@ -229,8 +229,8 @@ const Productos = () => {
   if (error) {
     return (
       <div className="p-8">
-        <ErrorAlert 
-          error={error} 
+        <ErrorAlert
+          error={error}
           onClose={clearError}
           title="Error de Carga"
         />
@@ -267,7 +267,7 @@ const Productos = () => {
           )}
           {/* Botón Nuevo Producto - Solo Admin */}
           {can(PERMISSIONS.PRODUCTOS_CREATE) && (
-            <Link 
+            <Link
               to="/admin/productos/crear"
               className="flex items-center gap-2 px-6 py-3 bg-[#F5C344] text-black hover:bg-[#eab308] transition-colors text-sm font-bold uppercase tracking-wide shadow-sm border border-yellow-500/20"
             >
@@ -301,31 +301,28 @@ const Productos = () => {
           <div className="flex items-center gap-1">
             <button
               onClick={() => setFiltroActivo('todos')}
-              className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${
-                filtroActivo === 'todos'
+              className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${filtroActivo === 'todos'
                   ? 'text-blue-700 bg-blue-50 border border-blue-100'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
-              }`}
+                }`}
             >
               Todos
             </button>
             <button
               onClick={() => setFiltroActivo('publicar')}
-              className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${
-                filtroActivo === 'publicar'
+              className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${filtroActivo === 'publicar'
                   ? 'text-green-700 bg-green-50 border border-green-100'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
-              }`}
+                }`}
             >
               Publicar
             </button>
             <button
               onClick={() => setFiltroActivo('borradores')}
-              className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${
-                filtroActivo === 'borradores'
+              className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${filtroActivo === 'borradores'
                   ? 'text-orange-700 bg-orange-50 border border-orange-100'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
-              }`}
+                }`}
             >
               Borradores
             </button>
@@ -408,7 +405,7 @@ const Productos = () => {
                     <td className="p-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
                         {can(PERMISSIONS.PRODUCTOS_EDIT) && (
-                          <Link 
+                          <Link
                             to={`/admin/productos/editar/${producto.id}`}
                             className="p-2 bg-white border border-gray-200 hover:border-blue-500 hover:text-blue-600 text-slate-400 transition-colors shadow-sm"
                             onClick={(e) => e.stopPropagation()}
@@ -418,7 +415,7 @@ const Productos = () => {
                           </Link>
                         )}
                         {can(PERMISSIONS.PRODUCTOS_DELETE) && (
-                          <button 
+                          <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -466,7 +463,7 @@ const Productos = () => {
             <span className="text-xs text-slate-500">
               Página {currentPage} de {totalPages || 1}
             </span>
-            <button 
+            <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               className="w-8 h-8 flex items-center justify-center border border-gray-300 bg-white hover:bg-gray-100 text-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -476,7 +473,7 @@ const Productos = () => {
             <button className="w-8 h-8 flex items-center justify-center border border-blue-600 bg-blue-600 text-white text-xs font-mono font-bold">
               {currentPage}
             </button>
-            <button 
+            <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage >= totalPages}
               className="w-8 h-8 flex items-center justify-center border border-gray-300 bg-white hover:bg-gray-100 text-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"

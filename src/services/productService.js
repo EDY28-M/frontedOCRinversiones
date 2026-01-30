@@ -39,7 +39,7 @@ export const productService = {
 
   // Importación masiva de productos
   bulkImportProducts: async (products) => {
-    const response = await axiosInstance.post('/products/bulk-import', { 
+    const response = await axiosInstance.post('/products/bulk-import', {
       products,
       autoCreateEntities: true
     });
@@ -73,7 +73,7 @@ export const productService = {
     const params = { page, pageSize, onlyWithImages };
     if (q) params.q = q;
     if (categoryId) params.categoryId = categoryId;
-    
+
     const response = await axiosInstance.get('/products/available', { params });
     return response.data;
   },

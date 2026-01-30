@@ -61,7 +61,7 @@ export function useProduct(id) {
  */
 export function usePrefetchProduct() {
   const queryClient = useQueryClient();
-  
+
   const prefetchProduct = useCallback((id) => {
     if (!id) return;
     queryClient.prefetchQuery({
@@ -70,7 +70,7 @@ export function usePrefetchProduct() {
       staleTime: 60000,
     });
   }, [queryClient]);
-  
+
   return prefetchProduct;
 }
 
@@ -151,7 +151,7 @@ export function useToggleProductActive() {
     // Rollback en caso de error
     onError: (err, variables, context) => {
       console.error('Error al actualizar estado del producto:', err);
-      
+
       // Restaurar estado anterior
       if (context?.previousQueries) {
         context.previousQueries.forEach(([queryKey, data]) => {
@@ -164,8 +164,8 @@ export function useToggleProductActive() {
 
     // Éxito: mostrar notificación
     onSuccess: (data, { newActiveState }) => {
-      const mensaje = newActiveState 
-        ? 'Producto activado correctamente' 
+      const mensaje = newActiveState
+        ? 'Producto activado correctamente'
         : 'Producto desactivado correctamente';
       success(mensaje);
     },
@@ -207,7 +207,7 @@ export function useDeleteProduct() {
 
     onError: (err, productId, context) => {
       console.error('Error al eliminar producto:', err);
-      
+
       if (context?.previousQueries) {
         context.previousQueries.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
