@@ -77,14 +77,14 @@ export default function Inicio() {
                                 )}
                             </NavLink>
                             <NavLink
-                                to="/servicios"
+                                to="/envios-provincias"
                                 className={({ isActive }) =>
                                     `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
                                 }
                             >
                                 {({ isActive }) => (
                                     <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                                        SERVICIOS
+                                        ENVÍOS A PROVINCIAS
                                     </span>
                                 )}
                             </NavLink>
@@ -102,17 +102,9 @@ export default function Inicio() {
                             </NavLink>
                         </nav>
                         <div className="flex-1 max-w-sm hidden lg:block">
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
-                                    <span className="material-symbols-outlined text-[20px]">search</span>
-                                </div>
-                                <input
-                                    className="block w-full pl-10 pr-3 py-2 border border-gray-100 rounded bg-gray-50 text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-primary/30 focus:ring-2 focus:ring-primary/10 transition-all"
-                                    placeholder="Buscar refacción..."
-                                    type="text"
-                                />
-                            </div>
+                            {/* Spacer to maintain layout positions */}
                         </div>
+
                         <div className="flex items-center gap-2 min-w-fit">
                             <button className="relative p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
                                 <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
@@ -160,7 +152,7 @@ export default function Inicio() {
                                         <span className="text-accent" style={{ textShadow: '0 0 20px rgba(255,204,0,0.5), 2px 2px 8px rgba(0,0,0,0.5)' }}>Chinos</span>
                                     </h1>
                                     <p className="text-base md:text-lg text-white max-w-md font-normal mb-6 md:mb-8 leading-relaxed border-l-4 border-accent pl-5" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
-                                        Más de 15 años de experiencia atendiendo talleres y flotas en Ate, Lima. Calidad garantizada para tu motor.
+                                        Más de 15 años de experiencia atendiendo talleres y flotas en Ate, Lima. Calidad garantizada para tu vehiculo.
                                     </p>
                                     <div className="flex flex-col sm:flex-row gap-3">
                                         <Link to="/productos" className="bg-accent hover:bg-yellow-400 text-black px-6 py-3 font-bold uppercase tracking-wider text-xs transition-all shadow-lg shadow-yellow-500/40 hover:shadow-yellow-400/60 hover:scale-105 text-center">
@@ -435,9 +427,9 @@ export default function Inicio() {
                                 <h4 className="text-sm font-bold text-accent uppercase tracking-wider mb-6">Nuestra Empresa</h4>
                                 <ul className="space-y-4">
                                     <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/nosotros">Sobre Nosotros</Link></li>
-                                    <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/contacto">Carreras</Link></li>
-                                    <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Blog Automotriz</a></li>
-                                    <li><a className="text-sm text-gray-200 hover:text-white transition-colors" href="#">Socios Comerciales</a></li>
+                                    <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/envios-provincias">Envíos a Provincias</Link></li>
+                                    <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/productos">Catálogo</Link></li>
+                                    <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/">Empresa</Link></li>
                                 </ul>
                             </div>
                             <div>
@@ -454,15 +446,15 @@ export default function Inicio() {
                                 <ul className="space-y-4">
                                     <li className="flex items-start gap-3">
                                         <span className="material-symbols-outlined text-accent text-lg mt-0.5">location_on</span>
-                                        <span className="text-sm text-gray-200">Av. Revolución 1234, CDMX, México</span>
+                                        <span className="text-sm text-gray-200">Av. Nicolás Ayllón 4329 - Ate, Lima</span>
                                     </li>
                                     <li className="flex items-center gap-3">
                                         <span className="material-symbols-outlined text-accent text-lg">mail</span>
-                                        <a className="text-sm text-gray-200 hover:text-white" href="mailto:ventas@estructurapro.com">ventas@estructurapro.com</a>
+                                        <a className="text-sm text-gray-200 hover:text-white" href="mailto:ventas@orcinversiones.com">ventas@orcinversiones.com</a>
                                     </li>
                                     <li className="flex items-center gap-3">
                                         <span className="material-symbols-outlined text-accent text-lg">call</span>
-                                        <span className="text-sm text-gray-200">+52 55 1234 5678</span>
+                                        <span className="text-sm text-gray-200">984 244 498</span>
                                     </li>
                                 </ul>
                             </div>

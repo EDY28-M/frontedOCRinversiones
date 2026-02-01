@@ -76,14 +76,14 @@ const MobileMenu = ({ isOpen, onClose }) => {
                     </NavLink>
 
                     <NavLink
-                        to="/servicios"
+                        to="/envios-provincias"
                         onClick={onClose}
                         className={({ isActive }) =>
                             `text-xl font-display font-medium tracking-wide transition-colors flex items-center justify-between group ${isActive ? 'text-primary' : 'text-gray-800 hover:text-primary'
                             }`
                         }
                     >
-                        SERVICIOS
+                        ENVÍOS A PROVINCIAS
                         <span className="material-symbols-outlined text-gray-300 group-hover:text-primary transition-colors">chevron_right</span>
                     </NavLink>
 

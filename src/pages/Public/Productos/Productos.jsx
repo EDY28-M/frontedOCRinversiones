@@ -87,14 +87,14 @@ export default function Productos() {
                 )}
               </NavLink>
               <NavLink
-                to="/servicios"
+                to="/envios-provincias"
                 className={({ isActive }) =>
                   `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
                 }
               >
                 {({ isActive }) => (
                   <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    SERVICIOS
+                    ENVÍOS A PROVINCIAS
                   </span>
                 )}
               </NavLink>
@@ -125,6 +125,7 @@ export default function Productos() {
                 />
               </div>
             </div>
+
             <div className="flex items-center gap-2 min-w-fit">
               <button className="relative p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
                 <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
@@ -300,9 +301,9 @@ export default function Productos() {
                 <h4 className="text-xs font-bold text-accent uppercase tracking-wider mb-4">Nuestra Empresa</h4>
                 <ul className="space-y-2">
                   <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/nosotros">Sobre Nosotros</Link></li>
-                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/contacto">Carreras</Link></li>
-                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Blog Automotriz</a></li>
-                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Socios Comerciales</a></li>
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/envios-provincias">Envíos a Provincias</Link></li>
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/productos">Catálogo</Link></li>
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/">Empresa</Link></li>
                 </ul>
               </div>
               <div>
@@ -319,15 +320,15 @@ export default function Productos() {
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <span className="material-symbols-outlined text-accent text-base mt-0.5">location_on</span>
-                    <span className="text-xs text-gray-200">Av. Revolución 1234, CDMX, México</span>
+                    <span className="text-xs text-gray-200">Av. Nicolás Ayllón 4329 - Ate, Lima</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-accent text-base">mail</span>
-                    <a className="text-xs text-gray-200 hover:text-white" href="mailto:ventas@estructurapro.com">ventas@estructurapro.com</a>
+                    <a className="text-xs text-gray-200 hover:text-white" href="mailto:ventas@orcinversiones.com">ventas@orcinversiones.com</a>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-accent text-base">call</span>
-                    <span className="text-xs text-gray-200">+52 55 1234 5678</span>
+                    <span className="text-xs text-gray-200">984 244 498</span>
                   </li>
                 </ul>
               </div>

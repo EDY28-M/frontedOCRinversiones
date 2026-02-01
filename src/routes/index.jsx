@@ -68,7 +68,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Inicio />} />
         <Route path="/productos" element={<Productos />} />
         <Route path="/catalogo" element={<Navigate to="/productos" replace />} />
-        <Route path="/servicios" element={<Servicios />} />
+        <Route path="/envios-provincias" element={<Servicios />} />
         <Route path="/nosotros" element={<Nosotros />} />
 
         {/* Rutas legacy con PublicLayout (contacto usa el diseño antiguo) */}
@@ -93,7 +93,7 @@ const AppRoutes = () => {
           >
             {/* Redirección dinámica según rol del usuario */}
             <Route index element={<DashboardRedirect />} />
-            
+
             {/* Página de Acceso Denegado dentro del layout */}
             <Route path="acceso-denegado" element={<AccessDenied />} />
 
@@ -118,7 +118,7 @@ const AppRoutes = () => {
                 <ProductosEdit />
               </ProtectedRoute>
             } />
-            
+
             {/* CATEGORÍAS - Solo Administrador */}
             <Route path="categorias" element={
               <ProtectedRoute permission={PERMISSIONS.CATEGORIAS_VIEW}>
@@ -135,7 +135,7 @@ const AppRoutes = () => {
                 <CategoriasEdit />
               </ProtectedRoute>
             } />
-            
+
             {/* NOMBRE MARCA - Solo Administrador */}
             <Route path="nombre-marca" element={
               <ProtectedRoute permission={PERMISSIONS.MARCAS_VIEW}>
@@ -152,7 +152,7 @@ const AppRoutes = () => {
                 <NombreMarcaEdit />
               </ProtectedRoute>
             } />
-            
+
             {/* USUARIOS - Solo Administrador */}
             <Route path="usuarios" element={
               <ProtectedRoute permission={PERMISSIONS.USUARIOS_VIEW}>
@@ -185,10 +185,10 @@ const AppRoutes = () => {
           >
             {/* Redirección por defecto a productos */}
             <Route index element={<Navigate to="/vendedor/productos" replace />} />
-            
+
             {/* Página de Acceso Denegado para vendedor */}
             <Route path="acceso-denegado" element={<VendedorAccessDenied />} />
-            
+
             {/* PRODUCTOS - Vendedor solo puede VER */}
             <Route path="productos" element={
               <ProtectedRoute permission={PERMISSIONS.PRODUCTOS_VIEW}>

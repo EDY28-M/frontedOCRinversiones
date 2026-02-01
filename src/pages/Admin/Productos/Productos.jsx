@@ -332,8 +332,8 @@ const Productos = () => {
             <button
               onClick={() => setFiltroActivo('todos')}
               className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${filtroActivo === 'todos'
-                  ? 'text-blue-700 bg-blue-50 border border-blue-100'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
+                ? 'text-blue-700 bg-blue-50 border border-blue-100'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
                 }`}
             >
               Todos
@@ -341,8 +341,8 @@ const Productos = () => {
             <button
               onClick={() => setFiltroActivo('publicar')}
               className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${filtroActivo === 'publicar'
-                  ? 'text-green-700 bg-green-50 border border-green-100'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
+                ? 'text-green-700 bg-green-50 border border-green-100'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
                 }`}
             >
               Publicar
@@ -350,8 +350,8 @@ const Productos = () => {
             <button
               onClick={() => setFiltroActivo('borradores')}
               className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${filtroActivo === 'borradores'
-                  ? 'text-orange-700 bg-orange-50 border border-orange-100'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
+                ? 'text-orange-700 bg-orange-50 border border-orange-100'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
                 }`}
             >
               Borradores

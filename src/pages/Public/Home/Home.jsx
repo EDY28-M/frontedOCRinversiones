@@ -25,18 +25,7 @@ const Home = () => {
                         <Link className="text-xs font-semibold hover:text-primary transition-colors tracking-wide" to="/servicios">SERVICIOS</Link>
                         <Link className="text-xs font-semibold hover:text-primary transition-colors tracking-wide" to="/nosotros">EMPRESA</Link>
                     </nav>
-                    <div className="flex-1 max-w-sm hidden lg:block">
-                        <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
-                                <span className="material-symbols-outlined text-[20px]">search</span>
-                            </div>
-                            <input
-                                className="block w-full pl-10 pr-3 py-2 border border-gray-100 rounded bg-gray-50 text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-primary/30 focus:ring-2 focus:ring-primary/10 transition-all"
-                                placeholder="Buscar refacción..."
-                                type="text"
-                            />
-                        </div>
-                    </div>
+
                     <div className="flex items-center gap-2 min-w-fit">
                         <button className="relative p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
                             <span className="material-symbols-outlined text-[22px]">shopping_bag</span>

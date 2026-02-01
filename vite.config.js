@@ -15,7 +15,7 @@ export default defineConfig({
     assetsInlineLimit: 0,
   },
   server: {
-    host: '0.0.0.0', // Escucha en todas las interfaces
+    host: 'localhost', // Escucha solo en localhost
     port: 5173,
     strictPort: true, // No cambiar de puerto automáticamente
     // Configuración del servidor de desarrollo
