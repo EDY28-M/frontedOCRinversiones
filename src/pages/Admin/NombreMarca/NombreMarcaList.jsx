@@ -1,13 +1,15 @@
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ErrorAlert, ConfirmModal } from '../../../components/common';
-import { useBrands, useDeleteBrand } from '../../../hooks/useBrands';
+import { useBrands, useDeleteBrand, useDeleteAllBrands } from '../../../hooks/useBrands';
 
 const NombreMarcaList = () => {
   const { data: nombreMarcas = [], isLoading: loading, error: queryError } = useBrands();
   const deleteMutation = useDeleteBrand();
-  
+  const deleteAllMutation = useDeleteAllBrands();
+
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null, nombre: '' });
+  const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
   const [error, setError] = useState(null);
 
   const clearError = useCallback(() => setError(null), []);
@@ -48,13 +50,22 @@ const NombreMarcaList = () => {
           </h1>
           <p className="text-slate-500 text-sm mt-1">Gestión de marcas de productos</p>
         </div>
-        <Link 
-          to="/admin/nombre-marca/crear"
-          className="flex items-center gap-2 px-6 py-3 bg-[#F5C344] text-black hover:bg-[#eab308] transition-colors text-sm font-bold uppercase tracking-wide shadow-sm border border-yellow-500/20"
-        >
-          <span className="material-symbols-outlined text-[20px]">add</span>
-          NUEVA MARCA
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setConfirmDeleteAll(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white hover:bg-red-700 transition-colors text-sm font-bold uppercase tracking-wide shadow-sm border border-red-500/20"
+          >
+            <span className="material-symbols-outlined text-[20px]">delete_forever</span>
+            ELIMINAR TODO
+          </button>
+          <Link
+            to="/admin/nombre-marca/crear"
+            className="flex items-center gap-2 px-6 py-3 bg-[#F5C344] text-black hover:bg-[#eab308] transition-colors text-sm font-bold uppercase tracking-wide shadow-sm border border-yellow-500/20"
+          >
+            <span className="material-symbols-outlined text-[20px]">add</span>
+            NUEVA MARCA
+          </Link>
+        </div>
       </div>
 
       {/* Error */}
@@ -93,13 +104,13 @@ const NombreMarcaList = () => {
                     </td>
                     <td className="p-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <Link 
+                        <Link
                           to={`/admin/nombre-marca/editar/${marca.id}`}
                           className="p-2 bg-white border border-gray-200 hover:border-blue-500 hover:text-blue-600 text-slate-400 transition-colors shadow-sm"
                         >
                           <span className="material-symbols-outlined text-[18px]">edit</span>
                         </Link>
-                        <button 
+                        <button
                           onClick={() => handleDelete(marca.id, marca.nombre)}
                           className="p-2 bg-white border border-gray-200 hover:border-red-500 hover:text-red-500 text-slate-400 transition-colors shadow-sm"
                         >
@@ -131,6 +142,21 @@ const NombreMarcaList = () => {
         title="Confirmar eliminación"
         message={`¿Estás seguro de eliminar la marca "${confirmDelete.nombre}"? Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+      />
+
+      {/* Modal de confirmación para ELIMINAR TODO */}
+      <ConfirmModal
+        isOpen={confirmDeleteAll}
+        onClose={() => setConfirmDeleteAll(false)}
+        onConfirm={() => {
+          deleteAllMutation.mutate();
+          setConfirmDeleteAll(false);
+        }}
+        title="PELIGRO: Eliminar TODAS las marcas"
+        message="¿Estás completamente seguro de que quieres ELIMINAR TODAS LAS MARCAS? Esta acción es IRREVERSIBLE y podría dejar productos sin marca."
+        confirmText="SÍ, ELIMINAR TODO"
         cancelText="Cancelar"
         variant="danger"
       />

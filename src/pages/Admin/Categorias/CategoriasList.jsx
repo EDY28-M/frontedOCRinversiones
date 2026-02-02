@@ -1,13 +1,15 @@
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ErrorAlert, ConfirmModal } from '../../../components/common';
-import { useCategories, useDeleteCategory } from '../../../hooks/useCategories';
+import { useCategories, useDeleteCategory, useDeleteAllCategories } from '../../../hooks/useCategories';
 
 const CategoriasList = () => {
   const { data: categorias = [], isLoading: loading, error: queryError } = useCategories();
   const deleteMutation = useDeleteCategory();
-  
+  const deleteAllMutation = useDeleteAllCategories();
+
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null, nombre: '' });
+  const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
   const [error, setError] = useState(null);
 
   const clearError = useCallback(() => setError(null), []);
@@ -48,13 +50,22 @@ const CategoriasList = () => {
           </h1>
           <p className="text-slate-500 text-sm mt-1">Gestión de categorías de productos</p>
         </div>
-        <Link 
-          to="/admin/categorias/crear"
-          className="flex items-center gap-2 px-6 py-3 bg-[#F5C344] text-black hover:bg-[#eab308] transition-colors text-sm font-bold uppercase tracking-wide shadow-sm border border-yellow-500/20"
-        >
-          <span className="material-symbols-outlined text-[20px]">add</span>
-          NUEVA CATEGORÍA
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setConfirmDeleteAll(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white hover:bg-red-700 transition-colors text-sm font-bold uppercase tracking-wide shadow-sm border border-red-500/20"
+          >
+            <span className="material-symbols-outlined text-[20px]">delete_forever</span>
+            ELIMINAR TODO
+          </button>
+          <Link
+            to="/admin/categorias/crear"
+            className="flex items-center gap-2 px-6 py-3 bg-[#F5C344] text-black hover:bg-[#eab308] transition-colors text-sm font-bold uppercase tracking-wide shadow-sm border border-yellow-500/20"
+          >
+            <span className="material-symbols-outlined text-[20px]">add</span>
+            NUEVA CATEGORÍA
+          </Link>
+        </div>
       </div>
 
       {/* Error */}
@@ -97,13 +108,13 @@ const CategoriasList = () => {
                     </td>
                     <td className="p-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <Link 
+                        <Link
                           to={`/admin/categorias/editar/${categoria.id}`}
                           className="p-2 bg-white border border-gray-200 hover:border-blue-500 hover:text-blue-600 text-slate-400 transition-colors shadow-sm"
                         >
                           <span className="material-symbols-outlined text-[18px]">edit</span>
                         </Link>
-                        <button 
+                        <button
                           onClick={() => handleDelete(categoria.id, categoria.name)}
                           className="p-2 bg-white border border-gray-200 hover:border-red-500 hover:text-red-500 text-slate-400 transition-colors shadow-sm"
                         >
@@ -138,7 +149,23 @@ const CategoriasList = () => {
         cancelText="Cancelar"
         variant="danger"
       />
+
+      {/* Modal de confirmación para ELIMINAR TODO */}
+      <ConfirmModal
+        isOpen={confirmDeleteAll}
+        onClose={() => setConfirmDeleteAll(false)}
+        onConfirm={() => {
+          deleteAllMutation.mutate();
+          setConfirmDeleteAll(false);
+        }}
+        title="PELIGRO: Eliminar TODAS las categorías"
+        message="¿Estás completamente seguro de que quieres ELIMINAR TODAS LAS CATEGORÍAS? Esta acción es IRREVERSIBLE y podría dejar productos sin categoría."
+        confirmText="SÍ, ELIMINAR TODO"
+        cancelText="Cancelar"
+        variant="danger"
+      />
     </div>
+
   );
 };
 

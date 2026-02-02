@@ -106,7 +106,7 @@ export function useDeleteBrand() {
     onMutate: async (brandId) => {
       await queryClient.cancelQueries({ queryKey: brandKeys.all });
       const previousData = queryClient.getQueryData(brandKeys.list({}));
-      
+
       queryClient.setQueryData(brandKeys.list({}), (old) => {
         if (!old) return old;
         return old.filter((brand) => brand.id !== brandId);
@@ -125,6 +125,37 @@ export function useDeleteBrand() {
 
     onSuccess: () => {
       success('Marca eliminada exitosamente');
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: brandKeys.all });
+    },
+  });
+}
+
+/**
+ * Hook para eliminar TODAS las marcas
+ */
+export function useDeleteAllBrands() {
+  const queryClient = useQueryClient();
+  const { success, error: showError } = useNotification();
+
+  return useMutation({
+    mutationFn: () => nombreMarcaService.deleteAllNombreMarcas(),
+
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: brandKeys.all });
+      queryClient.setQueriesData({ queryKey: brandKeys.list({}) }, []);
+    },
+
+    onError: (err) => {
+      console.error('Error al eliminar todas las marcas:', err);
+      showError('Error al eliminar todas las marcas');
+      queryClient.invalidateQueries({ queryKey: brandKeys.all });
+    },
+
+    onSuccess: () => {
+      success('Todas las marcas eliminadas correctamente');
     },
 
     onSettled: () => {

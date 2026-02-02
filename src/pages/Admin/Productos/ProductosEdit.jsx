@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { productService, categoryService, nombreMarcaService } from '../../../services/productService';
 import ErrorAlert from '../../../components/common/ErrorAlert';
 import ImageUploader from '../../../components/common/ImageUploader';
@@ -8,12 +8,13 @@ import { useProduct, useUpdateProduct } from '../../../hooks/useProducts';
 
 const ProductosEdit = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams();
-  
+
   // React Query hooks
   const { data: producto, isLoading: loadingProduct, error: productError } = useProduct(id);
   const updateMutation = useUpdateProduct();
-  
+
   const [categorias, setCategorias] = useState([]);
   const [marcas, setMarcas] = useState([]);
   const [formData, setFormData] = useState({
@@ -76,7 +77,7 @@ const ProductosEdit = () => {
         categoryId: producto.categoryId || '',
         isActive: producto.isActive !== undefined ? producto.isActive : true,
       });
-      
+
       // Cargar imágenes existentes en orden
       const initialImages = [];
       if (producto.imagenPrincipal) initialImages.push(producto.imagenPrincipal);
@@ -205,13 +206,16 @@ const ProductosEdit = () => {
       productData.Imagen2 = processedImages[1] || null;
       productData.Imagen3 = processedImages[2] || null;
       productData.Imagen4 = processedImages[3] || null;
-      
+
+      // Determinar URL de retorno (mantener paginación)
+      const backUrl = location.state?.max ? `/admin/productos?${location.state.max}` : '/admin/productos';
+
       // Usar mutation de React Query
       updateMutation.mutate(
         { id, productData },
         {
           onSuccess: () => {
-            navigate('/admin/productos');
+            navigate(backUrl);
           },
           onError: (err) => {
             let errorMessage = 'Error al actualizar el producto';
@@ -237,9 +241,12 @@ const ProductosEdit = () => {
 
   const loading = loadingProduct || loadingMeta;
   const saving = updateMutation.isPending;
-  
+
   // Mostrar error de carga del producto
   const displayError = error || (productError ? 'Error al cargar el producto' : null);
+
+  // Determinar URL de retorno para botón Cancelar
+  const backUrl = location.state?.max ? `/admin/productos?${location.state.max}` : '/admin/productos';
 
   // Skeleton loader en lugar de pantalla blanca
   if (loading) {
@@ -285,7 +292,7 @@ const ProductosEdit = () => {
             Datos del Producto
           </h2>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-4">
           {displayError && (
             <div className="mb-3">
@@ -295,10 +302,10 @@ const ProductosEdit = () => {
 
           {/* Layout en 2 columnas principales */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            
+
             {/* Columna Izquierda */}
             <div className="space-y-3">
-              
+
               {/* Códigos en fila */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -465,7 +472,7 @@ const ProductosEdit = () => {
                 Imágenes actuales se mostrarán. Elimínalas o agrega nuevas (máx. 4).
               </p>
               <div className="bg-gray-50 p-3 rounded border border-gray-200">
-                <ImageUploader 
+                <ImageUploader
                   images={productImages}
                   onChange={setProductImages}
                   maxImages={4}
@@ -485,7 +492,7 @@ const ProductosEdit = () => {
             </button>
             <button
               type="button"
-              onClick={() => navigate('/admin/productos')}
+              onClick={() => navigate(backUrl)}
               className="px-6 py-3 bg-gray-200 text-gray-700 font-bold text-sm uppercase tracking-widest hover:bg-gray-300 transition-all"
             >
               Cancelar

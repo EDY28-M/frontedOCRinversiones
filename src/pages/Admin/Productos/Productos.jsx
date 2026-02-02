@@ -1,25 +1,29 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { categoryService, nombreMarcaService } from '../../../services/productService';
 import { ErrorAlert, ConfirmModal, ImportProductsModal } from '../../../components/common';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { PERMISSIONS } from '../../../utils/permissions';
-import { useProducts, useToggleProductActive, useToggleProductFeatured, useDeleteProduct, usePrefetchProduct, productKeys } from '../../../hooks/useProducts';
+import { useProducts, useToggleProductActive, useToggleProductFeatured, useDeleteProduct, useDeleteAllProducts, usePrefetchProduct, productKeys } from '../../../hooks/useProducts';
 
 const Productos = () => {
   const { can } = usePermissions();
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // React Query hooks
   const { data: productos = [], isLoading: loading, error: queryError, refetch } = useProducts();
   const toggleActiveMutation = useToggleProductActive();
   const toggleFeaturedMutation = useToggleProductFeatured();
   const deleteMutation = useDeleteProduct();
+  const deleteAllMutation = useDeleteAllProducts();
   const prefetchProduct = usePrefetchProduct();
+  const error = queryError?.message || (queryError ? 'Error al cargar productos. Verifica que el backend esté corriendo.' : null);
 
-  const [filtroActivo, setFiltroActivo] = useState('todos');
+  // const [filtroActivo, setFiltroActivo] = useState('todos'); // Moved to URL params
   const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, id: null, descripcion: '' });
+  const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [marcas, setMarcas] = useState([]);
@@ -28,105 +32,41 @@ const Productos = () => {
   const [togglingRows, setTogglingRows] = useState(new Set());
   const [togglingFeaturedRows, setTogglingFeaturedRows] = useState(new Set());
 
-  // Paginación
-  const [currentPage, setCurrentPage] = useState(1);
+  // Paginación y Estado desde URL
+  const pageParam = parseInt(searchParams.get('page'), 10);
+  const currentPage = !isNaN(pageParam) && pageParam > 0 ? pageParam : 1;
+  const filtroActivo = searchParams.get('filter') || 'todos';
+  const searchTerm = searchParams.get('search') || '';
+
   const [pageSize, setPageSize] = useState(7);
 
+  const setCurrentPage = (page) => {
+    setSearchParams(prev => {
+      prev.set('page', page.toString());
+      return prev;
+    });
+  };
+
+  const handleSetFilter = (filter) => {
+    setSearchParams(prev => {
+      prev.set('filter', filter);
+      prev.set('page', '1'); // Reset to page 1
+      return prev;
+    });
+  };
+
+  const handleSearchChange = (e) => {
+    const term = e.target.value;
+    setSearchParams(prev => {
+      if (term) prev.set('search', term);
+      else prev.delete('search');
+      prev.set('page', '1'); // Reset to page 1
+      return prev;
+    });
+  };
+
   // Estado para búsqueda
-  const [searchTerm, setSearchTerm] = useState('');
-
-  // Función para limpiar error - solo por acción del usuario
-  const clearError = useCallback(() => {
-    queryClient.resetQueries({ queryKey: productKeys.all });
-  }, [queryClient]);
-
-  useEffect(() => {
-    loadCategoriesAndMarcas();
-  }, []);
-
-  const loadCategoriesAndMarcas = async () => {
-    try {
-      const [categoriesData, marcasData] = await Promise.all([
-        categoryService.getAllCategories(),
-        nombreMarcaService.getAllNombreMarcas()
-      ]);
-      setCategories(categoriesData);
-      setMarcas(marcasData);
-    } catch (err) {
-      console.error('Error al cargar categorías/marcas:', err);
-    }
-  };
-
-  const handleImportSuccess = () => {
-    queryClient.invalidateQueries({ queryKey: productKeys.all });
-  };
-
-  const handleDelete = async (id, descripcion) => {
-    setConfirmDelete({ isOpen: true, id, descripcion });
-  };
-
-  const confirmDeleteAction = async () => {
-    deleteMutation.mutate(confirmDelete.id);
-    setConfirmDelete({ isOpen: false, id: null, descripcion: '' });
-  };
-
-  // Toggle con optimistic update - solo visible en pestaña PUBLICAR
-  const handleToggleActive = useCallback((e, id, currentStatus) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const product = productos.find(p => p.id === id);
-    if (!product) return;
-
-    setTogglingRows(prev => new Set(prev).add(id));
-
-    toggleActiveMutation.mutate(
-      {
-        productId: id,
-        product,
-        newActiveState: !currentStatus,
-      },
-      {
-        onSettled: () => {
-          setTogglingRows(prev => {
-            const next = new Set(prev);
-            next.delete(id);
-            return next;
-          });
-        },
-      }
-    );
-  }, [productos, toggleActiveMutation]);
-
-  // Toggle destacado con optimistic update - solo visible en pestaña PUBLICAR
-  const handleToggleFeatured = useCallback((e, id, currentStatus) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const product = productos.find(p => p.id === id);
-    if (!product) return;
-
-    setTogglingFeaturedRows(prev => new Set(prev).add(id));
-
-    toggleFeaturedMutation.mutate(
-      {
-        productId: id,
-        product,
-        newFeaturedState: !currentStatus,
-      },
-      {
-        onSettled: () => {
-          setTogglingFeaturedRows(prev => {
-            const next = new Set(prev);
-            next.delete(id);
-            return next;
-          });
-        },
-      }
-    );
-  }, [productos, toggleFeaturedMutation]);
-
-  const error = queryError?.message || (queryError ? 'Error al cargar productos. Verifica que el backend esté corriendo.' : null);
+  // Estado para búsqueda (Moved to URL)
 
   const filteredProducts = useMemo(() => productos.filter(producto => {
     // Helper: Verificar si tiene imágenes
@@ -175,15 +115,108 @@ const Productos = () => {
 
   // Productos paginados
   const totalPages = Math.ceil(filteredProducts.length / pageSize);
+
+  // Asegurar que currentPage sea válido si los filtros cambiaron el total
+  useEffect(() => {
+    // Si la página actual es mayor al total de páginas (y hay páginas), ir a la última
+    if (totalPages > 0 && currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+    // OPTIONAL: Si no hay resultados (totalPages=0) y estamos en página > 1, volver a 1
+    // Esto evita mostrar "Página 5 de 1" vacío
+    if (totalPages === 0 && currentPage > 1) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
+
   const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  // Reset página al cambiar filtro o búsqueda
+  // Reset página auto-handled by bounds check and setters
+
+  // Función para limpiar error - solo por acción del usuario
+  const clearError = useCallback(() => {
+    queryClient.resetQueries({ queryKey: productKeys.all });
+  }, [queryClient]);
+
+  const loadCategoriesAndMarcas = async () => {
+    try {
+      const [categoriesData, marcasData] = await Promise.all([
+        categoryService.getAllCategories(),
+        nombreMarcaService.getAllNombreMarcas()
+      ]);
+      setCategories(categoriesData);
+      setMarcas(marcasData);
+    } catch (err) {
+      console.error('Error al cargar categorías/marcas:', err);
+    }
+  };
+
   useEffect(() => {
-    setCurrentPage(1);
-  }, [filtroActivo, pageSize, searchTerm]);
+    loadCategoriesAndMarcas();
+  }, []);
+
+  const handleImportSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: productKeys.all });
+  };
+
+  const handleDelete = async (id, descripcion) => {
+    setConfirmDelete({ isOpen: true, id, descripcion });
+  };
+
+  const confirmDeleteAction = async () => {
+    deleteMutation.mutate(confirmDelete.id);
+    setConfirmDelete({ isOpen: false, id: null, descripcion: '' });
+  };
+
+  // Toggle con optimistic update
+  const handleToggleActive = useCallback((e, id, currentStatus) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const product = productos.find(p => p.id === id);
+    if (!product) return;
+
+    setTogglingRows(prev => new Set(prev).add(id));
+
+    toggleActiveMutation.mutate(
+      { productId: id, product, newActiveState: !currentStatus },
+      {
+        onSettled: () => {
+          setTogglingRows(prev => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+        },
+      }
+    );
+  }, [productos, toggleActiveMutation]);
+
+  const handleToggleFeatured = useCallback((e, id, currentStatus) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const product = productos.find(p => p.id === id);
+    if (!product) return;
+
+    setTogglingFeaturedRows(prev => new Set(prev).add(id));
+
+    toggleFeaturedMutation.mutate(
+      { productId: id, product, newFeaturedState: !currentStatus },
+      {
+        onSettled: () => {
+          setTogglingFeaturedRows(prev => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+        },
+      }
+    );
+  }, [productos, toggleFeaturedMutation]);
 
   const getIconForCategory = (categoryName) => {
     const icons = {
@@ -285,6 +318,16 @@ const Productos = () => {
           <p className="text-slate-500 text-sm mt-1">Gestión de inventario de productos</p>
         </div>
         <div className="flex items-center gap-3">
+          {/* Botón Eliminar Todo - Solo Admin */}
+          {can(PERMISSIONS.PRODUCTOS_DELETE) && (
+            <button
+              onClick={() => setConfirmDeleteAll(true)}
+              className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white hover:bg-red-700 transition-colors text-sm font-bold uppercase tracking-wide shadow-sm border border-red-500/20"
+            >
+              <span className="material-symbols-outlined text-[20px]">delete_forever</span>
+              ELIMINAR TODO
+            </button>
+          )}
           {/* Botón Importar - Solo Admin */}
           {can(PERMISSIONS.PRODUCTOS_CREATE) && (
             <button
@@ -319,7 +362,7 @@ const Productos = () => {
             placeholder="BUSCAR CÓDIGO, SKU, PRODUCTO, MARCA, CATEGORÍA..."
             type="text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
       </div>
@@ -330,7 +373,7 @@ const Productos = () => {
         <div className="p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4 bg-gray-50/50">
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setFiltroActivo('todos')}
+              onClick={() => handleSetFilter('todos')}
               className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${filtroActivo === 'todos'
                 ? 'text-blue-700 bg-blue-50 border border-blue-100'
                 : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
@@ -339,7 +382,7 @@ const Productos = () => {
               Todos
             </button>
             <button
-              onClick={() => setFiltroActivo('publicar')}
+              onClick={() => handleSetFilter('publicar')}
               className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${filtroActivo === 'publicar'
                 ? 'text-green-700 bg-green-50 border border-green-100'
                 : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
@@ -348,7 +391,7 @@ const Productos = () => {
               Publicar
             </button>
             <button
-              onClick={() => setFiltroActivo('borradores')}
+              onClick={() => handleSetFilter('borradores')}
               className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${filtroActivo === 'borradores'
                 ? 'text-orange-700 bg-orange-50 border border-orange-100'
                 : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100 border border-transparent'
@@ -463,6 +506,7 @@ const Productos = () => {
                         {can(PERMISSIONS.PRODUCTOS_EDIT) && (
                           <Link
                             to={`/admin/productos/editar/${producto.id}`}
+                            state={{ max: searchParams.toString() }}
                             className="p-2 bg-white border border-gray-200 hover:border-blue-500 hover:text-blue-600 text-slate-400 transition-colors shadow-sm"
                             onClick={(e) => e.stopPropagation()}
                             onMouseEnter={() => prefetchProduct(producto.id)}
@@ -520,7 +564,7 @@ const Productos = () => {
               Página {currentPage} de {totalPages || 1}
             </span>
             <button
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
               className="w-8 h-8 flex items-center justify-center border border-gray-300 bg-white hover:bg-gray-100 text-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -530,7 +574,7 @@ const Productos = () => {
               {currentPage}
             </button>
             <button
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage >= totalPages}
               className="w-8 h-8 flex items-center justify-center border border-gray-300 bg-white hover:bg-gray-100 text-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -540,7 +584,6 @@ const Productos = () => {
         </div>
       </div>
 
-      {/* Modal de confirmación */}
       <ConfirmModal
         isOpen={confirmDelete.isOpen}
         onClose={() => setConfirmDelete({ isOpen: false, id: null, descripcion: '' })}
@@ -548,6 +591,21 @@ const Productos = () => {
         title="Confirmar eliminación"
         message={`¿Estás seguro de eliminar el producto "${confirmDelete.descripcion}"? Esta acción no se puede deshacer.`}
         confirmText="Eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+      />
+
+      {/* Modal de confirmación para ELIMINAR TODO */}
+      <ConfirmModal
+        isOpen={confirmDeleteAll}
+        onClose={() => setConfirmDeleteAll(false)}
+        onConfirm={() => {
+          deleteAllMutation.mutate();
+          setConfirmDeleteAll(false);
+        }}
+        title="PELIGRO: Eliminar TODOS los productos"
+        message="¿Estás completamente seguro de que quieres ELIMINAR TODOS LOS PRODUCTOS de la base de datos? Esta acción es IRREVERSIBLE y borrará todo el inventario."
+        confirmText="SÍ, ELIMINAR TODO"
         cancelText="Cancelar"
         variant="danger"
       />

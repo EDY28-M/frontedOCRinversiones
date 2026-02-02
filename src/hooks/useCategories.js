@@ -106,7 +106,7 @@ export function useDeleteCategory() {
     onMutate: async (categoryId) => {
       await queryClient.cancelQueries({ queryKey: categoryKeys.all });
       const previousData = queryClient.getQueryData(categoryKeys.list({}));
-      
+
       queryClient.setQueryData(categoryKeys.list({}), (old) => {
         if (!old) return old;
         return old.filter((cat) => cat.id !== categoryId);
@@ -125,6 +125,40 @@ export function useDeleteCategory() {
 
     onSuccess: () => {
       success('Categoría eliminada exitosamente');
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: categoryKeys.all });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: categoryKeys.all });
+    },
+  });
+}
+
+/**
+ * Hook para eliminar TODAS las categorías
+ */
+export function useDeleteAllCategories() {
+  const queryClient = useQueryClient();
+  const { success, error: showError } = useNotification();
+
+  return useMutation({
+    mutationFn: () => categoryService.deleteAllCategories(),
+
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: categoryKeys.all });
+      queryClient.setQueriesData({ queryKey: categoryKeys.list({}) }, []);
+    },
+
+    onError: (err) => {
+      console.error('Error al eliminar todas las categorías:', err);
+      showError('Error al eliminar todas las categorías');
+      queryClient.invalidateQueries({ queryKey: categoryKeys.all });
+    },
+
+    onSuccess: () => {
+      success('Todas las categorías eliminadas correctamente');
     },
 
     onSettled: () => {

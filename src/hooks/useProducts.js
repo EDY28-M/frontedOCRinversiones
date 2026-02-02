@@ -285,3 +285,35 @@ export function useDeleteProduct() {
     },
   });
 }
+
+/**
+ * Hook para eliminar TODOS los productos
+ */
+export function useDeleteAllProducts() {
+  const queryClient = useQueryClient();
+  const { success, error: showError } = useNotification();
+
+  return useMutation({
+    mutationFn: () => productService.deleteAllProducts(),
+
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: productKeys.all });
+      // Limpiar optimísticamente
+      queryClient.setQueriesData({ queryKey: productKeys.lists() }, []);
+    },
+
+    onError: (err) => {
+      console.error('Error al eliminar todos los productos:', err);
+      showError('Error al eliminar todos los productos');
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
+    },
+
+    onSuccess: () => {
+      success('Todos los productos han sido eliminados correctamente');
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
+    },
+  });
+}

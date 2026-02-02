@@ -83,6 +83,12 @@ export const productService = {
     const response = await axiosInstance.get('/products/available', { params });
     return response.data;
   },
+
+  // Eliminar TODOS los productos (Added via Tool)
+  deleteAllProducts: async () => {
+    const response = await axiosInstance.delete('/products/delete-all');
+    return response.data;
+  },
 };
 
 export const categoryService = {
@@ -113,6 +119,12 @@ export const categoryService = {
   // Eliminar categoría
   deleteCategory: async (id) => {
     const response = await axiosInstance.delete(`/categories/${id}`);
+    return response.data;
+  },
+
+  // Eliminar TODAS las categorías
+  deleteAllCategories: async () => {
+    const response = await axiosInstance.delete('/categories/delete-all');
     return response.data;
   },
 };
@@ -146,6 +158,12 @@ export const nombreMarcaService = {
   // Eliminar marca
   deleteNombreMarca: async (id) => {
     const response = await axiosInstance.delete(`/nombremarcas/${id}`);
+    return response.data;
+  },
+
+  // Eliminar TODAS las marcas
+  deleteAllNombreMarcas: async () => {
+    const response = await axiosInstance.delete('/nombremarcas/delete-all');
     return response.data;
   },
 };
