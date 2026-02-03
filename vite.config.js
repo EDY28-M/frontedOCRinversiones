@@ -7,7 +7,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    minify: 'terser',
+    minify: 'esbuild',
     // Generar nombres con hash para evitar problemas de caché
     rollupOptions: {
       output: {
