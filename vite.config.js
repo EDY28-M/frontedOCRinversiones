@@ -44,7 +44,7 @@ export default defineConfig({
     host: true,
     allowedHosts: [
       'frontedocrinversiones.onrender.com',
-      '.onrender.com',
+      '.onrender.com','https://orcinversionesperu.com','https://www.orcinversionesperu.com',
     ],
   },
 })
