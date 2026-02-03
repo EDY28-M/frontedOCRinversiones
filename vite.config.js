@@ -5,6 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
+    outDir: 'dist',
+    sourcemap: false,
+    minify: 'terser',
     // Generar nombres con hash para evitar problemas de caché
     rollupOptions: {
       output: {
@@ -13,12 +16,12 @@ export default defineConfig({
     },
     // Forzar recarga de assets
     assetsInlineLimit: 0,
+    chunkSizeWarningLimit: 1000,
   },
   server: {
-    host: 'localhost', // Escucha solo en localhost
+    host: 'localhost',
     port: 5173,
-    strictPort: true, // No cambiar de puerto automáticamente
-    // Configuración del servidor de desarrollo
+    strictPort: true,
     headers: {
       'Cache-Control': 'no-store',
     },
@@ -28,7 +31,6 @@ export default defineConfig({
       '.ngrok.io',
       '.ngrok-free.app',
     ],
-    // Proxy para redirigir peticiones /api al backend (evita Mixed Content)
     proxy: {
       '/api': {
         target: 'http://localhost:5095',
@@ -36,5 +38,9 @@ export default defineConfig({
         secure: false,
       },
     },
+  },
+  preview: {
+    port: 3000,
+    host: true,
   },
 })
