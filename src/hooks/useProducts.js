@@ -437,6 +437,7 @@ export function useDeleteAllProducts() {
 
 /**
  * Hook para crear producto
+ * Con actualización optimista de la lista
  */
 export function useCreateProduct() {
   const queryClient = useQueryClient();
@@ -446,17 +447,59 @@ export function useCreateProduct() {
     mutationFn: (productData) => productService.createProduct(productData),
 
     onSuccess: (data) => {
-      // Agregar a la caché
+      // Agregar a la caché de detalle
       queryClient.setQueryData(productKeys.detail(data.id), data);
       
-      // Invalidar listas
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+      // Función auxiliar para agregar producto a una lista
+      const addProductToList = (oldData) => {
+        if (!oldData) return oldData;
+        
+        // Si es array simple
+        if (Array.isArray(oldData)) {
+          return [data, ...oldData];
+        }
+        
+        // Si es data paginada
+        if (oldData.items) {
+          return {
+            ...oldData,
+            items: [data, ...oldData.items],
+            totalItems: (oldData.totalItems || 0) + 1,
+          };
+        }
+        
+        return oldData;
+      };
+      
+      // Agregar el nuevo producto a TODAS las listas en caché (admin)
+      queryClient.setQueriesData({ queryKey: productKeys.lists() }, addProductToList);
+      
+      // Agregar también a las listas de productos disponibles (públicos) si está activo
+      if (data.isActive !== false) {
+        queryClient.setQueriesData({ queryKey: productKeys.available() }, addProductToList);
+      }
+      
+      // Invalidar todas las queries de productos para sincronizar
+      queryClient.invalidateQueries({ 
+        queryKey: productKeys.all,
+        refetchType: 'all',
+      });
+      
+      // También invalidar queries públicas
+      queryClient.invalidateQueries({ queryKey: ['public-products'] });
+      queryClient.invalidateQueries({ queryKey: ['public-featured-products'] });
       
       success('Producto creado exitosamente');
     },
 
     onError: (err) => {
       showError(err.message || 'Error al crear el producto');
+    },
+    
+    onSettled: () => {
+      // Asegurar que se invalide todo al finalizar (éxito o error)
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
+      queryClient.invalidateQueries({ queryKey: productKeys.available() });
     },
   });
 }

@@ -5,10 +5,13 @@ import ErrorAlert from '../../../components/common/ErrorAlert';
 import ImageUploader from '../../../components/common/ImageUploader';
 import FichaTecnicaEditor from '../../../components/FichaTecnicaEditor';
 import { useNotification } from '../../../context/NotificationContext';
+import { useCreateProduct } from '../../../hooks/useProducts';
 
 const ProductosCreate = () => {
   const navigate = useNavigate();
   const { success } = useNotification();
+  const createProduct = useCreateProduct();
+  
   const [categorias, setCategorias] = useState([]);
   const [marcas, setMarcas] = useState([]);
   const [formData, setFormData] = useState({
@@ -23,7 +26,7 @@ const ProductosCreate = () => {
   });
   const [autoGenCodigo, setAutoGenCodigo] = useState(false);
   const [autoGenCodigoComer, setAutoGenCodigoComer] = useState(false);
-  const [preloadedCodes, setPreloadedCodes] = useState(null); // Códigos precargados al montar (respuesta instantánea al marcar AUTOGEN)
+  const [preloadedCodes, setPreloadedCodes] = useState(null);
   const [productImages, setProductImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -35,7 +38,7 @@ const ProductosCreate = () => {
     loadMarcas();
   }, []);
 
-  // Precargar códigos disponibles al montar para que al marcar AUTOGEN sea instantáneo
+  // Precargar códigos disponibles al montar
   useEffect(() => {
     let cancelled = false;
     productService.generateCodes()
@@ -56,10 +59,9 @@ const ProductosCreate = () => {
   const loadMarcas = async () => {
     try {
       const data = await nombreMarcaService.getAllNombreMarcas();
-      console.log('✅ Marcas cargadas:', data);
       setMarcas(data);
     } catch (err) {
-      console.error('❌ Error al cargar marcas:', err);
+      console.error('Error al cargar marcas:', err);
     }
   };
 
@@ -158,14 +160,14 @@ const ProductosCreate = () => {
         });
       };
 
-      // Procesar imágenes: convertir File a Base64 o mantener URL string
+      // Procesar imágenes
       const processedImages = await Promise.all(
         productImages.map(async (img) => {
           if (!img) return null;
-          if (typeof img === 'string') return img; // Ya es URL
+          if (typeof img === 'string') return img;
           if (img instanceof File) {
             try {
-              return await convertFileToBase64(img); // Convertir File a Base64
+              return await convertFileToBase64(img);
             } catch (error) {
               console.error('Error al convertir imagen a Base64:', error);
               return null;
@@ -175,7 +177,7 @@ const ProductosCreate = () => {
         })
       );
 
-      // Preparar payload con campos requeridos
+      // Preparar payload
       const productData = {
         Codigo: formData.codigo.trim(),
         CodigoComer: formData.codigoComer.trim(),
@@ -190,23 +192,19 @@ const ProductosCreate = () => {
         CategoryId: parseInt(formData.categoryId),
       };
       
-      await productService.createProduct(productData);
+      // Usar el hook de React Query para crear el producto
+      // Esto automáticamente invalidará la caché y actualizará la lista
+      await createProduct.mutateAsync(productData);
+      
       success('Producto creado exitosamente');
       navigate('/admin/productos');
     } catch (err) {
       console.error('❌ ERROR AL CREAR PRODUCTO:', err);
-      console.error('❌ Detalles del error:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status,
-        statusText: err.response?.statusText
-      });
       
       // Extraer mensaje de error del backend
       let errorMessage = 'Error al crear el producto';
       
       if (err.response?.data) {
-        // Si el backend devuelve errores de validación (ModelState)
         if (err.response.data.errors) {
           const errors = Object.values(err.response.data.errors).flat();
           errorMessage = `Errores de validación: ${errors.join(', ')}`;
@@ -227,14 +225,14 @@ const ProductosCreate = () => {
 
   return (
     <div className="p-4">
-      {/* Header compacto */}
+      {/* Header */}
       <div className="mb-4">
         <h1 className="text-xl font-bold text-slate-900 uppercase tracking-wide">
           Crear Producto
         </h1>
       </div>
 
-      {/* Formulario optimizado */}
+      {/* Formulario */}
       <div className="bg-white border border-gray-200 shadow-sm">
         <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
           <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
@@ -249,13 +247,12 @@ const ProductosCreate = () => {
             </div>
           )}
 
-          {/* Layout en 2 columnas principales */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             
             {/* Columna Izquierda */}
             <div className="space-y-3">
               
-              {/* Códigos en fila */}
+              {/* Códigos */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <div className="flex items-center justify-between mb-1">
@@ -328,7 +325,7 @@ const ProductosCreate = () => {
                 />
               </div>
 
-              {/* Marca y Categoría en fila */}
+              {/* Marca y Categoría */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
@@ -391,7 +388,6 @@ const ProductosCreate = () => {
               </div>
 
               {/* Ficha Técnica */}
-              {/* Ficha Técnica */}
               <FichaTecnicaEditor
                 value={formData.fichaTecnica}
                 onChange={(value) => setFormData(prev => ({ ...prev, fichaTecnica: value }))}
@@ -433,10 +429,10 @@ const ProductosCreate = () => {
           <div className="flex gap-3 pt-4 mt-4 border-t border-gray-200">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || createProduct.isPending}
               className="flex-1 py-3 bg-[#F5C344] text-black font-bold text-sm uppercase tracking-widest hover:bg-[#eab308] transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Guardando...' : 'Guardar Producto'}
+              {loading || createProduct.isPending ? 'Guardando...' : 'Guardar Producto'}
             </button>
             <button
               type="button"
