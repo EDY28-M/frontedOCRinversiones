@@ -127,10 +127,13 @@ export default function Nosotros() {
                   SOBRE <span className="text-primary">NOSOTROS</span>
                 </h2>
                 <p className="text-gray-700 leading-relaxed text-sm sm:text-base lg:text-lg">
-                  Somos <span className="text-primary font-bold">ORC Inversiones Perú</span>, líderes indiscutibles en la importación y distribución de refacciones de alto rendimiento para entusiastas del motor. Desde nuestros inicios, nos hemos dedicado a elevar el estándar de calidad en el mercado automotriz peruano.
+                  Somos una empresa especializada en la importación y comercialización de repuestos para vehículos de origen chino, japonés y coreano, comprometida con ofrecer productos de calidad y soluciones confiables para el sector automotriz.
                 </p>
                 <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                  Nuestro compromiso va más allá de vender piezas; ofrecemos asesoría experta y soluciones integrales para potenciar tu vehículo. Trabajamos directamente con los mejores fabricantes mundiales para garantizar que cada componente en nuestro catálogo cumpla con las exigencias más rigurosas de durabilidad y desempeño.
+                  Trabajamos con proveedores seleccionados y un control riguroso de nuestros productos, lo que nos permite garantizar repuestos confiables, disponibilidad permanente y precios competitivos. Nuestro equipo cuenta con experiencia en el rubro automotriz y brinda una atención personalizada, orientada a satisfacer las necesidades de talleres, empresas y clientes finales.
+                </p>
+                <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+                  Nuestro objetivo es convertirnos en un aliado estratégico para nuestros clientes, aportando confianza, cumplimiento y respaldo en cada compra.
                 </p>
                 <div className="mt-2 sm:mt-4">
                   <a
@@ -460,7 +463,7 @@ export default function Nosotros() {
                   <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
                 </div>
                 <p className="text-sm text-gray-200 leading-relaxed">
-                  Líderes en refacciones de alto rendimiento para entusiastas del motor. Calidad garantizada en cada pieza.
+                  Somos una empresa dedicada a la importación y venta de repuestos para vehículos chinos, japoneses y coreanos, ofreciendo calidad y precios competitivos.
                 </p>
                 <div className="flex gap-4">
                   <a className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">

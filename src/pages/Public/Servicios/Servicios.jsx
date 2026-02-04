@@ -128,7 +128,7 @@ export default function Servicios() {
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">Provincia</span>
                 </h1>
                 <p className="text-xl text-gray-600 max-w-xl leading-relaxed border-l-4 border-accent pl-6">
-                  Conectamos cada rincón del Perú con repuestos de alto rendimiento. Nuestra red logística garantiza que tu pedido llegue seguro y a tiempo, estés donde estés.
+                  Realizamos envíos a provincia todos los días, garantizando rapidez, seguridad y cumplimiento para que tus repuestos lleguen a tiempo donde los necesites.
                 </p>
                 <div className="mt-10 flex flex-wrap gap-4">
                   <a
@@ -160,7 +160,7 @@ export default function Servicios() {
                   />
                 </div>
                 <div className="order-1 lg:order- lg:ml-20">
-                  <h2 className="font-display text-4xl text-matte-dark mb-6 uppercase">Tu motor no espera,<br />nosotros tampoco.</h2>
+                  <h2 className="font-display text-4xl text-matte-dark mb-6 uppercase">¡Envíos diarios a provincia sin demoras!</h2>
                   <p className="text-lg text-gray-600 mb-8 leading-relaxed">
                     Entendemos la urgencia de tener tu vehículo listo. Por eso, hemos establecido alianzas estratégicas con las empresas de transporte más confiables del Perú para asegurar que tus repuestos lleguen en perfectas condiciones.
                   </p>
@@ -170,8 +170,8 @@ export default function Servicios() {
                         <span className="material-symbols-outlined">rocket_launch</span>
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">Envío Inmediato</h3>
-                        <p className="text-gray-600 mt-1">Los pedidos confirmados antes de la 1:00 PM se despachan el mismo día a la agencia de transporte.</p>
+                        <h3 className="text-lg font-bold text-gray-900">Envíos diarios a provincia</h3>
+                        <p className="text-gray-600 mt-1">Despachamos pedidos todos los días sin interrupciones.</p>
                       </div>
                     </div>
                     <div className="flex gap-4">
@@ -179,8 +179,8 @@ export default function Servicios() {
                         <span className="material-symbols-outlined">package_2</span>
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">Embalaje Seguro</h3>
-                        <p className="text-gray-600 mt-1">Material de protección reforzado para piezas delicadas y de alto valor.</p>
+                        <h3 className="text-lg font-bold text-gray-900">Agencia a elección</h3>
+                        <p className="text-gray-600 mt-1">El cliente elige la empresa de transporte de su preferencia.</p>
                       </div>
                     </div>
                     <div className="flex gap-4">
@@ -188,8 +188,8 @@ export default function Servicios() {
                         <span className="material-symbols-outlined">public</span>
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">Cobertura Total</h3>
-                        <p className="text-gray-600 mt-1">Llegamos a capitales de departamento y provincias principales a través de múltiples operadores.</p>
+                        <h3 className="text-lg font-bold text-gray-900">Entrega al día siguiente</h3>
+                        <p className="text-gray-600 mt-1">Rapidez y cumplimiento para que tu pedido llegue a tiempo.</p>
                       </div>
                     </div>
                   </div>
@@ -371,7 +371,7 @@ export default function Servicios() {
                   <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
                 </div>
                 <p className="text-sm text-gray-200 leading-relaxed">
-                  Líderes en refacciones de alto rendimiento para entusiastas del motor. Calidad garantizada en cada pieza.
+                  Somos una empresa dedicada a la importación y venta de repuestos para vehículos chinos, japoneses y coreanos, ofreciendo calidad y precios competitivos.
                 </p>
                 <div className="flex gap-4">
                   <a className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
