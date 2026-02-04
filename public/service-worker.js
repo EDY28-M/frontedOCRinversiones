@@ -12,12 +12,43 @@ const STATIC_ASSETS = [
   '/imagenes OC/1.jpeg',
 ];
 
+// Schemas que nunca deben ser interceptados
+const UNSUPPORTED_SCHEMES = [
+  'chrome-extension://',
+  'chrome://',
+  'edge://',
+  'brave://',
+  'file://',
+  'data:',
+  'blob:',
+  'javascript:',
+  'about:',
+];
+
 // Assets que nunca deben cachear
 const NEVER_CACHE = [
   /\/api\//,
   /\.mp4$/,
   /\.webm$/,
 ];
+
+/**
+ * Verifica si el esquema de la URL es soportado para cache
+ */
+function isSupportedScheme(url) {
+  return UNSUPPORTED_SCHEMES.every(scheme => !url.startsWith(scheme));
+}
+
+/**
+ * Verifica si una URL es válida para cachear
+ */
+function isValidForCache(url) {
+  // Solo cachear URLs HTTP/HTTPS
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return false;
+  }
+  return true;
+}
 
 // Instalación: Precachear assets estáticos
 self.addEventListener('install', (event) => {
@@ -64,21 +95,26 @@ self.addEventListener('activate', (event) => {
 // Fetch: Estrategia de caché
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  const url = new URL(request.url);
+  const url = request.url;
+  
+  // Ignorar requests no-HTTP/HTTPS (extensiones, etc.)
+  if (!isSupportedScheme(url) || !isValidForCache(url)) {
+    return;
+  }
   
   // No interceptar requests que no deben cachear
-  if (shouldNotCache(request.url)) {
+  if (shouldNotCache(url)) {
     return;
   }
   
   // Estrategia diferente según el tipo de request
-  if (isAPIRequest(request.url)) {
+  if (isAPIRequest(url)) {
     // API: Network First, Cache Fallback
     event.respondWith(networkFirstStrategy(request));
-  } else if (isImageRequest(request.url)) {
+  } else if (isImageRequest(url)) {
     // Imágenes: Cache First, Network Fallback
     event.respondWith(cacheFirstStrategy(request));
-  } else if (isStaticAsset(request.url)) {
+  } else if (isStaticAsset(url)) {
     // Assets estáticos: Cache First
     event.respondWith(cacheFirstStrategy(request));
   } else {
@@ -96,8 +132,8 @@ function isAPIRequest(url) {
   return url.includes('/api/');
 }
 
-function isImageRequest(requestUrl) {
-  return /\.(jpg|jpeg|png|gif|webp|svg|ico)$/i.test(requestUrl);
+function isImageRequest(url) {
+  return /\.(jpg|jpeg|png|gif|webp|svg|ico)$/i.test(url);
 }
 
 function isStaticAsset(url) {
@@ -116,7 +152,7 @@ async function cacheFirstStrategy(request) {
   
   if (cachedResponse) {
     // Actualizar caché en background (stale-while-revalidate)
-    fetchAndCache(request, cache);
+    fetchAndCache(request, cache).catch(() => {});
     return cachedResponse;
   }
   
@@ -165,8 +201,7 @@ async function staleWhileRevalidateStrategy(request) {
       }
       return networkResponse;
     })
-    .catch((error) => {
-      console.log('[SW] Background fetch failed:', error);
+    .catch(() => {
       return cachedResponse;
     });
   
