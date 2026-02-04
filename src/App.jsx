@@ -4,13 +4,36 @@ import { NotificationProvider } from './context/NotificationContext';
 import NotificationContainer from './components/common/NotificationContainer';
 import AppRoutes from './routes';
 
-// Configurar QueryClient con opciones por defecto
+// Configurar QueryClient con opciones optimizadas para rendimiento
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 30000, // 30 segundos
+      // Tiempo antes de considerar datos obsoletos (5 minutos)
+      staleTime: 5 * 60 * 1000,
+      // Tiempo que los datos permanecen en caché (10 minutos)
+      gcTime: 10 * 60 * 1000,
+      // No refetch al volver al foco (mejor rendimiento)
       refetchOnWindowFocus: false,
-      retry: 1,
+      // No refetch al reconectar (los datos ya están en caché)
+      refetchOnReconnect: false,
+      // Reintentos configurados
+      retry: (failureCount, error) => {
+        // No reintentar en errores 4xx (cliente)
+        if (error?.status >= 400 && error?.status < 500) return false;
+        return failureCount < 3;
+      },
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      // Estrategia de suspense desactivada por defecto
+      suspense: false,
+      // Habilitar placeholder data para mejor UX
+      placeholderData: (previousData) => previousData,
+    },
+    mutations: {
+      // Reintentos para mutaciones solo en errores de red
+      retry: (failureCount, error) => {
+        if (!error?.status && failureCount < 2) return true;
+        return false;
+      },
     },
   },
 });

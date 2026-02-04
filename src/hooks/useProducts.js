@@ -1,9 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { productService } from '../services/productService';
 import { useNotification } from '../context/NotificationContext';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
-// Query key factory para productos
+// Query key factory para productos - centralizado y type-safe
 export const productKeys = {
   all: ['products'],
   lists: () => [...productKeys.all, 'list'],
@@ -11,21 +11,36 @@ export const productKeys = {
   detail: (id) => [...productKeys.all, 'detail', id],
   available: () => [...productKeys.all, 'available'],
   availableList: (filters) => [...productKeys.available(), filters],
+  featured: () => [...productKeys.all, 'featured'],
+  infinite: () => [...productKeys.all, 'infinite'],
 };
+
+// Constantes de configuración
+const STALE_TIME = 5 * 60 * 1000; // 5 minutos
+const GC_TIME = 10 * 60 * 1000; // 10 minutos
 
 /**
  * Hook para obtener productos disponibles (con imágenes) con paginación del backend
- * Usado en ProductosDestacados
- * BÚSQUEDA INSTANTÁNEA: Sin debounce, sin staleTime - busca en nombre, categoría y marca
+ * Optimizado con React Query v5
  */
 export function useAvailableProducts({ page = 1, pageSize = 12, q = '', categoryId = null } = {}) {
+  // Memoizar filtros para evitar re-renders innecesarios
+  const filters = useMemo(() => ({
+    page,
+    pageSize,
+    q: q?.trim() || '',
+    categoryId,
+  }), [page, pageSize, q, categoryId]);
+
   return useQuery({
-    queryKey: productKeys.availableList({ page, pageSize, q, categoryId }),
-    queryFn: () => productService.getAvailableProducts({ page, pageSize, q, categoryId }),
-    staleTime: 30000, // 30 seconds
-    gcTime: 300000, // 5 minutes
+    queryKey: productKeys.availableList(filters),
+    queryFn: () => productService.getAvailableProducts(filters),
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
     refetchOnWindowFocus: false,
-    placeholderData: (previousData) => previousData, // Mantener data anterior durante transición
+    placeholderData: (previousData) => previousData,
+    // Habilitar solo cuando hay filtros válidos
+    enabled: page > 0 && pageSize > 0,
   });
 }
 
@@ -34,23 +49,31 @@ export function useAvailableProducts({ page = 1, pageSize = 12, q = '', category
  * Soporta filtros, paginación y búsqueda
  */
 export function useProducts(filters = {}) {
+  // Memoizar la representación string de los filtros para estabilidad
+  const filtersString = JSON.stringify(filters);
+  
+  const memoizedFilters = useMemo(() => filters, [filtersString]);
+
   return useQuery({
-    queryKey: productKeys.list(filters),
+    queryKey: productKeys.list(memoizedFilters),
     queryFn: () => productService.getAllProducts(),
-    staleTime: 30000, // 30 segundos antes de considerar stale
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
     refetchOnWindowFocus: false,
   });
 }
 
 /**
  * Hook para obtener un producto por ID
+ * Con prefetch automático y caché optimizada
  */
 export function useProduct(id) {
   return useQuery({
     queryKey: productKeys.detail(id),
     queryFn: () => productService.getProductById(id),
     enabled: !!id,
-    staleTime: 60000, // 1 minuto - evitar refetch innecesario
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
     refetchOnWindowFocus: false,
   });
 }
@@ -64,10 +87,15 @@ export function usePrefetchProduct() {
 
   const prefetchProduct = useCallback((id) => {
     if (!id) return;
+    
+    // Verificar si ya está en caché antes de prefetch
+    const existingData = queryClient.getQueryData(productKeys.detail(id));
+    if (existingData) return;
+    
     queryClient.prefetchQuery({
       queryKey: productKeys.detail(id),
       queryFn: () => productService.getProductById(id),
-      staleTime: 60000,
+      staleTime: STALE_TIME,
     });
   }, [queryClient]);
 
@@ -75,8 +103,49 @@ export function usePrefetchProduct() {
 }
 
 /**
- * Hook para actualizar producto completo (desde formulario de edición)
- * Invalida cache y navega sin pantalla blanca
+ * Hook para obtener productos destacados
+ * Caché más larga ya que cambian poco frecuentemente
+ */
+export function useFeaturedProducts(options = {}) {
+  return useQuery({
+    queryKey: productKeys.featured(),
+    queryFn: () => productService.getAvailableProducts({ 
+      page: 1, 
+      pageSize: 9, 
+      onlyWithImages: true 
+    }),
+    staleTime: 10 * 60 * 1000, // 10 minutos
+    gcTime: 30 * 60 * 1000, // 30 minutos
+    refetchOnWindowFocus: false,
+    ...options,
+  });
+}
+
+/**
+ * Hook para scroll infinito de productos
+ * Ideal para catálogos grandes
+ */
+export function useInfiniteProducts(pageSize = 12) {
+  return useInfiniteQuery({
+    queryKey: productKeys.infinite(),
+    queryFn: ({ pageParam = 1 }) => 
+      productService.getAvailableProducts({ page: pageParam, pageSize }),
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.hasMore) return undefined;
+      return lastPage.currentPage + 1;
+    },
+    staleTime: STALE_TIME,
+    gcTime: GC_TIME,
+  });
+}
+
+// ============================================
+// MUTATIONS
+// ============================================
+
+/**
+ * Hook para actualizar producto completo
+ * Con invalidación optimizada de caché
  */
 export function useUpdateProduct() {
   const queryClient = useQueryClient();
@@ -88,25 +157,21 @@ export function useUpdateProduct() {
     },
 
     onSuccess: (data, { id }) => {
-      // Invalidar queries para que al volver a la lista tenga datos frescos
-      queryClient.invalidateQueries({ queryKey: productKeys.all });
-      queryClient.invalidateQueries({ queryKey: productKeys.detail(id) });
+      // Actualizar caché inmediatamente sin esperar refetch
+      queryClient.setQueryData(productKeys.detail(id), data);
+      
+      // Invalidar listas para actualizar en background
+      queryClient.invalidateQueries({ 
+        queryKey: productKeys.lists(),
+        refetchType: 'inactive', // Solo refetch queries inactivas
+      });
+      
       success('Producto actualizado exitosamente');
     },
 
     onError: (err) => {
       console.error('Error al actualizar producto:', err);
-      let errorMessage = 'Error al actualizar el producto';
-      if (err.response?.data) {
-        if (err.response.data.errors) {
-          const errors = Object.values(err.response.data.errors).flat();
-          errorMessage = `Errores de validación: ${errors.join(', ')}`;
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        } else if (typeof err.response.data === 'string') {
-          errorMessage = err.response.data;
-        }
-      }
+      const errorMessage = err.message || 'Error al actualizar el producto';
       showError(errorMessage);
     },
   });
@@ -114,55 +179,77 @@ export function useUpdateProduct() {
 
 /**
  * Hook para toggle de estado activo con optimistic update
- * Evita pantalla blanca y proporciona UX fluida
+ * Proporciona UX fluida y rollback en caso de error
  */
 export function useToggleProductActive() {
   const queryClient = useQueryClient();
   const { success, error: showError } = useNotification();
 
   return useMutation({
-    mutationFn: async ({ productId, product, newActiveState }) => {
-      // Llamada al backend optimizada (PATCH)
+    mutationFn: async ({ productId, newActiveState }) => {
       return productService.updateProductStatus(productId, newActiveState);
     },
 
-    // Optimistic update: cambiar UI inmediatamente
     onMutate: async ({ productId, newActiveState }) => {
-      // Cancelar cualquier refetch en progreso para evitar conflictos
+      // Cancelar refetches en progreso
       await queryClient.cancelQueries({ queryKey: productKeys.all });
 
-      // Snapshot del estado anterior para rollback
+      // Snapshot del estado anterior
       const previousQueries = queryClient.getQueriesData({ queryKey: productKeys.lists() });
+      const previousDetail = queryClient.getQueryData(productKeys.detail(productId));
 
-      // Actualizar optimisticamente TODAS las queries de productos
+      // Optimistic update de listas
       queryClient.setQueriesData({ queryKey: productKeys.lists() }, (oldData) => {
         if (!oldData) return oldData;
-        return oldData.map((product) =>
-          product.id === productId
-            ? { ...product, isActive: newActiveState }
-            : product
-        );
+        if (Array.isArray(oldData)) {
+          return oldData.map((product) =>
+            product.id === productId
+              ? { ...product, isActive: newActiveState }
+              : product
+          );
+        }
+        // Para data paginada
+        if (oldData.items) {
+          return {
+            ...oldData,
+            items: oldData.items.map((product) =>
+              product.id === productId
+                ? { ...product, isActive: newActiveState }
+                : product
+            ),
+          };
+        }
+        return oldData;
       });
 
-      // Retornar contexto para rollback
-      return { previousQueries };
+      // Optimistic update de detalle
+      if (previousDetail) {
+        queryClient.setQueryData(productKeys.detail(productId), {
+          ...previousDetail,
+          isActive: newActiveState,
+        });
+      }
+
+      return { previousQueries, previousDetail };
     },
 
-    // Rollback en caso de error
     onError: (err, variables, context) => {
-      console.error('Error al actualizar estado del producto:', err);
-
-      // Restaurar estado anterior
+      // Rollback
       if (context?.previousQueries) {
         context.previousQueries.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
+      if (context?.previousDetail) {
+        queryClient.setQueryData(
+          productKeys.detail(variables.productId), 
+          context.previousDetail
+        );
+      }
 
-      showError('Error al actualizar el estado del producto. Se ha revertido el cambio.');
+      showError(err.message || 'Error al actualizar el estado del producto');
     },
 
-    // Éxito: mostrar notificación
     onSuccess: (data, { newActiveState }) => {
       const mensaje = newActiveState
         ? 'Producto activado correctamente'
@@ -170,15 +257,13 @@ export function useToggleProductActive() {
       success(mensaje);
     },
 
-    // Siempre refetch silencioso al terminar para sincronizar con backend
-    onSettled: () => {
+    onSettled: (data, error, variables) => {
+      // Invalidar para sincronizar con backend
       queryClient.invalidateQueries({ queryKey: productKeys.all });
-      queryClient.invalidateQueries({ queryKey: productKeys.available() });
-      // También invalidar queries públicas para actualizar /productos
-      queryClient.invalidateQueries({ queryKey: ['public-products'] });
-      queryClient.invalidateQueries({ queryKey: ['public-featured-products'] });
-      queryClient.invalidateQueries({ queryKey: ['public-categories'] });
-      queryClient.invalidateQueries({ queryKey: ['public-brands'] });
+      queryClient.invalidateQueries({ 
+        queryKey: productKeys.detail(variables.productId),
+        refetchType: 'all',
+      });
     },
   });
 }
@@ -199,32 +284,49 @@ export function useToggleProductFeatured() {
       await queryClient.cancelQueries({ queryKey: productKeys.all });
 
       const previousQueries = queryClient.getQueriesData({ queryKey: productKeys.lists() });
+      const previousFeatured = queryClient.getQueriesData({ queryKey: productKeys.featured() });
 
-      queryClient.setQueriesData({ queryKey: productKeys.lists() }, (oldData) => {
+      const optimisticUpdate = (oldData) => {
         if (!oldData) return oldData;
-        return oldData.map((product) =>
-          product.id === productId
-            ? { ...product, isFeatured: newFeaturedState }
-            : product
-        );
-      });
+        if (Array.isArray(oldData)) {
+          return oldData.map((product) =>
+            product.id === productId
+              ? { ...product, isFeatured: newFeaturedState }
+              : product
+          );
+        }
+        if (oldData.items) {
+          return {
+            ...oldData,
+            items: oldData.items.map((product) =>
+              product.id === productId
+                ? { ...product, isFeatured: newFeaturedState }
+                : product
+            ),
+          };
+        }
+        return oldData;
+      };
 
-      return { previousQueries };
+      queryClient.setQueriesData({ queryKey: productKeys.lists() }, optimisticUpdate);
+      queryClient.setQueriesData({ queryKey: productKeys.featured() }, optimisticUpdate);
+
+      return { previousQueries, previousFeatured };
     },
 
     onError: (err, variables, context) => {
-      console.error('Error al actualizar destacado del producto:', err);
-
       if (context?.previousQueries) {
         context.previousQueries.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
+      if (context?.previousFeatured) {
+        context.previousFeatured.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
 
-      // Mostrar mensaje del backend si existe (ej: límite de 9 productos)
-      const errorMessage = err.response?.data?.message
-        || 'Error al actualizar el destacado del producto. Se ha revertido el cambio.';
-      showError(errorMessage);
+      showError(err.message || 'Error al actualizar el destacado del producto');
     },
 
     onSuccess: (data, { newFeaturedState }) => {
@@ -236,7 +338,7 @@ export function useToggleProductFeatured() {
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.all });
-      queryClient.invalidateQueries({ queryKey: ['public-featured-products'] });
+      queryClient.invalidateQueries({ queryKey: productKeys.featured() });
     },
   });
 }
@@ -258,22 +360,31 @@ export function useDeleteProduct() {
 
       queryClient.setQueriesData({ queryKey: productKeys.lists() }, (oldData) => {
         if (!oldData) return oldData;
-        return oldData.filter((product) => product.id !== productId);
+        if (Array.isArray(oldData)) {
+          return oldData.filter((product) => product.id !== productId);
+        }
+        if (oldData.items) {
+          return {
+            ...oldData,
+            items: oldData.items.filter((product) => product.id !== productId),
+          };
+        }
+        return oldData;
       });
+
+      // Remover del caché de detalle
+      queryClient.removeQueries({ queryKey: productKeys.detail(productId) });
 
       return { previousQueries };
     },
 
     onError: (err, productId, context) => {
-      console.error('Error al eliminar producto:', err);
-
       if (context?.previousQueries) {
         context.previousQueries.forEach(([queryKey, data]) => {
           queryClient.setQueryData(queryKey, data);
         });
       }
-
-      showError('Error al eliminar el producto');
+      showError(err.message || 'Error al eliminar el producto');
     },
 
     onSuccess: () => {
@@ -298,22 +409,54 @@ export function useDeleteAllProducts() {
 
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: productKeys.all });
-      // Limpiar optimísticamente
+      const previousQueries = queryClient.getQueriesData({ queryKey: productKeys.lists() });
+      
       queryClient.setQueriesData({ queryKey: productKeys.lists() }, []);
+      
+      return { previousQueries };
     },
 
-    onError: (err) => {
-      console.error('Error al eliminar todos los productos:', err);
-      showError('Error al eliminar todos los productos');
-      queryClient.invalidateQueries({ queryKey: productKeys.all });
+    onError: (err, variables, context) => {
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+      showError(err.message || 'Error al eliminar todos los productos');
     },
 
     onSuccess: () => {
-      success('Todos los productos han sido eliminados correctamente');
+      success('Todos los productos han sido eliminados');
     },
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.all });
+    },
+  });
+}
+
+/**
+ * Hook para crear producto
+ */
+export function useCreateProduct() {
+  const queryClient = useQueryClient();
+  const { success, error: showError } = useNotification();
+
+  return useMutation({
+    mutationFn: (productData) => productService.createProduct(productData),
+
+    onSuccess: (data) => {
+      // Agregar a la caché
+      queryClient.setQueryData(productKeys.detail(data.id), data);
+      
+      // Invalidar listas
+      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+      
+      success('Producto creado exitosamente');
+    },
+
+    onError: (err) => {
+      showError(err.message || 'Error al crear el producto');
     },
   });
 }
