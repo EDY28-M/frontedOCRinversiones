@@ -350,6 +350,7 @@ export default function Productos() {
         <ProductDetailModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
+          isPublic={true}
         />
       )}
     </div>
