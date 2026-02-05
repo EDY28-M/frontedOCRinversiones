@@ -479,6 +479,7 @@ export default function Inicio() {
                 <ProductDetailModal
                     product={selectedProduct}
                     onClose={() => setSelectedProduct(null)}
+                    isPublic={true}
                 />
             )}
         </div>
