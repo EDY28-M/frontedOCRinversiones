@@ -1,60 +1,66 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 const ImageUploader = ({ 
   images = [], 
   onChange, 
-  maxImages = 4,
-  maxSizeMB = 5,
-  acceptedTypes = ['image/jpeg', 'image/png', 'image/webp'] 
+  maxImages = 4
 }) => {
   const [error, setError] = useState(null);
+  const [urlInput, setUrlInput] = useState('');
   const [previews, setPreviews] = useState([]);
 
-  // Generar previews cuando cambian las imágenes
+  // Generar previews cuando cambian las imágenes (solo URLs string)
   useEffect(() => {
-    const newPreviews = images.map(img => {
-      if (typeof img === 'string') return { type: 'url', url: img };
-      if (img instanceof File) return { type: 'file', url: URL.createObjectURL(img) };
-      return null;
-    }).filter(Boolean);
-
+    const newPreviews = images
+      .filter(img => typeof img === 'string' && img.trim())
+      .map(url => ({ type: 'url', url }));
     setPreviews(newPreviews);
-
-    // Cleanup de ObjectURLs
-    return () => {
-      newPreviews.forEach(p => {
-        if (p.type === 'file') URL.revokeObjectURL(p.url);
-      });
-    };
   }, [images]);
 
-  const handleFileSelect = (e) => {
-    const files = Array.from(e.target.files);
-    setError(null);
+  // Validar si es una URL válida
+  const isValidUrl = (string) => {
+    try {
+      const url = new URL(string);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch (_) {
+      return false;
+    }
+  };
 
-    if (images.length + files.length > maxImages) {
+  const handleAddUrl = () => {
+    setError(null);
+    const url = urlInput.trim();
+
+    if (!url) {
+      setError('Ingresa una URL');
+      return;
+    }
+
+    if (!isValidUrl(url)) {
+      setError('URL no válida. Debe comenzar con http:// o https://');
+      return;
+    }
+
+    if (images.length >= maxImages) {
       setError(`Máximo ${maxImages} imágenes permitidas`);
       return;
     }
 
-    const validFiles = [];
-    for (const file of files) {
-      // Validar tipo
-      if (!acceptedTypes.includes(file.type)) {
-        setError(`Tipo de archivo no válido: ${file.name}. Solo ${acceptedTypes.map(t => t.split('/')[1]).join(', ')}`);
-        return;
-      }
-      // Validar tamaño
-      if (file.size > maxSizeMB * 1024 * 1024) {
-        setError(`Archivo demasiado grande: ${file.name}. Máximo ${maxSizeMB}MB`);
-        return;
-      }
-      validFiles.push(file);
+    // Verificar duplicados
+    if (images.includes(url)) {
+      setError('Esta URL ya está agregada');
+      return;
     }
 
-    onChange([...images, ...validFiles]);
-    // Reset input
-    e.target.value = '';
+    onChange([...images, url]);
+    setUrlInput('');
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddUrl();
+    }
   };
 
   const removeImage = (index) => {
@@ -66,6 +72,32 @@ const ImageUploader = ({
 
   return (
     <div className="space-y-4">
+      {/* Campo para agregar URL */}
+      {images.length < maxImages && (
+        <div className="space-y-2">
+          <label className="block text-xs font-bold text-slate-700 uppercase">
+            Agregar URL de Imagen (Backblaze, CDN, etc.)
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="https://f005.backblazeb2.com/file/bucket/imagen.jpg"
+              className="flex-1 px-3 py-2 border-2 border-gray-200 focus:border-blue-500 focus:outline-none bg-gray-50 text-sm"
+            />
+            <button
+              type="button"
+              onClick={handleAddUrl}
+              className="px-4 py-2 bg-blue-600 text-white font-bold text-sm uppercase hover:bg-blue-700 transition-colors"
+            >
+              Agregar
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Mensajes de Error */}
       {error && (
         <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm flex items-center gap-2 border border-red-100">
@@ -76,6 +108,7 @@ const ImageUploader = ({
         </div>
       )}
 
+      {/* Grid de previews */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Previews existentes */}
         {previews.map((preview, idx) => (
@@ -84,6 +117,9 @@ const ImageUploader = ({
               src={preview.url} 
               alt={`Imagen ${idx + 1}`} 
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23f3f4f6" width="100" height="100"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="12">Error</text></svg>';
+              }}
             />
             
             {/* Overlay acciones */}
@@ -109,33 +145,18 @@ const ImageUploader = ({
           </div>
         ))}
 
-        {/* Botón Agregar */}
-        {images.length < maxImages && (
-          <label className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all group">
-            <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center mb-3 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-            <span className="text-sm font-bold text-gray-600 group-hover:text-blue-600">
-              {images.length === 0 ? 'Agregar imagen' : 'Agregar otra'}
+        {/* Placeholder para espacios vacíos */}
+        {images.length < maxImages && images.length > 0 && (
+          <div className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
+            <span className="text-xs text-gray-400">
+              {maxImages - images.length} espacio(s) disponible(s)
             </span>
-            <span className="text-xs text-gray-400 mt-1">
-              Max {maxImages} imgs
-            </span>
-            <input 
-              type="file" 
-              className="hidden" 
-              accept={acceptedTypes.join(',')}
-              onChange={handleFileSelect}
-              multiple // Permitir selección múltiple
-            />
-          </label>
+          </div>
         )}
       </div>
 
       <p className="text-xs text-gray-500 italic">
-        * Formatos permitidos: JPG, PNG, WEBP. Máximo {maxSizeMB}MB por archivo.
+        * Pega las URLs de las imágenes subidas a Backblaze u otro CDN. Máximo {maxImages} imágenes.
       </p>
     </div>
   );

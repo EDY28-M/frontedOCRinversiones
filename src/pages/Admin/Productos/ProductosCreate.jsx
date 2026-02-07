@@ -150,44 +150,17 @@ const ProductosCreate = () => {
     try {
       setLoading(true);
       
-      // Convertir archivos File a Base64
-      const convertFileToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = error => reject(error);
-        });
-      };
-
-      // Procesar imágenes
-      const processedImages = await Promise.all(
-        productImages.map(async (img) => {
-          if (!img) return null;
-          if (typeof img === 'string') return img;
-          if (img instanceof File) {
-            try {
-              return await convertFileToBase64(img);
-            } catch (error) {
-              console.error('Error al convertir imagen a Base64:', error);
-              return null;
-            }
-          }
-          return null;
-        })
-      );
-
-      // Preparar payload
+      // Preparar payload con URLs de imágenes (ya no Base64)
       const productData = {
         Codigo: formData.codigo.trim(),
         CodigoComer: formData.codigoComer.trim(),
         Producto: formData.producto.trim(),
         Descripcion: formData.descripcion.trim() || null,
         FichaTecnica: formData.fichaTecnica.trim() || null,
-        ImagenPrincipal: processedImages[0] || null,
-        Imagen2: processedImages[1] || null,
-        Imagen3: processedImages[2] || null,
-        Imagen4: processedImages[3] || null,
+        ImagenPrincipal: productImages[0] || null,
+        Imagen2: productImages[1] || null,
+        Imagen3: productImages[2] || null,
+        Imagen4: productImages[3] || null,
         MarcaId: parseInt(formData.marcaId),
         CategoryId: parseInt(formData.categoryId),
       };

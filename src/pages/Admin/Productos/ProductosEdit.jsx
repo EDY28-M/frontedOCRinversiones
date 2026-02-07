@@ -161,7 +161,7 @@ const ProductosEdit = () => {
       return;
     }
 
-    // Preparar payload con PascalCase
+    // Preparar payload con PascalCase y URLs de imágenes (ya no Base64)
     const productData = {
       Codigo: formData.codigo.trim(),
       CodigoComer: formData.codigoComer.trim(),
@@ -170,73 +170,39 @@ const ProductosEdit = () => {
       FichaTecnica: formData.fichaTecnica.trim() || null,
       MarcaId: parseInt(formData.marcaId),
       CategoryId: parseInt(formData.categoryId),
-      IsActive: formData.isActive
+      IsActive: formData.isActive,
+      ImagenPrincipal: productImages[0] || null,
+      Imagen2: productImages[1] || null,
+      Imagen3: productImages[2] || null,
+      Imagen4: productImages[3] || null,
     };
 
-    // Convertir archivos File a Base64 antes de enviar
-    const convertFileToBase64 = (file) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-      });
-    };
+    // Determinar URL de retorno (mantener paginación)
+    const backUrl = location.state?.max ? `/admin/productos?${location.state.max}` : '/admin/productos';
 
-    try {
-      // Procesar imágenes: convertir File a Base64 o mantener URL string
-      const processedImages = await Promise.all(
-        productImages.map(async (img) => {
-          if (!img) return null;
-          if (typeof img === 'string') return img; // Ya es URL
-          if (img instanceof File) {
-            try {
-              return await convertFileToBase64(img); // Convertir File a Base64
-            } catch (error) {
-              console.error('Error al convertir imagen a Base64:', error);
-              return null;
+    // Usar mutation de React Query
+    updateMutation.mutate(
+      { id, productData },
+      {
+        onSuccess: () => {
+          navigate(backUrl);
+        },
+        onError: (err) => {
+          let errorMessage = 'Error al actualizar el producto';
+          if (err.response?.data) {
+            if (err.response.data.errors) {
+              const errors = Object.values(err.response.data.errors).flat();
+              errorMessage = `Errores de validación: ${errors.join(', ')}`;
+            } else if (err.response.data.message) {
+              errorMessage = err.response.data.message;
+            } else if (typeof err.response.data === 'string') {
+              errorMessage = err.response.data;
             }
           }
-          return null;
-        })
-      );
-
-      // Agregar imágenes al payload
-      productData.ImagenPrincipal = processedImages[0] || null;
-      productData.Imagen2 = processedImages[1] || null;
-      productData.Imagen3 = processedImages[2] || null;
-      productData.Imagen4 = processedImages[3] || null;
-
-      // Determinar URL de retorno (mantener paginación)
-      const backUrl = location.state?.max ? `/admin/productos?${location.state.max}` : '/admin/productos';
-
-      // Usar mutation de React Query
-      updateMutation.mutate(
-        { id, productData },
-        {
-          onSuccess: () => {
-            navigate(backUrl);
-          },
-          onError: (err) => {
-            let errorMessage = 'Error al actualizar el producto';
-            if (err.response?.data) {
-              if (err.response.data.errors) {
-                const errors = Object.values(err.response.data.errors).flat();
-                errorMessage = `Errores de validación: ${errors.join(', ')}`;
-              } else if (err.response.data.message) {
-                errorMessage = err.response.data.message;
-              } else if (typeof err.response.data === 'string') {
-                errorMessage = err.response.data;
-              }
-            }
-            setError(errorMessage);
-          },
-        }
-      );
-    } catch (err) {
-      console.error('Error al procesar imágenes:', err);
-      setError('Error al procesar las imágenes');
-    }
+          setError(errorMessage);
+        },
+      }
+    );
   };
 
   const loading = loadingProduct || loadingMeta;
