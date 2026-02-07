@@ -46,8 +46,8 @@ export default function Productos() {
   };
 
   return (
-    <div className="productos-wrapper bg-surface font-sans text-text-main antialiased">
-      <div className="relative flex flex-col w-full">
+    <div className="productos-wrapper min-h-screen flex flex-col bg-surface font-sans text-text-main antialiased">
+      <div className="relative flex flex-col flex-1 w-full">
         {/* Header */}
         <header className="w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">

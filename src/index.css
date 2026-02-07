@@ -27,6 +27,7 @@
 html {
   width: 100%;
   min-height: 100%;
+  background-color: #ffffff;
   /* NO overflow:hidden - permite scroll */
 }
 
@@ -38,6 +39,7 @@ body {
   font-family: 'Inter', 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff;
   /* NO overflow:hidden - permite scroll natural */
   overflow-x: hidden; /* Solo prevenir scroll horizontal */
 }
