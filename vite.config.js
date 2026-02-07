@@ -141,6 +141,7 @@ export default defineConfig(({ mode }) => ({
       '.onrender.com',
       'orcinversionesperu.com',
       'www.orcinversionesperu.com',
+      'frontedocrinversiones.orcinversionespe.workers.dev',
     ],
   },
   // Definir variables de entorno para el cliente
