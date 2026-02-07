@@ -33,7 +33,7 @@ const FiltersSidebar = ({
       </div>
 
       {/* Sidebar - Categorías y marcas dinámicas del backend */}
-      <aside className={`w-full lg:w-64 flex-shrink-0 border-r border-gray-200 bg-white p-6 lg:min-h-[calc(100vh-80px)] ${mobileFiltersOpen ? 'block' : 'hidden lg:block'}`}>
+      <aside className={`w-full lg:w-64 flex-shrink-0 border-r border-gray-200 bg-white p-6 ${mobileFiltersOpen ? 'block' : 'hidden lg:block'}`}>
 
         {/* Header de Filtros con Reset */}
         <div className="flex items-center justify-between mb-8">

@@ -5,6 +5,7 @@ import WhatsAppButton from '../../../components/WhatsAppButton';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 import '../../../styles/inicio.css';
 import { usePublicFeaturedProducts } from '../../../hooks/usePublicFeaturedProducts';
+import { getFirstValidImageUrl } from '../../../utils/imageUtils';
 
 /**
  * Componente Inicio - Migración pixel-perfect del HTML original (Google Stitch)
@@ -25,14 +26,6 @@ export default function Inicio() {
         }
         return rows;
     }, [featuredProducts]);
-
-    const getFirstImageUrl = (producto) => {
-        if (producto?.imagenPrincipal) return producto.imagenPrincipal;
-        if (producto?.imagen2) return producto.imagen2;
-        if (producto?.imagen3) return producto.imagen3;
-        if (producto?.imagen4) return producto.imagen4;
-        return null;
-    };
 
     return (
         <div className="inicio-wrapper min-h-screen flex flex-col bg-surface font-sans text-text-main antialiased">
@@ -341,7 +334,7 @@ export default function Inicio() {
                                     className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 ${rowIndex < featuredRows.length - 1 ? 'mb-5 md:mb-6' : ''}`}
                                 >
                                     {row.map((producto) => {
-                                        const imageUrl = getFirstImageUrl(producto);
+                                        const imageUrl = getFirstValidImageUrl(producto);
                                         return (
                                             <div
                                                 key={producto.id}

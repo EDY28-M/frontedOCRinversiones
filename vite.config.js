@@ -86,6 +86,10 @@ export default defineConfig(({ mode }) => ({
     reportCompressedSize: false, // Más rápido
     emptyOutDir: true,
   },
+  resolve: {
+    // Evitar múltiples copias de React (previene "Invalid hook call")
+    dedupe: ['react', 'react-dom', 'react-router-dom'],
+  },
   optimizeDeps: {
     // Pre-bundle de dependencias para desarrollo más rápido
     include: [
@@ -105,13 +109,14 @@ export default defineConfig(({ mode }) => ({
     pure: mode === 'production' ? ['console.log', 'console.info', 'console.debug'] : [],
   },
   server: {
-    host: 'localhost',
+    host: true, // Escuchar en todas las interfaces (0.0.0.0) para HMR correcto
     port: 5173,
     strictPort: true,
     headers: {
       'Cache-Control': 'no-store',
     },
     allowedHosts: [
+      'localhost',
       'kiara-unascendant-trustingly.ngrok-free.dev',
       '.ngrok-free.dev',
       '.ngrok.io',
@@ -124,7 +129,7 @@ export default defineConfig(({ mode }) => ({
         secure: false,
       },
     },
-    // Optimizaciones de HMR
+    // HMR auto-detecta el host desde la URL del navegador
     hmr: {
       overlay: true,
     },

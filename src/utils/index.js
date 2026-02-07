@@ -7,6 +7,9 @@ export * from './formatters';
 // Permisos
 export * from './permissions';
 
+// Imágenes - validación y utilidades
+export * from './imageUtils';
+
 // Service Worker
 export {
   register,

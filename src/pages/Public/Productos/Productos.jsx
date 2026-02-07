@@ -46,8 +46,8 @@ export default function Productos() {
   };
 
   return (
-    <div className="productos-wrapper min-h-screen flex flex-col bg-surface font-sans text-text-main antialiased">
-      <div className="relative flex flex-col flex-1 w-full">
+    <div className="productos-wrapper bg-surface font-sans text-text-main antialiased">
+      <div className="relative flex flex-col min-h-screen w-full">
         {/* Header */}
         <header className="w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
@@ -147,7 +147,7 @@ export default function Productos() {
         {/* Mobile Menu Component */}
         <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
-        <main className="flex-1 w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row">
+        <main className="w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row">
           <FiltersSidebar
             categories={categories}
             brands={brands}
@@ -271,7 +271,7 @@ export default function Productos() {
           </section>
         </main>
 
-        <footer className="bg-primary text-white pt-10 pb-6 border-t-4 border-accent">
+        <footer className="mt-auto flex-shrink-0 bg-primary text-white pt-10 pb-6 border-t-4 border-accent">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
               <div className="flex flex-col gap-4">

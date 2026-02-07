@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { getAllValidImageUrls } from '../utils/imageUtils';
 
 const ProductDetailModal = ({ product, onClose, isPublic = false }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [images, setImages] = useState([]);
+  const [imageErrors, setImageErrors] = useState(new Set());
   const [quantity, setQuantity] = useState(1);
 
   // Número de WhatsApp de la empresa
@@ -10,15 +12,12 @@ const ProductDetailModal = ({ product, onClose, isPublic = false }) => {
 
   useEffect(() => {
     if (product) {
-      // Recopilar todas las imágenes del producto
-      const productImages = [];
-      if (product.imagenPrincipal) productImages.push(product.imagenPrincipal);
-      if (product.imagen2) productImages.push(product.imagen2);
-      if (product.imagen3) productImages.push(product.imagen3);
-      if (product.imagen4) productImages.push(product.imagen4);
+      // Recopilar solo imágenes con URL válida
+      const productImages = getAllValidImageUrls(product);
 
       setImages(productImages);
       setSelectedImage(productImages[0] || null);
+      setImageErrors(new Set());
       setQuantity(1); // Reset quantity when product changes
     }
   }, [product]);
@@ -127,6 +126,13 @@ Por favor, quisiera más información sobre disponibilidad y precio.`;
                         alt={product.producto}
                         className="object-contain w-full h-full max-h-[500px] transform group-hover:scale-105 transition-transform duration-500"
                         src={selectedImage}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          setImageErrors(prev => new Set(prev).add(selectedImage));
+                          // Auto-seleccionar la siguiente imagen válida
+                          const nextValid = images.find(img => img !== selectedImage && !imageErrors.has(img));
+                          if (nextValid) setSelectedImage(nextValid);
+                        }}
                       />
                     </div>
                   </div>
@@ -134,7 +140,7 @@ Por favor, quisiera más información sobre disponibilidad y precio.`;
                   {/* Miniaturas (solo si hay más de 1 imagen) */}
                   {images.length > 1 && (
                     <div className="grid grid-cols-4 gap-4">
-                      {images.map((img, index) => (
+                      {images.filter(img => !imageErrors.has(img)).map((img, index) => (
                         <button
                           key={index}
                           onClick={() => setSelectedImage(img)}
@@ -148,6 +154,10 @@ Por favor, quisiera más información sobre disponibilidad y precio.`;
                             className={`w-full h-20 object-cover transition-opacity ${selectedImage === img ? 'opacity-100' : 'opacity-70 hover:opacity-100'
                               }`}
                             src={img}
+                            onError={(e) => {
+                              e.target.parentElement.style.display = 'none';
+                              setImageErrors(prev => new Set(prev).add(img));
+                            }}
                           />
                         </button>
                       ))}

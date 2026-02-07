@@ -1,26 +1,22 @@
 import { memo, useState, useCallback } from 'react';
 import OptimizedImage from '../common/OptimizedImage';
+import { getFirstValidImageUrl, getAllValidImageUrls } from '../../utils/imageUtils';
 
 /**
  * ProductCard optimizado con:
  * - React.memo para evitar re-renders innecesarios
  * - useCallback para handlers memoizados
  * - OptimizedImage para carga eficiente de imágenes
+ * - Validación de URLs de imagen con fallback automático
  * - Comparación profunda de props
  */
 const ProductCard = memo(({ product, onProductClick, priority = false }) => {
-  const [imageError, setImageError] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [allImagesFailed, setAllImagesFailed] = useState(false);
 
-  // Memoizar función para obtener URL de imagen
-  const getFirstImageUrl = useCallback((producto) => {
-    if (producto.imagenPrincipal) return producto.imagenPrincipal;
-    if (producto.imagen2) return producto.imagen2;
-    if (producto.imagen3) return producto.imagen3;
-    if (producto.imagen4) return producto.imagen4;
-    return null;
-  }, []);
-
-  const imageUrl = getFirstImageUrl(product);
+  // Obtener todas las URLs válidas (pre-validadas por formato)
+  const validImageUrls = getAllValidImageUrls(product);
+  const imageUrl = validImageUrls[currentImageIndex] || null;
 
   // Memoizar handler de click
   const handleClick = useCallback(() => {
@@ -29,10 +25,16 @@ const ProductCard = memo(({ product, onProductClick, priority = false }) => {
     }
   }, [onProductClick, product]);
 
-  // Memoizar handler de error de imagen
+  // Handler de error de imagen: intenta la siguiente imagen válida
   const handleImageError = useCallback(() => {
-    setImageError(true);
-  }, []);
+    if (currentImageIndex < validImageUrls.length - 1) {
+      // Intentar con la siguiente imagen válida
+      setCurrentImageIndex(prev => prev + 1);
+    } else {
+      // Todas las imágenes fallaron
+      setAllImagesFailed(true);
+    }
+  }, [currentImageIndex, validImageUrls.length]);
 
   return (
     <article
@@ -46,7 +48,7 @@ const ProductCard = memo(({ product, onProductClick, priority = false }) => {
       {/* Imagen con aspect-ratio estable usando OptimizedImage */}
       <div className="relative w-full pt-[100%] overflow-hidden bg-gray-50">
         <div className="absolute inset-0 flex items-center justify-center p-2">
-          {!imageError && imageUrl ? (
+          {!allImagesFailed && imageUrl ? (
             <OptimizedImage
               src={imageUrl}
               alt={product.producto || 'Producto'}

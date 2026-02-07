@@ -1,10 +1,11 @@
 import { memo, useState, useCallback, useEffect, useRef } from 'react';
+import { isValidImageUrl } from '../../utils/imageUtils';
 
 /**
  * Componente de imagen optimizado con:
  * - Lazy loading nativo + IntersectionObserver
  * - Placeholder mientras carga
- * - Manejo de errores
+ * - Manejo de errores con validación de URL
  * - Intersection Observer para cargar solo cuando es visible
  */
 const OptimizedImage = memo(({
@@ -24,7 +25,7 @@ const OptimizedImage = memo(({
   ...props
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const [hasError, setHasError] = useState(!isValidImageUrl(src)); // Pre-validar URL
   const [isInView, setIsInView] = useState(priority || false);
   const imgRef = useRef(null);
 
