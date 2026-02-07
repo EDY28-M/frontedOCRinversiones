@@ -1,15 +1,11 @@
 import { memo, useState, useCallback, useEffect, useRef } from 'react';
 
-// Cache global de imágenes ya cargadas para evitar re-descargas
-const loadedImages = new Set();
-
 /**
  * Componente de imagen optimizado con:
- * - Lazy loading nativo + IntersectionObserver con rootMargin amplio
+ * - Lazy loading nativo + IntersectionObserver
  * - Placeholder mientras carga
- * - Manejo de errores con reintentos
- * - Cache de imágenes ya cargadas
- * - fetchpriority para imágenes above-the-fold
+ * - Manejo de errores
+ * - Intersection Observer para cargar solo cuando es visible
  */
 const OptimizedImage = memo(({
   src,
@@ -27,15 +23,10 @@ const OptimizedImage = memo(({
   objectFit = 'cover',
   ...props
 }) => {
-  // Si la imagen ya se cargó antes, mostrarla inmediatamente
-  const alreadyCached = src ? loadedImages.has(src) : false;
-  const [isLoaded, setIsLoaded] = useState(alreadyCached);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [isInView, setIsInView] = useState(alreadyCached);
-  const [retryCount, setRetryCount] = useState(0);
+  const [isInView, setIsInView] = useState(priority || false);
   const imgRef = useRef(null);
-  const observerRef = useRef(null);
-  const MAX_RETRIES = 2;
 
   // Efecto para manejar el estado inicial de isInView
   useEffect(() => {
@@ -46,7 +37,6 @@ const OptimizedImage = memo(({
 
   // Intersection Observer para lazy loading manual
   useEffect(() => {
-    // No observar si ya está en vista o es prioridad
     if (isInView || priority || loading !== 'lazy') {
       return;
     }
@@ -62,13 +52,12 @@ const OptimizedImage = memo(({
         }
       },
       {
-        rootMargin: '400px', // Precargar 400px antes de ser visible para UX fluida
+        rootMargin: '200px',
         threshold: 0.01,
       }
     );
 
     observer.observe(element);
-    observerRef.current = observer;
 
     return () => {
       observer.disconnect();
@@ -77,19 +66,13 @@ const OptimizedImage = memo(({
 
   const handleLoad = useCallback(() => {
     setIsLoaded(true);
-    if (src) loadedImages.add(src);
     onLoad?.();
-  }, [onLoad, src]);
+  }, [onLoad]);
 
   const handleError = useCallback(() => {
-    // Reintentar automáticamente hasta MAX_RETRIES veces
-    if (retryCount < MAX_RETRIES) {
-      setRetryCount(prev => prev + 1);
-      return;
-    }
     setHasError(true);
     onError?.();
-  }, [onError, retryCount, MAX_RETRIES]);
+  }, [onError]);
 
   // Estilos para el contenedor
   const containerStyle = {
@@ -136,20 +119,16 @@ const OptimizedImage = memo(({
       )}
       
       {/* Imagen real */}
-      {isInView && (
+      {isInView && src && (
         <img
-          src={retryCount > 0 ? `${src}${src.includes('?') ? '&' : '?'}retry=${retryCount}` : src}
+          src={src}
           alt={alt}
           loading={priority ? 'eager' : loading}
           decoding={decoding}
-          fetchpriority={priority ? 'high' : 'auto'}
           onLoad={handleLoad}
           onError={handleError}
           style={imageStyle}
           className="absolute inset-0"
-          width={width || undefined}
-          height={height || undefined}
-          referrerPolicy="no-referrer"
         />
       )}
     </div>
