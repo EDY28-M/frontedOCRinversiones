@@ -1,0 +1,9 @@
+# SPA Routing para Cloudflare Pages
+# Todas las rutas que no sean archivos estáticos van a index.html
+
+# Assets estáticos - no redirigir
+/assets/*  /assets/:splat  200
+/images/*  /images/:splat  200
+
+# SPA fallback - todas las demás rutas van a index.html
+/*  /index.html  200

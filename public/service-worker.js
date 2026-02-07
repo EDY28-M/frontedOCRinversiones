@@ -1,15 +1,14 @@
 /**
  * Service Worker para ORC Inversiones
- * Estrategia: Cache First, Network Fallback
- * Proporciona soporte offline y carga rápida
+ * Estrategia: Network First para JS/CSS, Cache First para imágenes
+ * VERSIÓN 3: Más conservador para evitar errores de MIME type
  */
 
-const CACHE_NAME = 'orc-inversiones-v2';
+const CACHE_NAME = 'orc-inversiones-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/imagenes OC/1.jpeg',
 ];
 
 // Schemas que nunca deben ser interceptados
@@ -30,7 +29,11 @@ const NEVER_CACHE = [
   /\/api\//,
   /\.mp4$/,
   /\.webm$/,
+  /\.hot-update\./,
 ];
+
+// Assets JS/CSS con hash - NO interceptar, dejar que el navegador maneje
+const HASHED_ASSETS = /\/assets\/.*-[a-zA-Z0-9]{8,}\.(js|css)$/;
 
 /**
  * Verifica si el esquema de la URL es soportado para cache
@@ -106,21 +109,22 @@ self.addEventListener('fetch', (event) => {
   if (shouldNotCache(url)) {
     return;
   }
-  
-  // Estrategia diferente según el tipo de request
-  if (isAPIRequest(url)) {
-    // API: Network First, Cache Fallback
-    event.respondWith(networkFirstStrategy(request));
-  } else if (isImageRequest(url)) {
-    // Imágenes: Cache First, Network Fallback
-    event.respondWith(cacheFirstStrategy(request));
-  } else if (isStaticAsset(url)) {
-    // Assets estáticos: Cache First
-    event.respondWith(cacheFirstStrategy(request));
-  } else {
-    // Default: Stale While Revalidate
-    event.respondWith(staleWhileRevalidateStrategy(request));
+
+  // ⚠️ NO interceptar assets JS/CSS con hash - el navegador los maneja mejor
+  // Esto evita errores de MIME type cuando el servidor devuelve HTML para rutas SPA
+  if (HASHED_ASSETS.test(url)) {
+    return;
   }
+  
+  // Solo interceptar navegación y recursos específicos
+  if (request.mode === 'navigate') {
+    // Navegación: Network First con fallback a index.html
+    event.respondWith(navigationStrategy(request));
+  } else if (isImageRequest(url)) {
+    // Imágenes: Cache First
+    event.respondWith(cacheFirstStrategy(request));
+  }
+  // Para todo lo demás (JS, CSS, etc.) - NO interceptar
 });
 
 // Helpers
@@ -163,6 +167,37 @@ function shouldCacheResponse(request, response) {
 }
 
 // Estrategias de caché
+
+/**
+ * Navigation Strategy: Network First, fallback a index.html cacheado
+ * Ideal para SPA - siempre intenta network primero
+ */
+async function navigationStrategy(request) {
+  try {
+    // Siempre intentar network primero para navegación
+    const networkResponse = await fetch(request);
+    
+    // Si es exitoso, cachear solo el index.html
+    if (networkResponse.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      cache.put('/index.html', networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    // Si falla la red, servir index.html cacheado (SPA fallback)
+    console.log('[SW] Network failed for navigation, serving cached index.html');
+    const cache = await caches.open(CACHE_NAME);
+    const cachedIndex = await cache.match('/index.html');
+    
+    if (cachedIndex) {
+      return cachedIndex;
+    }
+    
+    // Si no hay caché, devolver error
+    throw error;
+  }
+}
 
 /**
  * Cache First: Busca en caché primero, si no está, fetch y guarda en caché

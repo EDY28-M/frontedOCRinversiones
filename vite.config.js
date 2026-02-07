@@ -22,6 +22,8 @@ const copy404Plugin = () => ({
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
+  // Base URL - rutas absolutas para evitar problemas de MIME type
+  base: '/',
   plugins: [
     react({
       // Optimizaciones de Babel para React
