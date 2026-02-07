@@ -108,7 +108,7 @@ export default function Nosotros() {
           <section className="pt-6 sm:pt-8 md:pt-10 pb-10 sm:pb-12 md:pb-10 bg-white overflow-hidden">
             <div className="flex flex-col lg:flex-row items-stretch max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 gap-6 lg:gap-8">
               {/* Imagen del auto */}
-              <div className="relative w-full lg:w-1/2 xl:w-[50%] rounded-lg overflow-hidden order-1 lg:order-1">
+              <div className="relative w-full lg:w-1/2 xl:w-[50%] overflow-hidden order-1 lg:order-1">
                 <div className="aspect-[16/10] sm:aspect-[16/9] lg:aspect-auto lg:absolute lg:inset-0">
                   <img
                     src="/imagenes OC/1.jpeg"
@@ -166,17 +166,21 @@ export default function Nosotros() {
                 {/* 2008 */}
                 <div className="relative mb-16 md:mb-24">
                   <div className="md:flex items-center justify-between w-full">
-                    <div className="md:w-5/12 order-1 md:text-right pr-0 md:pr-12 pl-12 md:pl-0 mb-4 md:mb-0">
-                      <span className="block text-6xl font-display font-bold text-gray-100 absolute md:relative -top-6 left-0 md:top-auto md:left-auto -z-10">2008</span>
-                      <h3 className="text-2xl font-bold text-matte-dark uppercase font-display mb-2">Inicio de Operaciones</h3>
-                      <p className="text-gray-600 leading-relaxed text-sm md:text-base">
+                    <div className="md:w-6/12 order-1 text-left pr-0 md:pr-12 pl-12 md:pl-0 mb-4 md:mb-0">
+                      <span className="block text-7xl font-display font-bold text-gray-100 absolute md:relative -top-6 left-0 md:top-auto md:left-auto -z-10">2008</span>
+                      <h3 className="text-3xl font-bold text-matte-dark uppercase font-display mb-3">Inicio de Operaciones</h3>
+                      <p className="text-gray-700 leading-relaxed text-lg md:text-xl">
                         Fundación en Ate, Lima. ORC Inversiones nace con un inventario modesto pero con una visión técnica clara: suministrar solo componentes de alta especificación.
                       </p>
                     </div>
                     <div className="absolute left-4 md:left-1/2 transform -translate-x-1/2 bg-white border-4 border-accent w-6 h-6 z-20"></div>
-                    <div className="md:w-5/12 order-1 pl-12 md:pl-12">
-                      <div className="bg-gray-100 h-40 w-full border border-gray-200 flex items-center justify-center relative group">
-                        <span className="material-symbols-outlined text-6xl text-gray-300 group-hover:text-secondary transition-colors">warehouse</span>
+                    <div className="md:w-4/12 order-1 pl-12 md:pl-4">
+                      <div className="w-full overflow-hidden relative group shadow-md">
+                        <img 
+                          src="/nosotrosimages/inicioperaciones.jpg" 
+                          alt="Inicio de Operaciones ORC" 
+                          className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
+                        />
                         <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-secondary"></div>
                         <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-secondary"></div>
                       </div>
@@ -187,17 +191,21 @@ export default function Nosotros() {
                 {/* 2015 */}
                 <div className="relative mb-16 md:mb-24">
                   <div className="md:flex items-center justify-between w-full flex-row-reverse">
-                    <div className="md:w-5/12 text-left pl-12 md:pl-12 mb-4 md:mb-0">
-                      <span className="block text-6xl font-display font-bold text-gray-100 absolute md:relative -top-6 left-0 md:top-auto md:left-auto -z-10">2015</span>
-                      <h3 className="text-2xl font-bold text-matte-dark uppercase font-display mb-2">Expansión Logística</h3>
-                      <p className="text-gray-600 leading-relaxed text-sm md:text-base">
+                    <div className="md:w-6/12 text-left pl-12 md:pl-12 mb-4 md:mb-0">
+                      <span className="block text-7xl font-display font-bold text-gray-100 absolute md:relative -top-6 left-0 md:top-auto md:left-auto -z-10">2015</span>
+                      <h3 className="text-3xl font-bold text-matte-dark uppercase font-display mb-3">Expansión Logística</h3>
+                      <p className="text-gray-700 leading-relaxed text-lg md:text-xl">
                         Consolidación de alianzas estratégicas internacionales. Apertura del centro de distribución frente a Puruchuco, optimizando tiempos de entrega en un 40%.
                       </p>
                     </div>
                     <div className="absolute left-4 md:left-1/2 transform -translate-x-1/2 bg-secondary w-6 h-6 z-20 shadow-lg shadow-secondary/50"></div>
-                    <div className="md:w-5/12 pr-0 md:pr-12 pl-12 md:pl-0">
-                      <div className="bg-gray-100 h-40 w-full border border-gray-200 flex items-center justify-center relative group">
-                        <span className="material-symbols-outlined text-6xl text-gray-300 group-hover:text-secondary transition-colors">local_shipping</span>
+                    <div className="md:w-4/12 pr-0 md:pr-4 pl-12 md:pl-0">
+                      <div className="w-full overflow-hidden relative group shadow-md">
+                        <img 
+                          src="/nosotrosimages/logisitca.jpg" 
+                          alt="Expansión Logística ORC" 
+                          className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
+                        />
                         <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-accent"></div>
                         <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-accent"></div>
                       </div>
@@ -208,17 +216,21 @@ export default function Nosotros() {
                 {/* 2024 */}
                 <div className="relative">
                   <div className="md:flex items-center justify-between w-full">
-                    <div className="md:w-5/12 order-1 md:text-right pr-0 md:pr-12 pl-12 md:pl-0 mb-4 md:mb-0">
-                      <span className="block text-6xl font-display font-bold text-gray-100 absolute md:relative -top-6 left-0 md:top-auto md:left-auto -z-10">2024</span>
-                      <h3 className="text-2xl font-bold text-matte-dark uppercase font-display mb-2">Ingeniería Digital</h3>
-                      <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-                        Implementación de sistemas de trazabilidad y catálogo digital. Hoy somos la referencia técnica para flotas industriales y transporte pesado en Perú.
+                    <div className="md:w-6/12 order-1 text-left pr-0 md:pr-12 pl-12 md:pl-0 mb-4 md:mb-0">
+                      <span className="block text-7xl font-display font-bold text-gray-100 absolute md:relative -top-6 left-0 md:top-auto md:left-auto -z-10">2024</span>
+                      <h3 className="text-3xl font-bold text-matte-dark uppercase font-display mb-3">Repuestos Originales</h3>
+                      <p className="text-gray-700 leading-relaxed text-lg md:text-xl">
+                        Consolidamos nuestra oferta con repuestos 100% originales y certificados. Catálogo digital completo para flotas industriales y transporte pesado en Perú.
                       </p>
                     </div>
                     <div className="absolute left-4 md:left-1/2 transform -translate-x-1/2 bg-matte-dark border-2 border-white w-6 h-6 z-20"></div>
-                    <div className="md:w-5/12 order-1 pl-12 md:pl-12">
-                      <div className="bg-gray-100 h-40 w-full border border-gray-200 flex items-center justify-center relative group">
-                        <span className="material-symbols-outlined text-6xl text-gray-300 group-hover:text-secondary transition-colors">hub</span>
+                    <div className="md:w-4/12 order-1 pl-12 md:pl-4">
+                      <div className="w-full overflow-hidden relative group shadow-md">
+                        <img 
+                          src="/nosotrosimages/repuestos_originales.jpg" 
+                          alt="Repuestos Originales ORC" 
+                          className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
+                        />
                         <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-secondary"></div>
                         <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-secondary"></div>
                       </div>
