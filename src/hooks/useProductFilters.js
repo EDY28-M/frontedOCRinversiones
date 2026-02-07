@@ -1,102 +1,85 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback, useTransition, useDeferredValue } from 'react';
 import { usePublicProducts } from './usePublicProducts.js';
 import { usePublicBrands } from './usePublicBrands.js';
 import { usePublicCategories } from './usePublicCategories.js';
 
-// Hook para manejar filtros con paginación híbrida:
-// - Sin búsqueda de texto: carga todo y filtra en cliente (categoría/marca instantáneo)
-// - Con búsqueda: usa filtrado server-side
+// Hook para manejar filtros con paginación 100% server-side
+// Optimizado con useTransition para UI responsiva
 export const useProductFilters = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [selectedBrands, setSelectedBrands] = useState([]); // Array de números
   const pageSize = 12;
-  const maxClientItems = 9999;
-  const hasTextSearch = searchQuery.trim().length > 0;
 
-  // Resetear página cuando cambian los filtros
+  // useTransition para cambios de filtro no urgentes
+  const [isPending, startTransition] = useTransition();
+
+  // Debounce de búsqueda con useDeferredValue
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+
+  // Resetear página cuando cambian los filtros (con transición)
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedCategory, selectedBrands]);
+    startTransition(() => {
+      setCurrentPage(1);
+    });
+  }, [deferredSearchQuery, selectedCategory, selectedBrands]);
 
-  // 1. Cargar productos con filtros del servidor (SERVER-SIDE)
+  // Cargar productos con filtros del servidor (100% SERVER-SIDE)
   const {
-    products: backendProducts,
-    total: backendTotal,
-    totalPages: backendTotalPages,
+    products,
+    total,
+    totalPages,
     isLoading: isLoadingProducts,
+    isFetching,
     isError,
     error,
     refetch: refetchProducts
   } = usePublicProducts({
-    page: hasTextSearch ? currentPage : 1,
-    pageSize: hasTextSearch ? pageSize : maxClientItems,
-    q: hasTextSearch ? searchQuery : '',
-    categoryId: hasTextSearch ? selectedCategory : null,
-    brandIds: hasTextSearch && selectedBrands.length > 0 ? selectedBrands.join(',') : undefined
+    page: currentPage,
+    pageSize: pageSize,
+    q: deferredSearchQuery.trim() || '',
+    categoryId: selectedCategory,
+    brandIds: selectedBrands.length > 0 ? selectedBrands.join(',') : undefined
   });
 
-  // 2. Cargar datos adicionales (marcas/categorías)
+  // Cargar datos adicionales (marcas/categorías)
   const { brands, isLoading: isLoadingBrands, error: brandsError } = usePublicBrands();
   const { categories, isLoading: isLoadingCategories, error: categoriesError } = usePublicCategories();
 
-  // 3. Filtrado client-side (categorías/marcas) cuando no hay búsqueda de texto
-  const clientFilteredProducts = useMemo(() => {
-    if (hasTextSearch) return backendProducts;
+  // Handler robusto para categorías (toggle) - con transición
+  const handleCategoryChange = useCallback((categoryId) => {
+    const numericId = categoryId !== null ? Number(categoryId) : null;
+    startTransition(() => {
+      setSelectedCategory(prev => prev === numericId ? null : numericId);
+    });
+  }, []);
 
-    let filtered = backendProducts;
-    const normalizedCategory = selectedCategory != null ? String(selectedCategory) : null;
-    const normalizedBrands = new Set(selectedBrands.map(brandId => String(brandId)));
-
-    if (normalizedCategory) {
-      filtered = filtered.filter(product => String(product.CategoryId ?? product.categoryId) === normalizedCategory);
-    }
-
-    if (normalizedBrands.size > 0) {
-      filtered = filtered.filter(product => normalizedBrands.has(String(product.MarcaId ?? product.marcaId)));
-    }
-
-    return filtered;
-  }, [backendProducts, hasTextSearch, selectedCategory, selectedBrands]);
-
-  const paginatedClientProducts = useMemo(() => {
-    if (hasTextSearch) return backendProducts;
-    const startIndex = (currentPage - 1) * pageSize;
-    return clientFilteredProducts.slice(startIndex, startIndex + pageSize);
-  }, [backendProducts, clientFilteredProducts, currentPage, hasTextSearch, pageSize]);
-
-  const total = hasTextSearch ? backendTotal : clientFilteredProducts.length;
-  const totalPages = hasTextSearch
-    ? backendTotalPages
-    : Math.max(1, Math.ceil(total / pageSize));
-  const products = hasTextSearch ? backendProducts : paginatedClientProducts;
-
-  // Funciones de manejo de filtros
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId === selectedCategory ? null : categoryId);
-  };
-
-  const handleBrandToggle = (brandId) => {
-    if (brandId === 'all') {
-      setSelectedBrands([]);
-    } else {
+  // Handler robusto para marcas (multi-select toggle) - con transición
+  const handleBrandToggle = useCallback((brandId) => {
+    const numericId = Number(brandId);
+    if (isNaN(numericId) || numericId <= 0) return;
+    
+    startTransition(() => {
       setSelectedBrands(prev => {
-        if (prev.includes(brandId)) {
-          return prev.filter(id => id !== brandId);
+        const exists = prev.includes(numericId);
+        if (exists) {
+          return prev.filter(id => id !== numericId);
         } else {
-          return [...prev, brandId];
+          return [...prev, numericId];
         }
       });
-    }
-  };
+    });
+  }, []);
 
-  const handleClearFilters = () => {
-    setSelectedCategory(null);
-    setSelectedBrands([]);
-    setSearchQuery('');
-    setCurrentPage(1);
-  };
+  const handleClearFilters = useCallback(() => {
+    startTransition(() => {
+      setSelectedCategory(null);
+      setSelectedBrands([]);
+      setSearchQuery('');
+      setCurrentPage(1);
+    });
+  }, []);
 
   return {
     // Estados
@@ -119,6 +102,7 @@ export const useProductFilters = () => {
     totalPages,
     pageSize,
     isLoading: isLoadingProducts,
+    isFetching: isFetching || isPending, // Incluye transiciones pendientes
     isError,
     error,
     refetch: refetchProducts,

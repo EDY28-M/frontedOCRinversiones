@@ -168,3 +168,16 @@ body {
 .animate-slide-in {
   animation: slideIn 0.3s ease-out;
 }
+
+/* Loading bar animation for fetching states */
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(200%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}

@@ -30,6 +30,7 @@ export default function Productos() {
     totalPages,
     pageSize,
     isLoading,
+    isFetching,
     isError,
     error,
     refetch,
@@ -264,6 +265,7 @@ export default function Productos() {
             <ProductsGrid
               products={products}
               isLoading={isLoading}
+              isFetching={isFetching}
               isError={isError}
               error={error}
               refetch={refetch}

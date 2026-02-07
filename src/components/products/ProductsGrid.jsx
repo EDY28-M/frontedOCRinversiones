@@ -3,12 +3,14 @@ import ProductCard from './ProductCard.jsx';
 const ProductsGrid = ({
   products,
   isLoading,
+  isFetching = false,
   isError,
   error,
   refetch,
   total,
   onProductClick
 }) => {
+  // Loading inicial (sin datos)
   if (isLoading && products.length === 0) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -53,17 +55,27 @@ const ProductsGrid = ({
     );
   }
 
-  // Grid de productos - 4x4 responsive
+  // Grid de productos - con indicador de carga en background
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {products.map((product, index) => (
-        <ProductCard 
-          key={product.id} 
-          product={product} 
-          onProductClick={onProductClick}
-          priority={index < 4} /* Primeros 4 productos cargan inmediatamente */
-        />
-      ))}
+    <div className="relative">
+      {/* Barra de progreso sutil durante fetch en background */}
+      {isFetching && (
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100 overflow-hidden z-10">
+          <div className="h-full bg-blue-500 animate-[loading_1s_ease-in-out_infinite]" 
+               style={{ width: '30%', animation: 'loading 1s ease-in-out infinite' }}></div>
+        </div>
+      )}
+      
+      <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 transition-opacity duration-200 ${isFetching ? 'opacity-70' : 'opacity-100'}`}>
+        {products.map((product, index) => (
+          <ProductCard 
+            key={product.id} 
+            product={product} 
+            onProductClick={onProductClick}
+            priority={index < 4} /* Primeros 4 productos cargan inmediatamente */
+          />
+        ))}
+      </div>
     </div>
   );
 };

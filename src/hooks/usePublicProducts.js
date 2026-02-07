@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { publicProductsApi } from '../api/publicApi';
 
 /**
@@ -21,14 +21,13 @@ export function usePublicProducts({
   categoryId = null,
   brandIds = undefined
 } = {}) {
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ['public-products', { page, pageSize, q, categoryId, brandIds }],
     queryFn: () => publicProductsApi.getActiveProducts({ page, pageSize, q, categoryId, brandIds }),
-    staleTime: 1000 * 60 * 5,   // 5 minutos - mantiene caché al navegar entre páginas
-    gcTime: 1000 * 60 * 10,     // 10 minutos en memoria
-    refetchOnWindowFocus: false, // No refetch automático al cambiar de tab
-    refetchOnMount: false,       // No refetch cuando el componente se monta (usa caché)
-    placeholderData: (previousData) => previousData,
+    staleTime: 1000 * 60 * 2,   // 2 minutos
+    gcTime: 1000 * 60 * 5,      // 5 minutos en memoria
+    refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData, // v5: mantiene datos anteriores mientras carga
   });
 
   const products = data?.items || [];
@@ -41,7 +40,8 @@ export function usePublicProducts({
     totalPages,
     page,
     pageSize,
-    isLoading,
+    isLoading: isLoading && !data,
+    isFetching,
     isError,
     isSuccess: !isLoading && !isError,
     error: error?.message || null,
