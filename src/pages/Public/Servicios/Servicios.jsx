@@ -11,11 +11,9 @@ export default function Servicios() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="inicio-wrapper min-h-screen flex flex-col bg-surface font-sans text-text-main antialiased">
-      <div className="relative flex flex-col flex-1 w-full">
-
-        {/* Header */}
-        <header className="w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+    <div className="h-screen flex flex-col bg-surface font-sans text-text-main antialiased overflow-hidden">
+      {/* Header */}
+      <header className="flex-shrink-0 w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
             <div className="flex items-center gap-3 min-w-fit">
               <div className="text-primary">
@@ -98,11 +96,13 @@ export default function Servicios() {
               </button>
             </div>
           </div>
-        </header>
+      </header>
 
-        {/* Mobile Menu Component */}
-        <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+      {/* Mobile Menu Component */}
+      <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
+      {/* Contenedor con scroll */}
+      <div className="flex-1 overflow-y-auto">
         {/* Content */}
         <main className="pt-0">
 
@@ -431,7 +431,7 @@ export default function Servicios() {
             </div>
           </div>
         </footer>
-      </div>
+      </div>{/* Cierre del contenedor con scroll */}
     </div>
   );
 }

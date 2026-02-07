@@ -150,7 +150,11 @@ const ProductosDestacados = () => {
         {/* Header interno con paginación */}
         <div className="p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4 bg-gray-50/50">
         <div className="text-sm text-slate-600 font-mono">
-            Mostrando <span className="font-bold">{productos.length}</span> de <span className="font-bold">{total}</span> productos
+            {total > 0 ? (
+              <>Mostrando <span className="font-bold">{(currentPage - 1) * pageSize + 1}</span> - <span className="font-bold">{Math.min(currentPage * pageSize, total)}</span> de <span className="font-bold">{total}</span> productos</>
+            ) : (
+              <>Mostrando <span className="font-bold">0</span> productos</>
+            )}
           </div>
           
           {/* Paginación */}

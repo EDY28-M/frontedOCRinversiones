@@ -26,30 +26,29 @@
 
 html {
   width: 100%;
-  min-height: 100%;
+  height: 100%;
   background-color: #ffffff;
-  /* NO overflow:hidden - permite scroll */
+  overflow: hidden; /* Sin scroll en html */
 }
 
 body {
   width: 100%;
-  min-height: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
   font-family: 'Inter', 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #ffffff;
-  /* NO overflow:hidden - permite scroll natural */
-  overflow-x: hidden; /* Solo prevenir scroll horizontal */
+  overflow: hidden; /* Sin scroll en body - cada página controla su scroll */
 }
 
 #root {
   width: 100%;
-  min-height: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
-  /* NO max-width, NO margin:auto, NO padding - full width */
+  overflow: hidden; /* Sin scroll en #root */
 }
 
 /* Fuentes del diseño */

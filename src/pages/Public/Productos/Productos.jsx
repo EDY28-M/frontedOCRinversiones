@@ -28,6 +28,7 @@ export default function Productos() {
     products,
     total,
     totalPages,
+    pageSize,
     isLoading,
     isError,
     error,
@@ -46,10 +47,9 @@ export default function Productos() {
   };
 
   return (
-    <div className="productos-wrapper bg-surface font-sans text-text-main antialiased">
-      <div className="relative flex flex-col min-h-screen w-full">
-        {/* Header */}
-        <header className="w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+    <div className="h-screen flex flex-col bg-surface font-sans text-text-main antialiased overflow-hidden">
+      {/* Header fijo */}
+      <header className="flex-shrink-0 w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
             <div className="flex items-center gap-3 min-w-fit">
               <div className="text-primary">
@@ -147,7 +147,9 @@ export default function Productos() {
         {/* Mobile Menu Component */}
         <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
-        <main className="w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row">
+        {/* Contenedor con scroll - igual que admin */}
+        <div className="flex-1 overflow-y-auto">
+          <main className="w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row">
           <FiltersSidebar
             categories={categories}
             brands={brands}
@@ -174,7 +176,7 @@ export default function Productos() {
               {!isLoading && total > 0 && (
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="text-sm text-slate-600 font-mono">
-                    Mostrando <span className="font-bold">{products.length}</span> de <span className="font-bold">{total}</span> productos
+                    Mostrando <span className="font-bold">{(currentPage - 1) * pageSize + 1}</span> - <span className="font-bold">{Math.min(currentPage * pageSize, total)}</span> de <span className="font-bold">{total}</span> productos
                   </div>
 
                   <nav className="flex items-center gap-2">
@@ -343,7 +345,7 @@ export default function Productos() {
             </div>
           </div>
         </footer>
-      </div>
+        </div>{/* Cierre del contenedor con scroll */}
 
       {/* Modal de Detalle del Producto */}
       {selectedProduct && (

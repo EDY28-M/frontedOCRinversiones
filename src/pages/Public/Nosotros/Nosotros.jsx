@@ -10,11 +10,9 @@ export default function Nosotros() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="inicio-wrapper min-h-screen flex flex-col bg-surface font-sans text-text-main antialiased">
-      <div className="relative flex flex-col flex-1 w-full">
-
-        {/* Header */}
-        <header className="w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+    <div className="h-screen flex flex-col bg-surface font-sans text-text-main antialiased overflow-hidden">
+      {/* Header */}
+      <header className="flex-shrink-0 w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
           <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
             <div className="flex items-center gap-3 min-w-fit">
               <div className="text-primary">
@@ -97,13 +95,15 @@ export default function Nosotros() {
               </button>
             </div>
           </div>
-        </header>
+      </header>
 
-        {/* Mobile Menu Component */}
-        <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+      {/* Mobile Menu Component */}
+      <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
+      {/* Contenedor con scroll */}
+      <div className="flex-1 overflow-y-auto">
         {/* Content */}
-        <main className="flex-grow font-body">
+        <main className="font-body">
           {/* Sobre Nosotros Section */}
           <section className="pt-6 sm:pt-8 md:pt-10 pb-10 sm:pb-12 md:pb-10 bg-white overflow-hidden">
             <div className="flex flex-col lg:flex-row items-stretch max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 gap-6 lg:gap-8">
@@ -523,8 +523,7 @@ export default function Nosotros() {
             </div>
           </div>
         </footer>
-
-      </div >
-    </div >
+      </div>{/* Cierre del contenedor con scroll */}
+    </div>
   );
 }

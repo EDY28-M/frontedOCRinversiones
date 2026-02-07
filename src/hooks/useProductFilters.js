@@ -117,6 +117,7 @@ export const useProductFilters = () => {
     products,
     total,
     totalPages,
+    pageSize,
     isLoading: isLoadingProducts,
     isError,
     error,

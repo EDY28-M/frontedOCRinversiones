@@ -406,7 +406,11 @@ const Productos = () => {
             </button>
           </div>
           <div className="text-xs text-slate-400 font-mono">
-            MOSTRANDO {filteredProducts.length} DE {productos.length}
+            {filteredProducts.length > 0 ? (
+              <>MOSTRANDO {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, filteredProducts.length)} DE {filteredProducts.length}</>
+            ) : (
+              <>MOSTRANDO 0 PRODUCTOS</>
+            )}
           </div>
         </div>
 
