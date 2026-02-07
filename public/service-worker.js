@@ -4,7 +4,7 @@
  * Proporciona soporte offline y carga rápida
  */
 
-const CACHE_NAME = 'orc-inversiones-v1';
+const CACHE_NAME = 'orc-inversiones-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -140,6 +140,28 @@ function isStaticAsset(url) {
   return /\.(js|css|woff2?|ttf|eot)$/i.test(url);
 }
 
+function isHtmlResponse(response) {
+  const contentType = response.headers.get('content-type') || '';
+  return contentType.includes('text/html');
+}
+
+function shouldBypassCachedResponse(request, cachedResponse) {
+  const url = request.url;
+  if ((isStaticAsset(url) || isImageRequest(url)) && isHtmlResponse(cachedResponse)) {
+    return true;
+  }
+  return false;
+}
+
+function shouldCacheResponse(request, response) {
+  if (!response || !response.ok) return false;
+  const url = request.url;
+  if ((isStaticAsset(url) || isImageRequest(url)) && isHtmlResponse(response)) {
+    return false;
+  }
+  return true;
+}
+
 // Estrategias de caché
 
 /**
@@ -151,6 +173,9 @@ async function cacheFirstStrategy(request) {
   const cachedResponse = await cache.match(request);
   
   if (cachedResponse) {
+    if (shouldBypassCachedResponse(request, cachedResponse)) {
+      return fetchAndCache(request, cache);
+    }
     // Actualizar caché en background (stale-while-revalidate)
     fetchAndCache(request, cache).catch(() => {});
     return cachedResponse;
@@ -169,7 +194,7 @@ async function networkFirstStrategy(request) {
   try {
     const networkResponse = await fetch(request);
     
-    if (networkResponse.ok) {
+    if (shouldCacheResponse(request, networkResponse)) {
       cache.put(request, networkResponse.clone());
     }
     
@@ -196,7 +221,7 @@ async function staleWhileRevalidateStrategy(request) {
   
   const fetchPromise = fetch(request)
     .then((networkResponse) => {
-      if (networkResponse.ok) {
+      if (shouldCacheResponse(request, networkResponse)) {
         cache.put(request, networkResponse.clone());
       }
       return networkResponse;
@@ -215,7 +240,7 @@ async function fetchAndCache(request, cache) {
   try {
     const networkResponse = await fetch(request);
     
-    if (networkResponse.ok) {
+    if (shouldCacheResponse(request, networkResponse)) {
       cache.put(request, networkResponse.clone());
     }
     
@@ -228,7 +253,7 @@ async function fetchAndCache(request, cache) {
 
 // Manejo de mensajes desde la aplicación
 self.addEventListener('message', (event) => {
-  if (event.data === 'skipWaiting') {
+  if (event.data === 'skipWaiting' || event.data?.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
   

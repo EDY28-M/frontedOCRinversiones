@@ -6,6 +6,8 @@ import { ErrorAlert, ConfirmModal, ImportProductsModal } from '../../../componen
 import { usePermissions } from '../../../hooks/usePermissions';
 import { PERMISSIONS } from '../../../utils/permissions';
 import { useProducts, useToggleProductActive, useToggleProductFeatured, useDeleteProduct, useDeleteAllProducts, usePrefetchProduct, productKeys } from '../../../hooks/useProducts';
+import { categoryKeys } from '../../../hooks/useCategories';
+import { brandKeys } from '../../../hooks/useBrands';
 
 const Productos = () => {
   const { can } = usePermissions();
@@ -160,6 +162,9 @@ const Productos = () => {
 
   const handleImportSuccess = () => {
     queryClient.invalidateQueries({ queryKey: productKeys.all });
+    queryClient.invalidateQueries({ queryKey: categoryKeys.all });
+    queryClient.invalidateQueries({ queryKey: brandKeys.all });
+    loadCategoriesAndMarcas();
   };
 
   const handleDelete = async (id, descripcion) => {
