@@ -1,23 +1,5 @@
 {
   "version": 1,
   "include": ["/*"],
-  "exclude": [
-    "/assets/*",
-    "/images/*",
-    "/svg*",
-    "/Bancos/*",
-    "/envios/*",
-    "/imagenes*",
-    "/*.png",
-    "/*.jpg",
-    "/*.jpeg",
-    "/*.gif",
-    "/*.webp",
-    "/*.svg",
-    "/*.ico",
-    "/*.css",
-    "/*.js",
-    "/manifest.json",
-    "/service-worker.js"
-  ]
+  "exclude": []
 }

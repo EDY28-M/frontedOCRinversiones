@@ -1,11 +1,24 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { readFileSync } from 'fs'
+import { readFileSync, copyFileSync } from 'fs'
 
 // Leer versión del package.json
 const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8'))
 const appVersion = packageJson.version || '0.0.0'
+
+// Plugin para copiar index.html como 404.html para Cloudflare Pages SPA routing
+const copy404Plugin = () => ({
+  name: 'copy-404',
+  closeBundle() {
+    try {
+      copyFileSync('dist/index.html', 'dist/404.html');
+      console.log('✓ Copied index.html to 404.html for SPA routing');
+    } catch (err) {
+      console.warn('Could not copy 404.html:', err.message);
+    }
+  }
+});
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -26,6 +39,8 @@ export default defineConfig(({ mode }) => ({
       brotliSize: true,
       filename: 'dist/stats.html',
     }),
+    // Copiar 404.html para SPA routing en Cloudflare Pages
+    copy404Plugin(),
   ],
   build: {
     outDir: 'dist',
