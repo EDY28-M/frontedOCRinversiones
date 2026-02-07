@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const ProductDetailModal = ({ product, onClose }) => {
+const ProductDetailModal = ({ product, onClose, isPublic = false }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [images, setImages] = useState([]);
   const [quantity, setQuantity] = useState(1);
@@ -181,10 +181,12 @@ Por favor, quisiera más información sobre disponibilidad y precio.`;
                       <span className="text-blue-600 material-symbols-outlined text-sm">qr_code</span>
                       Código: <span className="font-bold text-gray-900">{product.codigo}</span>
                     </span>
-                    <span className="flex items-center gap-1">
-                      <span className="text-blue-600 material-symbols-outlined text-sm">tag</span>
-                      Código Com.: <span className="font-bold text-gray-900">{product.codigoComer}</span>
-                    </span>
+                    {!isPublic && (
+                      <span className="flex items-center gap-1">
+                        <span className="text-blue-600 material-symbols-outlined text-sm">tag</span>
+                        Código Com.: <span className="font-bold text-gray-900">{product.codigoComer}</span>
+                      </span>
+                    )}
                   </div>
                 </div>
 

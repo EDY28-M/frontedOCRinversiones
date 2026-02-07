@@ -409,7 +409,7 @@ export default function Inicio() {
                                     <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
                                 </div>
                                 <p className="text-sm text-gray-200 leading-relaxed">
-                                    Líderes en refacciones de alto rendimiento para entusiastas del motor. Calidad garantizada en cada pieza.
+                                    Somos una empresa dedicada a la importación y venta de repuestos para vehículos chinos, japoneses y coreanos, ofreciendo calidad y precios competitivos.
                                 </p>
                                 <div className="flex gap-4">
                                     <a className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
@@ -479,6 +479,7 @@ export default function Inicio() {
                 <ProductDetailModal
                     product={selectedProduct}
                     onClose={() => setSelectedProduct(null)}
+                    isPublic={true}
                 />
             )}
         </div>
