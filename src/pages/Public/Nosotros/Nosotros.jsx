@@ -2,12 +2,92 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import MobileMenu from '../../../components/common/MobileMenu';
 import '../../../styles/inicio.css';
+import { contactService } from '../../../services/contactService';
 
 /**
  * Página Nosotros - V3
  */
 export default function Nosotros() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    company: '',
+    email: '',
+    message: '',
+  });
+  const [contactStatus, setContactStatus] = useState({
+    isSubmitting: false,
+    type: '',
+    message: '',
+    confirmationSent: false,
+  });
+
+  const handleContactChange = (event) => {
+    const { name, value } = event.target;
+    if (contactStatus.message) {
+      setContactStatus((prev) => ({ ...prev, message: '', type: '' }));
+    }
+    setContactForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleContactSubmit = async (event) => {
+    event.preventDefault();
+    if (contactStatus.isSubmitting) return;
+
+    const name = contactForm.name.trim();
+    const email = contactForm.email.trim();
+    const message = contactForm.message.trim();
+    const company = contactForm.company.trim();
+
+    if (!name || !email || !message) {
+      setContactStatus((prev) => ({
+        ...prev,
+        type: 'error',
+        message: 'Por favor completa los campos obligatorios.',
+      }));
+      return;
+    }
+
+    const subjectBase = 'Consulta desde página Nosotros';
+    const subjectRaw = company ? `${subjectBase} - ${company}` : subjectBase;
+    const subject = subjectRaw.length > 120 ? subjectRaw.slice(0, 120) : subjectRaw;
+    const composedMessage = company
+      ? `Empresa: ${company}\n\n${message}`
+      : message;
+
+    try {
+      setContactStatus((prev) => ({ ...prev, isSubmitting: true, message: '', type: '' }));
+      const response = await contactService.sendContact({
+        name,
+        email,
+        subject,
+        message: composedMessage,
+      });
+
+      setContactStatus({
+        isSubmitting: false,
+        type: 'success',
+        message: response?.message || 'Mensaje enviado correctamente.',
+        confirmationSent: response?.confirmationSent ?? true,
+      });
+      setContactForm({
+        name: '',
+        company: '',
+        email: '',
+        message: '',
+      });
+    } catch (error) {
+      setContactStatus({
+        isSubmitting: false,
+        type: 'error',
+        message: error?.message || 'No pudimos enviar tu mensaje. Inténtalo más tarde.',
+        confirmationSent: false,
+      });
+    }
+  };
 
   return (
     <div className="h-screen flex flex-col bg-surface font-sans text-text-main antialiased overflow-hidden">
@@ -381,7 +461,7 @@ export default function Nosotros() {
                 <div className="absolute top-0 left-0 w-20 h-20 border-t-4 border-l-4 border-accent opacity-50"></div>
                 <h2 className="text-4xl font-bold font-display uppercase mb-2">Contacto</h2>
                 <p className="text-gray-400 mb-10 font-light">Complete la ficha técnica para iniciar una consulta.</p>
-                <form className="space-y-6">
+                <form className="space-y-6" onSubmit={handleContactSubmit}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="relative pt-2">
                       <input
@@ -389,6 +469,10 @@ export default function Nosotros() {
                         id="name"
                         placeholder="Nombre Completo"
                         type="text"
+                        name="name"
+                        value={contactForm.name}
+                        onChange={handleContactChange}
+                        required
                       />
                       <label
                         className="absolute left-4 top-4 text-gray-400 text-base transition-all duration-200 pointer-events-none uppercase tracking-wide peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-1 peer-focus:text-[10px] peer-focus:text-primary"
@@ -403,6 +487,9 @@ export default function Nosotros() {
                         id="company"
                         placeholder="Empresa"
                         type="text"
+                        name="company"
+                        value={contactForm.company}
+                        onChange={handleContactChange}
                       />
                       <label
                         className="absolute left-4 top-4 text-gray-400 text-base transition-all duration-200 pointer-events-none uppercase tracking-wide peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-1 peer-focus:text-[10px] peer-focus:text-primary"
@@ -418,6 +505,10 @@ export default function Nosotros() {
                       id="email"
                       placeholder="Correo Corporativo"
                       type="email"
+                      name="email"
+                      value={contactForm.email}
+                      onChange={handleContactChange}
+                      required
                     />
                     <label
                       className="absolute left-4 top-4 text-gray-400 text-base transition-all duration-200 pointer-events-none uppercase tracking-wide peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-1 peer-focus:text-[10px] peer-focus:text-primary"
@@ -432,6 +523,11 @@ export default function Nosotros() {
                       id="message"
                       placeholder="Especificaciones del Requerimiento"
                       rows="4"
+                      name="message"
+                      value={contactForm.message}
+                      onChange={handleContactChange}
+                      maxLength={5000}
+                      required
                     ></textarea>
                     <label
                       className="absolute left-4 top-4 text-gray-400 text-base transition-all duration-200 pointer-events-none uppercase tracking-wide peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-1 peer-focus:text-[10px] peer-focus:text-primary"
@@ -440,8 +536,24 @@ export default function Nosotros() {
                       Especificaciones
                     </label>
                   </div>
-                  <button className="w-full bg-accent text-matte-dark font-bold font-display uppercase tracking-widest text-sm py-5 hover:bg-yellow-400 transition-colors shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none translate-x-0 hover:translate-x-[2px] hover:translate-y-[2px] duration-200" type="button">
-                    Enviar Solicitud
+                  {contactStatus.message && (
+                    <div
+                      className={`text-sm font-semibold ${
+                        contactStatus.type === 'success' ? 'text-emerald-300' : 'text-red-300'
+                      }`}
+                    >
+                      {contactStatus.message}
+                      {contactStatus.type === 'success' && contactStatus.confirmationSent === false
+                        ? ' No pudimos enviar el correo de confirmación.'
+                        : ''}
+                    </div>
+                  )}
+                  <button
+                    className="w-full bg-accent text-matte-dark font-bold font-display uppercase tracking-widest text-sm py-5 hover:bg-yellow-400 transition-colors shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-none translate-x-0 hover:translate-x-[2px] hover:translate-y-[2px] duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                    type="submit"
+                    disabled={contactStatus.isSubmitting}
+                  >
+                    {contactStatus.isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}
                   </button>
                 </form>
               </div>

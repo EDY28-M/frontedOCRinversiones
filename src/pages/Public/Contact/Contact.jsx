@@ -1,25 +1,68 @@
 import { useState } from 'react';
+import { contactService } from '../../../services/contactService';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
     telefono: '',
+    asunto: '',
     mensaje: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState(null);
 
   const handleChange = (e) => {
+    if (feedback) setFeedback(null);
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí irá la lógica para enviar el formulario
-    console.log('Formulario enviado:', formData);
-    alert('Mensaje enviado. Nos pondremos en contacto pronto.');
+    if (isSubmitting) return;
+
+    const payload = {
+      name: formData.nombre.trim(),
+      email: formData.email.trim(),
+      phone: formData.telefono.trim() || null,
+      subject: formData.asunto.trim() || null,
+      message: formData.mensaje.trim(),
+    };
+
+    if (!payload.name || !payload.email || !payload.message) {
+      setFeedback({
+        type: 'error',
+        message: 'Por favor completa los campos obligatorios.',
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const response = await contactService.sendContact(payload);
+      setFeedback({
+        type: 'success',
+        message: response?.message || 'Mensaje enviado correctamente.',
+        confirmationSent: response?.confirmationSent ?? true,
+      });
+      setFormData({
+        nombre: '',
+        email: '',
+        telefono: '',
+        asunto: '',
+        mensaje: '',
+      });
+    } catch (error) {
+      setFeedback({
+        type: 'error',
+        message: error?.message || 'No pudimos enviar tu mensaje. Inténtalo más tarde.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -80,7 +123,22 @@ const Contact = () => {
                   value={formData.telefono}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border-2 border-gray-200 focus:border-secondary focus:outline-none transition-colors bg-gray-50 text-sm font-semibold"
-                  required
+                  placeholder="Opcional"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">
+                  Asunto
+                </label>
+                <input
+                  type="text"
+                  name="asunto"
+                  value={formData.asunto}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border-2 border-gray-200 focus:border-secondary focus:outline-none transition-colors bg-gray-50 text-sm font-semibold"
+                  placeholder="Opcional"
+                  maxLength={120}
                 />
               </div>
 
@@ -93,16 +151,29 @@ const Contact = () => {
                   value={formData.mensaje}
                   onChange={handleChange}
                   rows="5"
+                  maxLength={5000}
                   className="w-full px-4 py-3 border-2 border-gray-200 focus:border-secondary focus:outline-none transition-colors bg-gray-50 text-sm font-semibold resize-none"
                   required
                 ></textarea>
               </div>
 
+              {feedback?.message && (
+                <div
+                  className={`text-sm font-semibold ${feedback.type === 'success' ? 'text-green-600' : 'text-red-600'}`}
+                >
+                  {feedback.message}
+                  {feedback.type === 'success' && feedback.confirmationSent === false
+                    ? ' No pudimos enviar el correo de confirmación.'
+                    : ''}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="w-full py-4 bg-primary text-secondary font-bold text-sm uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-md hover:shadow-lg"
+                className="w-full py-4 bg-primary text-secondary font-bold text-sm uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                disabled={isSubmitting}
               >
-                Enviar Mensaje
+                {isSubmitting ? 'Enviando...' : 'Enviar Mensaje'}
               </button>
             </form>
           </div>
