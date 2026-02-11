@@ -207,33 +207,35 @@ Por favor, quisiera más información sobre disponibilidad y precio.`;
                   </div>
                 )}
 
-                {/* Ficha Técnica */}
-                <div className="mb-4 sm:mb-6 md:mb-8">
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-sm font-bold text-gray-900 uppercase border-l-4 border-blue-600 pl-2">
-                      Ficha Técnica
-                    </h3>
-                  </div>
+                {/* Ficha Técnica - Solo visible en vista privada (admin) */}
+                {!isPublic && (
+                  <div className="mb-4 sm:mb-6 md:mb-8">
+                    <div className="flex justify-between items-center mb-3">
+                      <h3 className="text-sm font-bold text-gray-900 uppercase border-l-4 border-blue-600 pl-2">
+                        Ficha Técnica
+                      </h3>
+                    </div>
 
-                  {fichaTecnica.length > 0 ? (
-                    <div className="overflow-x-auto overflow-hidden border border-gray-200">
-                      <table className="min-w-full text-xs sm:text-sm text-left">
-                        <tbody className="divide-y divide-gray-200">
-                          {fichaTecnica.map((item, index) => (
-                            <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                              <td className="px-2 sm:px-4 py-2 font-medium text-gray-700 w-1/3">{item.label}</td>
-                              <td className="px-2 sm:px-4 py-2 text-gray-600 font-mono">{item.value}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <div className="border border-gray-200 p-4 bg-gray-50 text-center">
-                      <p className="text-sm text-gray-400">No hay ficha técnica disponible</p>
-                    </div>
-                  )}
-                </div>
+                    {fichaTecnica.length > 0 ? (
+                      <div className="overflow-x-auto overflow-hidden border border-gray-200">
+                        <table className="min-w-full text-xs sm:text-sm text-left">
+                          <tbody className="divide-y divide-gray-200">
+                            {fichaTecnica.map((item, index) => (
+                              <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                                <td className="px-2 sm:px-4 py-2 font-medium text-gray-700 w-1/3">{item.label}</td>
+                                <td className="px-2 sm:px-4 py-2 text-gray-600 font-mono">{item.value}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="border border-gray-200 p-4 bg-gray-50 text-center">
+                        <p className="text-sm text-gray-400">No hay ficha técnica disponible</p>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Estado y Acciones */}
                 <div className="mt-auto">
