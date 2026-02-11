@@ -171,10 +171,10 @@ const ProductosEdit = () => {
       MarcaId: parseInt(formData.marcaId),
       CategoryId: parseInt(formData.categoryId),
       IsActive: formData.isActive,
-      ImagenPrincipal: productImages[0] || null,
-      Imagen2: productImages[1] || null,
-      Imagen3: productImages[2] || null,
-      Imagen4: productImages[3] || null,
+      ImagenPrincipal: productImages[0] || '',
+      Imagen2: productImages[1] || '',
+      Imagen3: productImages[2] || '',
+      Imagen4: productImages[3] || '',
     };
 
     // Determinar URL de retorno (mantener paginación)
@@ -190,13 +190,16 @@ const ProductosEdit = () => {
         onError: (err) => {
           let errorMessage = 'Error al actualizar el producto';
           if (err.response?.data) {
-            if (err.response.data.errors) {
-              const errors = Object.values(err.response.data.errors).flat();
-              errorMessage = `Errores de validación: ${errors.join(', ')}`;
-            } else if (err.response.data.message) {
-              errorMessage = err.response.data.message;
-            } else if (typeof err.response.data === 'string') {
-              errorMessage = err.response.data;
+            const data = err.response.data;
+            if (data.errors && typeof data.errors === 'object') {
+              const errors = Object.values(data.errors).flat();
+              errorMessage = errors.length > 0 ? errors.join(', ') : 'Error de validación';
+            } else if (data.message) {
+              errorMessage = data.message;
+            } else if (data.title) {
+              errorMessage = data.title;
+            } else if (typeof data === 'string') {
+              errorMessage = data;
             }
           }
           setError(errorMessage);

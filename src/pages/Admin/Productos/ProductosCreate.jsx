@@ -4,12 +4,10 @@ import { productService, categoryService, nombreMarcaService } from '../../../se
 import ErrorAlert from '../../../components/common/ErrorAlert';
 import ImageUploader from '../../../components/common/ImageUploader';
 import FichaTecnicaEditor from '../../../components/FichaTecnicaEditor';
-import { useNotification } from '../../../context/NotificationContext';
 import { useCreateProduct } from '../../../hooks/useProducts';
 
 const ProductosCreate = () => {
   const navigate = useNavigate();
-  const { success } = useNotification();
   const createProduct = useCreateProduct();
   
   const [categorias, setCategorias] = useState([]);
@@ -167,9 +165,9 @@ const ProductosCreate = () => {
       
       // Usar el hook de React Query para crear el producto
       // Esto automáticamente invalidará la caché y actualizará la lista
+      // La notificación de éxito se maneja en el hook useCreateProduct
       await createProduct.mutateAsync(productData);
       
-      success('Producto creado exitosamente');
       navigate('/admin/productos');
     } catch (err) {
       console.error('❌ ERROR AL CREAR PRODUCTO:', err);
@@ -178,13 +176,16 @@ const ProductosCreate = () => {
       let errorMessage = 'Error al crear el producto';
       
       if (err.response?.data) {
-        if (err.response.data.errors) {
-          const errors = Object.values(err.response.data.errors).flat();
-          errorMessage = `Errores de validación: ${errors.join(', ')}`;
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        } else if (typeof err.response.data === 'string') {
-          errorMessage = err.response.data;
+        const data = err.response.data;
+        if (data.errors && typeof data.errors === 'object') {
+          const errors = Object.values(data.errors).flat();
+          errorMessage = errors.length > 0 ? errors.join(', ') : 'Error de validación';
+        } else if (data.message) {
+          errorMessage = data.message;
+        } else if (data.title) {
+          errorMessage = data.title;
+        } else if (typeof data === 'string') {
+          errorMessage = data;
         }
       } else if (err.message) {
         errorMessage = err.message;
