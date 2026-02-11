@@ -1,4 +1,4 @@
 # SPA Routing para Cloudflare Pages
-# Solo redirigir rutas de navegación a index.html, NO assets
+# Cloudflare Workers handles SPA routing via the asset binding
+# Only keep explicit asset passthrough
 /assets/*  /assets/:splat  200
-/*  /index.html  200
