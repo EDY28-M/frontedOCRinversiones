@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/common/ProtectedRoute';
 import { PERMISSIONS } from '../utils/permissions';
+import { lazyWithRetry } from '../utils/lazyWithRetry';
 
 // Componente de carga optimizado
 const PageLoader = () => (
@@ -16,48 +17,48 @@ const PageLoader = () => (
   </div>
 );
 
-// Lazy loading de layouts
-const PublicLayout = lazy(() => import('../layouts/PublicLayout/PublicLayout'));
-const AdminLayout = lazy(() => import('../layouts/AdminLayout/AdminLayout'));
-const VendedorLayout = lazy(() => import('../layouts/VendedorLayout/VendedorLayout'));
+// Lazy loading de layouts (con retry automático ante deploy nuevo)
+const PublicLayout = lazyWithRetry(() => import('../layouts/PublicLayout/PublicLayout'));
+const AdminLayout = lazyWithRetry(() => import('../layouts/AdminLayout/AdminLayout'));
+const VendedorLayout = lazyWithRetry(() => import('../layouts/VendedorLayout/VendedorLayout'));
 
 // Lazy loading de páginas públicas
-const Inicio = lazy(() => import('../pages/Public/Inicio/Inicio'));
-const Productos = lazy(() => import('../pages/Public/Productos/Productos'));
-const Servicios = lazy(() => import('../pages/Public/Servicios/Servicios'));
-const Nosotros = lazy(() => import('../pages/Public/Nosotros/Nosotros'));
-const Home = lazy(() => import('../pages/Public/Home/Home'));
-const About = lazy(() => import('../pages/Public/About/About'));
-const Contact = lazy(() => import('../pages/Public/Contact/Contact'));
+const Inicio = lazyWithRetry(() => import('../pages/Public/Inicio/Inicio'));
+const Productos = lazyWithRetry(() => import('../pages/Public/Productos/Productos'));
+const Servicios = lazyWithRetry(() => import('../pages/Public/Servicios/Servicios'));
+const Nosotros = lazyWithRetry(() => import('../pages/Public/Nosotros/Nosotros'));
+const Home = lazyWithRetry(() => import('../pages/Public/Home/Home'));
+const About = lazyWithRetry(() => import('../pages/Public/About/About'));
+const Contact = lazyWithRetry(() => import('../pages/Public/Contact/Contact'));
 
 // Lazy loading de páginas de admin
-const AdminLogin = lazy(() => import('../pages/Admin/Login/Login'));
-const AccessDenied = lazy(() => import('../pages/Admin/AccessDenied/AccessDenied'));
-const DashboardRedirect = lazy(() => import('../pages/Admin/Dashboard/DashboardRedirect'));
+const AdminLogin = lazyWithRetry(() => import('../pages/Admin/Login/Login'));
+const AccessDenied = lazyWithRetry(() => import('../pages/Admin/AccessDenied/AccessDenied'));
+const DashboardRedirect = lazyWithRetry(() => import('../pages/Admin/Dashboard/DashboardRedirect'));
 
 // Lazy loading de páginas de vendedor
-const VendedorAccessDenied = lazy(() => import('../pages/Vendedor/VendedorAccessDenied'));
+const VendedorAccessDenied = lazyWithRetry(() => import('../pages/Vendedor/VendedorAccessDenied'));
 
 // Lazy loading de productos
-const ProductosList = lazy(() => import('../pages/Admin/Productos/Productos'));
-const ProductosCreate = lazy(() => import('../pages/Admin/Productos/ProductosCreate'));
-const ProductosEdit = lazy(() => import('../pages/Admin/Productos/ProductosEdit'));
-const ProductosDestacados = lazy(() => import('../pages/Admin/ProductosDestacados/ProductosDestacados'));
+const ProductosList = lazyWithRetry(() => import('../pages/Admin/Productos/Productos'));
+const ProductosCreate = lazyWithRetry(() => import('../pages/Admin/Productos/ProductosCreate'));
+const ProductosEdit = lazyWithRetry(() => import('../pages/Admin/Productos/ProductosEdit'));
+const ProductosDestacados = lazyWithRetry(() => import('../pages/Admin/ProductosDestacados/ProductosDestacados'));
 
 // Lazy loading de categorías
-const CategoriasList = lazy(() => import('../pages/Admin/Categorias/CategoriasList'));
-const CategoriasCreate = lazy(() => import('../pages/Admin/Categorias/CategoriasCreate'));
-const CategoriasEdit = lazy(() => import('../pages/Admin/Categorias/CategoriasEdit'));
+const CategoriasList = lazyWithRetry(() => import('../pages/Admin/Categorias/CategoriasList'));
+const CategoriasCreate = lazyWithRetry(() => import('../pages/Admin/Categorias/CategoriasCreate'));
+const CategoriasEdit = lazyWithRetry(() => import('../pages/Admin/Categorias/CategoriasEdit'));
 
 // Lazy loading de nombre marca
-const NombreMarcaList = lazy(() => import('../pages/Admin/NombreMarca/NombreMarcaList'));
-const NombreMarcaCreate = lazy(() => import('../pages/Admin/NombreMarca/NombreMarcaCreate'));
-const NombreMarcaEdit = lazy(() => import('../pages/Admin/NombreMarca/NombreMarcaEdit'));
+const NombreMarcaList = lazyWithRetry(() => import('../pages/Admin/NombreMarca/NombreMarcaList'));
+const NombreMarcaCreate = lazyWithRetry(() => import('../pages/Admin/NombreMarca/NombreMarcaCreate'));
+const NombreMarcaEdit = lazyWithRetry(() => import('../pages/Admin/NombreMarca/NombreMarcaEdit'));
 
 // Lazy loading de usuarios
-const UsuariosList = lazy(() => import('../pages/Admin/Usuarios/UsuariosList'));
-const UsuariosCreate = lazy(() => import('../pages/Admin/Usuarios/UsuariosCreate'));
-const UsuariosEdit = lazy(() => import('../pages/Admin/Usuarios/UsuariosEdit'));
+const UsuariosList = lazyWithRetry(() => import('../pages/Admin/Usuarios/UsuariosList'));
+const UsuariosCreate = lazyWithRetry(() => import('../pages/Admin/Usuarios/UsuariosCreate'));
+const UsuariosEdit = lazyWithRetry(() => import('../pages/Admin/Usuarios/UsuariosEdit'));
 
 // Private Route Component for Admin
 const PrivateRoute = ({ children }) => {

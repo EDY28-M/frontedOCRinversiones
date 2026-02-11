@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import NotificationContainer from './components/common/NotificationContainer';
+import ChunkErrorBoundary from './components/common/ChunkErrorBoundary';
 import AppRoutes from './routes';
 
 // Configurar QueryClient con opciones optimizadas para rendimiento
@@ -38,14 +39,16 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <NotificationProvider>
-          <AppRoutes />
-          <NotificationContainer />
-        </NotificationProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ChunkErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <NotificationProvider>
+            <AppRoutes />
+            <NotificationContainer />
+          </NotificationProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ChunkErrorBoundary>
   );
 }
 

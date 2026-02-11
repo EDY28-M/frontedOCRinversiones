@@ -1,3 +1,4 @@
-# SPA Routing para Cloudflare Pages/Workers
-# El archivo 404.html (copia de index.html) maneja rutas SPA automáticamente
-# No se necesita el catch-all /* aquí para evitar bucles infinitos
+# SPA Routing para Cloudflare Pages
+# Solo redirigir rutas de navegación a index.html, NO assets
+/assets/*  /assets/:splat  200
+/*  /index.html  200
