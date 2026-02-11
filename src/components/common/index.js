@@ -5,6 +5,7 @@ export { default as ConfirmModal } from './ConfirmModal';
 export { default as ErrorAlert } from './ErrorAlert';
 export { default as ImageUploader } from './ImageUploader';
 export { default as ImportProductsModal } from './ImportProductsModal';
+export { default as TableLoader } from './TableLoader';
 export { default as MobileMenu } from './MobileMenu';
 export { default as NotificationContainer } from './NotificationContainer';
 export { default as OptimizedImage } from './OptimizedImage';
