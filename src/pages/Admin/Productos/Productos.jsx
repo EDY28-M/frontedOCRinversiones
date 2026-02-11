@@ -85,32 +85,25 @@ const Productos = () => {
     }
     // 'todos' no filtra nada
 
-    // Filtro por búsqueda
+    // Filtro por búsqueda inteligente (AND por cada palabra)
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+      const tokens = searchTerm.toLowerCase().split(/\s+/).filter(Boolean);
 
-      // Buscar en Código
-      const matchCodigo = producto.codigo?.toString().toLowerCase().includes(term);
+      // Cada token debe coincidir en al menos un campo (AND entre tokens)
+      const allTokensMatch = tokens.every(token => {
+        const matchCodigo = producto.codigo?.toString().toLowerCase().includes(token);
+        const matchCodigoComer = producto.codigoComer?.toString().toLowerCase().includes(token);
+        const matchProducto = producto.producto?.toLowerCase().includes(token);
+        const matchMarca = producto.marcaNombre?.toLowerCase().includes(token);
+        const matchCategoria = producto.categoryName?.toLowerCase().includes(token) ||
+          producto.categoria?.toLowerCase().includes(token) ||
+          producto.category?.nombre?.toLowerCase().includes(token) ||
+          producto.category?.toLowerCase().includes(token);
 
-      // Buscar en Código Comercial
-      const matchCodigoComer = producto.codigoComer?.toString().toLowerCase().includes(term);
+        return matchCodigo || matchCodigoComer || matchProducto || matchMarca || matchCategoria;
+      });
 
-      // Buscar en Producto (nombre/descripción)
-      const matchProducto = producto.producto?.toLowerCase().includes(term);
-
-      // Buscar en Marca
-      const matchMarca = producto.marcaNombre?.toLowerCase().includes(term);
-
-      // Buscar en Categoría (múltiples opciones de campo)
-      const matchCategoria = producto.categoryName?.toLowerCase().includes(term) ||
-        producto.categoria?.toLowerCase().includes(term) ||
-        producto.category?.nombre?.toLowerCase().includes(term) ||
-        producto.category?.toLowerCase().includes(term);
-
-      // Si no coincide con ninguno, excluir el producto
-      if (!matchCodigo && !matchCodigoComer && !matchProducto && !matchMarca && !matchCategoria) {
-        return false;
-      }
+      if (!allTokensMatch) return false;
     }
 
     return true;
