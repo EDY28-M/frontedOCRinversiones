@@ -10,7 +10,7 @@ const LIMIT_OPTIONS = [10, 25, 50, 100];
  */
 const RecentProductsPanel = () => {
   const [limit, setLimit] = useState(10);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const { data: recentProducts = [], isLoading, isError, error } = useRecentProducts(limit);
 
   const formatDate = useMemo(() => {
