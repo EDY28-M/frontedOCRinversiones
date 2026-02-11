@@ -66,7 +66,7 @@ const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <FullPageLoader />;
+    return null;
   }
 
   return isAuthenticated ? children : <Navigate to="/admin/login" />;
