@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,8 @@ import { isAdmin } from '../../../utils/permissions';
 import { productKeys } from '../../../hooks/useProducts';
 import { productService } from '../../../services/productService';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+
 const Login = () => {
   const [formData, setFormData] = useState({
     usuario: '',
@@ -14,11 +16,50 @@ const Login = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [serverStatus, setServerStatus] = useState('checking'); // 'checking' | 'ready' | 'waking'
+  const warmupStarted = useRef(false);
   
   const { login } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { error: showError, success: showSuccess } = useNotification();
+
+  // 🔥 WARMUP: Despertar el servidor apenas se carga la página de login
+  useEffect(() => {
+    if (warmupStarted.current) return;
+    warmupStarted.current = true;
+
+    const wakeUpServer = async () => {
+      const startTime = Date.now();
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s max
+
+        const response = await fetch(`${API_BASE_URL}/auth/ping`, {
+          signal: controller.signal,
+          cache: 'no-store',
+        });
+        clearTimeout(timeoutId);
+
+        const elapsed = Date.now() - startTime;
+        if (response.ok) {
+          setServerStatus('ready');
+          if (elapsed > 3000) {
+            console.log(`🔥 Servidor despertó en ${elapsed}ms (cold start detectado)`);
+          }
+        }
+      } catch (err) {
+        // Si falla, igual permitir login (el error se mostrará al enviar)
+        console.warn('⚠️ Warmup ping falló:', err.message);
+        setServerStatus('ready');
+      }
+    };
+
+    // Pequeño delay para no competir con la carga del componente
+    setServerStatus('waking');
+    const timer = setTimeout(wakeUpServer, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -193,12 +234,36 @@ const Login = () => {
 
               {/* Submit Button */}
               <div className="pt-2">
+                {/* Server status indicator */}
+                {serverStatus === 'waking' && (
+                  <div className="flex items-center justify-center gap-2 mb-3 text-xs text-amber-600 bg-amber-50 border border-amber-200 py-2 px-3 rounded-sm animate-pulse">
+                    <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    <span className="font-semibold uppercase tracking-wide">Conectando al servidor...</span>
+                  </div>
+                )}
+                {serverStatus === 'ready' && (
+                  <div className="flex items-center justify-center gap-1.5 mb-3 text-xs text-green-600">
+                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <span className="font-semibold uppercase tracking-wide">Servidor listo</span>
+                  </div>
+                )}
                 <button
                   className="w-full flex justify-center py-4 px-4 border border-transparent text-sm font-extrabold text-black bg-accent hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-all duration-200 uppercase tracking-widest rounded-none shadow-md hover:shadow-lg active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
                   type="submit"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Iniciando...' : 'Iniciar Sesión'}
+                  {isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                      </svg>
+                      Verificando credenciales...
+                    </span>
+                  ) : 'Iniciar Sesión'}
                 </button>
               </div>
             </form>
