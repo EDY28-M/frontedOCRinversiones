@@ -115,7 +115,7 @@ const AppRoutes = () => {
             element={
               <PrivateRoute>
                 <ProtectedRoute adminOnly={true}>
-                  <Suspense fallback={null}><AdminLayout /></Suspense>
+                  <AdminLazyWrapper><AdminLayout /></AdminLazyWrapper>
                 </ProtectedRoute>
               </PrivateRoute>
             }
@@ -207,7 +207,7 @@ const AppRoutes = () => {
             element={
               <PrivateRoute>
                 <ProtectedRoute vendedorOnly={true}>
-                  <Suspense fallback={null}><VendedorLayout /></Suspense>
+                  <AdminLazyWrapper><VendedorLayout /></AdminLazyWrapper>
                 </ProtectedRoute>
               </PrivateRoute>
             }
