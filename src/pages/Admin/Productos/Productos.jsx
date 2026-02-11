@@ -8,6 +8,7 @@ import { PERMISSIONS } from '../../../utils/permissions';
 import { useProducts, useToggleProductActive, useToggleProductFeatured, useDeleteProduct, useDeleteAllProducts, usePrefetchProduct, productKeys } from '../../../hooks/useProducts';
 import { categoryKeys } from '../../../hooks/useCategories';
 import { brandKeys } from '../../../hooks/useBrands';
+import RecentProductsPanel from '../../../components/products/RecentProductsPanel';
 
 const Productos = () => {
   const { can } = usePermissions();
@@ -355,6 +356,9 @@ const Productos = () => {
           )}
         </div>
       </div>
+
+      {/* Historial de productos recientes */}
+      <RecentProductsPanel />
 
       {/* Búsqueda */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">

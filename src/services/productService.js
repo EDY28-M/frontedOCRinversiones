@@ -89,6 +89,14 @@ export const productService = {
     const response = await axiosInstance.delete('/products/delete-all');
     return response.data;
   },
+
+  // Obtener últimos productos creados (historial reciente)
+  getRecentProducts: async (limit = 10) => {
+    const response = await axiosInstance.get('/products/recent', {
+      params: { limit }
+    });
+    return response.data;
+  },
 };
 
 export const categoryService = {

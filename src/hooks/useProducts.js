@@ -13,6 +13,7 @@ export const productKeys = {
   availableList: (filters) => [...productKeys.available(), filters],
   featured: () => [...productKeys.all, 'featured'],
   infinite: () => [...productKeys.all, 'infinite'],
+  recent: (limit) => [...productKeys.all, 'recent', limit],
 };
 
 // Constantes de configuración
@@ -136,6 +137,20 @@ export function useInfiniteProducts(pageSize = 12) {
     },
     staleTime: STALE_TIME,
     gcTime: GC_TIME,
+  });
+}
+
+/**
+ * Hook para obtener los últimos productos creados (historial reciente)
+ * @param {number} limit - Cantidad de productos recientes (1-100, default 10)
+ */
+export function useRecentProducts(limit = 10) {
+  return useQuery({
+    queryKey: productKeys.recent(limit),
+    queryFn: () => productService.getRecentProducts(limit),
+    staleTime: 2 * 60 * 1000, // 2 minutos — datos que cambian con cada importación
+    gcTime: GC_TIME,
+    refetchOnWindowFocus: false,
   });
 }
 
