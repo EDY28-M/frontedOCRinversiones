@@ -58,7 +58,18 @@ const Login = () => {
     // Pequeño delay para no competir con la carga del componente
     setServerStatus('waking');
     const timer = setTimeout(wakeUpServer, 100);
-    return () => clearTimeout(timer);
+
+    // 🔥 PRELOAD: Cargar chunks del admin layout en paralelo mientras el usuario escribe
+    // Así cuando haga login, el navigate es instantáneo (chunks ya descargados)
+    const preloadTimer = setTimeout(() => {
+      import('../../../layouts/AdminLayout/AdminLayout').catch(() => {});
+      import('../../Admin/Dashboard/DashboardRedirect').catch(() => {});
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(preloadTimer);
+    };
   }, []);
 
   const handleChange = (e) => {
@@ -78,13 +89,14 @@ const Login = () => {
       showSuccess('¡Bienvenido! Iniciando sesión...');
       
       if (isAdmin(userData.role)) {
-        // Prefetch listado de productos para que al llegar a /admin/productos cargue al instante o ya en caché
+        // Navegar PRIMERO (instantáneo porque chunks ya están preloaded)
+        navigate('/admin/', { replace: true });
+        // Prefetch productos en background DESPUÉS de navegar (no bloquea)
         queryClient.prefetchQuery({
           queryKey: productKeys.list({}),
           queryFn: () => productService.getAllProducts(),
           staleTime: 30000,
         });
-        navigate('/admin/', { replace: true });
       } else {
         navigate('/vendedor/productos', { replace: true });
       }
