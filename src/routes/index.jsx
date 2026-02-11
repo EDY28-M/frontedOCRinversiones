@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/common/ProtectedRoute';
 import { PERMISSIONS } from '../utils/permissions';
 import { lazyWithRetry } from '../utils/lazyWithRetry';
+import TableLoader from '../components/common/TableLoader';
 
 // Componente de carga optimizado
 const PageLoader = () => (
@@ -78,6 +79,13 @@ const LazyWrapper = ({ children }) => (
   </Suspense>
 );
 
+// Wrapper específico para tablas de admin (usa TableLoader para smooth transition)
+const AdminTableLazyWrapper = ({ children }) => (
+  <Suspense fallback={<TableLoader />}>
+    {children}
+  </Suspense>
+);
+
 const AppRoutes = () => {
   return (
     <BrowserRouter>
@@ -121,12 +129,12 @@ const AppRoutes = () => {
             {/* PRODUCTOS - Admin tiene acceso completo */}
             <Route path="productos" element={
               <ProtectedRoute permission={PERMISSIONS.PRODUCTOS_VIEW}>
-                <LazyWrapper><ProductosList /></LazyWrapper>
+                <AdminTableLazyWrapper><ProductosList /></AdminTableLazyWrapper>
               </ProtectedRoute>
             } />
             <Route path="productos/destacados" element={
               <ProtectedRoute permission={PERMISSIONS.PRODUCTOS_VIEW}>
-                <LazyWrapper><ProductosDestacados /></LazyWrapper>
+                <AdminTableLazyWrapper><ProductosDestacados /></AdminTableLazyWrapper>
               </ProtectedRoute>
             } />
             <Route path="productos/crear" element={
@@ -143,7 +151,7 @@ const AppRoutes = () => {
             {/* CATEGORÍAS - Solo Administrador */}
             <Route path="categorias" element={
               <ProtectedRoute permission={PERMISSIONS.CATEGORIAS_VIEW}>
-                <LazyWrapper><CategoriasList /></LazyWrapper>
+                <AdminTableLazyWrapper><CategoriasList /></AdminTableLazyWrapper>
               </ProtectedRoute>
             } />
             <Route path="categorias/crear" element={
@@ -160,7 +168,7 @@ const AppRoutes = () => {
             {/* NOMBRE MARCA - Solo Administrador */}
             <Route path="nombre-marca" element={
               <ProtectedRoute permission={PERMISSIONS.MARCAS_VIEW}>
-                <LazyWrapper><NombreMarcaList /></LazyWrapper>
+                <AdminTableLazyWrapper><NombreMarcaList /></AdminTableLazyWrapper>
               </ProtectedRoute>
             } />
             <Route path="nombre-marca/crear" element={
@@ -177,7 +185,7 @@ const AppRoutes = () => {
             {/* USUARIOS - Solo Administrador */}
             <Route path="usuarios" element={
               <ProtectedRoute permission={PERMISSIONS.USUARIOS_VIEW}>
-                <LazyWrapper><UsuariosList /></LazyWrapper>
+                <AdminTableLazyWrapper><UsuariosList /></AdminTableLazyWrapper>
               </ProtectedRoute>
             } />
             <Route path="usuarios/crear" element={
