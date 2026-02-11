@@ -64,24 +64,20 @@ const ProductosDestacados = () => {
   // Skeleton loader mientras carga inicialmente
   if (isLoading && !productsData) {
     return (
-      <div className="p-4">
+      <div className="p-4 animate-pulse">
         <div className="flex flex-col md:flex-row gap-4 mb-6 items-start md:items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-slate-900 uppercase tracking-wide">
-              Productos Disponibles
-            </h1>
-            <p className="text-slate-500 text-sm mt-1">
-              Gestiona los productos que se mostrarán en la página principal
-            </p>
+          <div className="space-y-2">
+            <div className="h-8 bg-gray-200 rounded w-48" />
+            <div className="h-4 bg-gray-200 rounded w-64" />
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="bg-white rounded-lg border border-gray-100 shadow-sm animate-pulse">
+            <div key={i} className="bg-white rounded-lg border border-gray-100 shadow-sm">
               <div className="w-full pt-[100%] bg-gray-200"></div>
-              <div className="p-4">
-                <div className="h-3 bg-gray-200 rounded w-1/3 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
+              <div className="p-4 space-y-2">
+                <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                 <div className="h-4 bg-gray-200 rounded w-1/2"></div>
               </div>
             </div>

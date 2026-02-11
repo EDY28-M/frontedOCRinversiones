@@ -43,8 +43,6 @@ const TableLoader = ({ columns = [], rows = 5 }) => {
           ))}
         </div>
       </div>
-      
-      <p className="text-center text-sm text-slate-500 mt-4">Cargando datos...</p>
     </div>
   );
 };
