@@ -47,6 +47,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: 'dist',
     sourcemap: mode === 'development',
+    manifest: true,
     minify: 'esbuild',
     // Target moderno para menos polyfills
     target: 'es2020',
