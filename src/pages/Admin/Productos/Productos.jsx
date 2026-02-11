@@ -9,7 +9,7 @@ import { useProducts, useToggleProductActive, useToggleProductFeatured, useDelet
 import { categoryKeys } from '../../../hooks/useCategories';
 import { brandKeys } from '../../../hooks/useBrands';
 import RecentProductsPanel from '../../../components/products/RecentProductsPanel';
-import TableLoader from '../../../components/common/TableLoader';
+import PageLoader from '../../../components/common/PageLoader';
 
 const Productos = () => {
   const { can } = usePermissions();
@@ -229,7 +229,7 @@ const Productos = () => {
   };
 
   if (loading) {
-    return <TableLoader columns={['w-20', 'w-32', 'w-48', 'w-24', 'w-24', 'w-28']} />;
+    return <PageLoader />;
   }
 
   if (error) {

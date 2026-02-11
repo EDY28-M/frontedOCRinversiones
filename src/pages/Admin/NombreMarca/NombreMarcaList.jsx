@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ErrorAlert, ConfirmModal, TableLoader } from '../../../components/common';
+import { ErrorAlert, ConfirmModal, PageLoader } from '../../../components/common';
 import { useBrands, useDeleteBrand, useDeleteAllBrands } from '../../../hooks/useBrands';
 
 const NombreMarcaList = () => {
@@ -26,7 +26,7 @@ const NombreMarcaList = () => {
   const displayError = error || (queryError ? 'Error al cargar las marcas. Verifica que el backend esté corriendo.' : null);
 
   if (loading) {
-    return <TableLoader columns={['w-20', 'w-1/3', 'w-32']} />;
+    return <PageLoader />;
   }
 
   return (

@@ -61,27 +61,15 @@ const ProductosDestacados = () => {
     return null;
   };
 
-  // Skeleton loader mientras carga inicialmente
+  // Loader mientras carga inicialmente
   if (isLoading && !productsData) {
     return (
-      <div className="p-4 animate-pulse">
-        <div className="flex flex-col md:flex-row gap-4 mb-6 items-start md:items-center justify-between">
-          <div className="space-y-2">
-            <div className="h-8 bg-gray-200 rounded w-48" />
-            <div className="h-4 bg-gray-200 rounded w-64" />
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
           </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="bg-white rounded-lg border border-gray-100 shadow-sm">
-              <div className="w-full pt-[100%] bg-gray-200"></div>
-              <div className="p-4 space-y-2">
-                <div className="h-3 bg-gray-200 rounded w-1/3"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              </div>
-            </div>
-          ))}
+          <p className="text-sm text-gray-500 font-medium">Cargando...</p>
         </div>
       </div>
     );

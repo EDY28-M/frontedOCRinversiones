@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ErrorAlert, ConfirmModal, TableLoader } from '../../../components/common';
+import { ErrorAlert, ConfirmModal, PageLoader } from '../../../components/common';
 import { useUsers, useDeleteUser } from '../../../hooks/useUsers';
 
 const UsuariosList = () => {
@@ -24,7 +24,7 @@ const UsuariosList = () => {
   const displayError = error || (queryError ? 'Error al cargar usuarios. Verifica que el backend esté corriendo.' : null);
 
   if (loading) {
-    return <TableLoader columns={['w-20', 'w-1/4', 'w-1/4', 'w-32']} />;
+    return <PageLoader />;
   }
 
   return (

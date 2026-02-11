@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ErrorAlert, ConfirmModal, TableLoader } from '../../../components/common';
+import { ErrorAlert, ConfirmModal, PageLoader } from '../../../components/common';
 import { useCategories, useDeleteCategory, useDeleteAllCategories } from '../../../hooks/useCategories';
 
 const CategoriasList = () => {
@@ -26,7 +26,7 @@ const CategoriasList = () => {
   const displayError = error || (queryError ? 'Error al cargar categorías. Verifica que el backend esté corriendo.' : null);
 
   if (loading) {
-    return <TableLoader columns={['w-20', 'w-1/4', 'w-1/3', 'w-32']} />;
+    return <PageLoader />;
   }
 
   return (
