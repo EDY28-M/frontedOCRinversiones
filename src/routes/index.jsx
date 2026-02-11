@@ -115,13 +115,13 @@ const AppRoutes = () => {
             element={
               <PrivateRoute>
                 <ProtectedRoute adminOnly={true}>
-                  <LazyWrapper><AdminLayout /></LazyWrapper>
+                  <AdminLazyWrapper><AdminLayout /></AdminLazyWrapper>
                 </ProtectedRoute>
               </PrivateRoute>
             }
           >
             {/* Redirección dinámica según rol del usuario */}
-            <Route index element={<LazyWrapper><DashboardRedirect /></LazyWrapper>} />
+            <Route index element={<AdminLazyWrapper><DashboardRedirect /></AdminLazyWrapper>} />
 
             {/* Página de Acceso Denegado dentro del layout */}
             <Route path="acceso-denegado" element={<LazyWrapper><AccessDenied /></LazyWrapper>} />
@@ -207,7 +207,7 @@ const AppRoutes = () => {
             element={
               <PrivateRoute>
                 <ProtectedRoute vendedorOnly={true}>
-                  <LazyWrapper><VendedorLayout /></LazyWrapper>
+                  <AdminLazyWrapper><VendedorLayout /></AdminLazyWrapper>
                 </ProtectedRoute>
               </PrivateRoute>
             }
