@@ -13,7 +13,7 @@ const ProductDetailModal = ({ product, onClose, isPublic = false }) => {
   // Helper function to remove code from title
   const getDisplayTitle = () => {
     if (!product?.producto) return '';
-    if (!isPublic) return product.producto;
+    // if (!isPublic) return product.producto; // Eliminar esta línea para que siempre limpie el código
     if (!product.codigo) return product.producto;
 
     try {
