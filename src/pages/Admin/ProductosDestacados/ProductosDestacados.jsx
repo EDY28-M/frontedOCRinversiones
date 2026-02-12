@@ -57,7 +57,7 @@ const ProductosDestacados = () => {
     if (producto.imagen2) return producto.imagen2;
     if (producto.imagen3) return producto.imagen3;
     if (producto.imagen4) return producto.imagen4;
-    
+
     return null;
   };
 
@@ -87,7 +87,7 @@ const ProductosDestacados = () => {
             Gestiona los productos  que se mostrarán en la página principal
           </p>
         </div>
-        
+
         {/* Botón de Refresh */}
         <button
           onClick={() => refetch()}
@@ -115,7 +115,7 @@ const ProductosDestacados = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <select 
+        <select
           className="bg-white border border-gray-300 text-slate-900 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 p-3 cursor-pointer font-mono shadow-sm uppercase tracking-wide min-w-[200px]"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
@@ -133,41 +133,41 @@ const ProductosDestacados = () => {
       <div className="bg-white border border-gray-200 shadow-sm flex flex-col">
         {/* Header interno con paginación */}
         <div className="p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4 bg-gray-50/50">
-        <div className="text-sm text-slate-600 font-mono">
+          <div className="text-sm text-slate-600 font-mono">
             {total > 0 ? (
               <>Mostrando <span className="font-bold">{(currentPage - 1) * pageSize + 1}</span> - <span className="font-bold">{Math.min(currentPage * pageSize, total)}</span> de <span className="font-bold">{total}</span> productos</>
             ) : (
               <>Mostrando <span className="font-bold">0</span> productos</>
             )}
           </div>
-          
+
           {/* Paginación */}
           <nav className="flex items-center gap-2">
-            <button 
+            <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               className="w-8 h-8 flex items-center justify-center border border-gray-200 text-gray-500 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="material-symbols-outlined text-sm">west</span>
             </button>
-            
+
             {/* Páginas */}
             {(() => {
               const maxVisiblePages = 5; // Mostrar máximo 5 números de página
               let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
               let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-              
+
               // Ajustar startPage si estamos cerca del final
               if (endPage - startPage < maxVisiblePages - 1) {
                 startPage = Math.max(1, endPage - maxVisiblePages + 1);
               }
-              
+
               const pages = [];
-              
+
               // Botón primera página si no está visible
               if (startPage > 1) {
                 pages.push(
-                  <button 
+                  <button
                     key={1}
                     onClick={() => setCurrentPage(1)}
                     className="w-8 h-8 flex items-center justify-center text-xs font-bold shadow-sm transition-colors border border-gray-200 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50"
@@ -179,31 +179,30 @@ const ProductosDestacados = () => {
                   pages.push(<span key="start-ellipsis" className="px-2 text-gray-400 text-xs">...</span>);
                 }
               }
-              
+
               // Páginas visibles
               for (let i = startPage; i <= endPage; i++) {
                 pages.push(
-                  <button 
+                  <button
                     key={i}
                     onClick={() => setCurrentPage(i)}
-                    className={`w-8 h-8 flex items-center justify-center text-xs font-bold shadow-sm transition-colors ${
-                      currentPage === i 
-                        ? 'bg-blue-600 text-white' 
+                    className={`w-8 h-8 flex items-center justify-center text-xs font-bold shadow-sm transition-colors ${currentPage === i
+                        ? 'bg-blue-600 text-white'
                         : 'border border-gray-200 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50'
-                    }`}
+                      }`}
                   >
                     {i}
                   </button>
                 );
               }
-              
+
               // Botón última página si no está visible
               if (endPage < totalPages) {
                 if (endPage < totalPages - 1) {
                   pages.push(<span key="end-ellipsis" className="px-2 text-gray-400 text-xs">...</span>);
                 }
                 pages.push(
-                  <button 
+                  <button
                     key={totalPages}
                     onClick={() => setCurrentPage(totalPages)}
                     className="w-8 h-8 flex items-center justify-center text-xs font-bold shadow-sm transition-colors border border-gray-200 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50"
@@ -212,11 +211,11 @@ const ProductosDestacados = () => {
                   </button>
                 );
               }
-              
+
               return pages;
             })()}
-            
-            <button 
+
+            <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage >= totalPages}
               className="w-8 h-8 flex items-center justify-center border border-gray-200 text-gray-500 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -238,20 +237,19 @@ const ProductosDestacados = () => {
               {productos.map((producto) => {
                 const imageUrl = getFirstImageUrl(producto);
                 const hasImage = imageUrl !== null;
-                
+
                 return (
-                  <article 
-                    key={producto.id} 
+                  <article
+                    key={producto.id}
                     onClick={() => hasImage && setSelectedProduct(producto)}
-                    className={`group bg-white rounded-lg border border-gray-100 hover:border-red-200 shadow-sm hover:shadow-xl hover:shadow-red-500/5 transition-all duration-300 flex flex-col h-full ${
-                      hasImage ? 'cursor-pointer' : 'cursor-default'
-                    }`}
+                    className={`group bg-white rounded-lg border border-gray-100 hover:border-red-200 shadow-sm hover:shadow-xl hover:shadow-red-500/5 transition-all duration-300 flex flex-col h-full ${hasImage ? 'cursor-pointer' : 'cursor-default'
+                      }`}
                   >
                     {imageUrl && (
                       <div className="relative w-full pt-[100%] overflow-hidden">
                         <div className="absolute inset-0 flex items-center justify-center p-2 bg-gray-50">
-                          <img 
-                            alt={producto.producto || 'Producto'} 
+                          <img
+                            alt={producto.producto || 'Producto'}
                             className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                             src={imageUrl}
                             onError={(e) => {
@@ -261,7 +259,7 @@ const ProductosDestacados = () => {
                         </div>
                       </div>
                     )}
-                    
+
                     <div className="p-4 flex flex-col flex-grow border-t border-gray-50 bg-white">
                       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
                         {producto.categoryName || 'Sin categoría'}
@@ -269,6 +267,16 @@ const ProductosDestacados = () => {
                       <h3 className="text-sm font-bold text-gray-900 leading-snug mb-3">
                         {producto.producto || 'Sin nombre'}
                       </h3>
+
+                      {/* Códigos (Solo visible en admin) */}
+                      <div className="flex flex-col gap-0.5 mb-3 text-[10px] text-slate-500 font-mono border-l-2 border-blue-100 pl-2">
+                        <div>
+                          <span className="font-bold text-slate-700">Cod:</span> {producto.codigo || '-'}
+                        </div>
+                        <div>
+                          <span className="font-bold text-slate-700">Com:</span> {producto.codigoComer || '-'}
+                        </div>
+                      </div>
                       <div className="mt-auto flex items-center justify-between gap-3 pt-2">
                         <span className="text-base font-bold text-gray-900">
                           {producto.marcaNombre || 'Sin marca'}
@@ -290,7 +298,7 @@ const ProductosDestacados = () => {
 
       {/* Modal de Detalle del Producto */}
       {selectedProduct && (
-        <ProductDetailModal 
+        <ProductDetailModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
         />
