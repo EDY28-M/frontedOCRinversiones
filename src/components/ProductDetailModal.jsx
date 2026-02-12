@@ -10,6 +10,23 @@ const ProductDetailModal = ({ product, onClose, isPublic = false }) => {
   // Número de WhatsApp de la empresa
   const whatsappNumber = "51984244498";
 
+  // Helper function to remove code from title
+  const getDisplayTitle = () => {
+    if (!product?.producto) return '';
+    if (!isPublic) return product.producto;
+    if (!product.codigo) return product.producto;
+
+    try {
+      // Escape special regex chars
+      const escapedCode = product.codigo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      // Match: whitespace(opt) + (opt) + code + )opt
+      const pattern = new RegExp(`\\s*\\(?${escapedCode}\\)?`, 'gi');
+      return product.producto.replace(pattern, '').trim();
+    } catch (e) {
+      return product.producto;
+    }
+  };
+
   useEffect(() => {
     if (product) {
       // Recopilar solo imágenes con URL válida
@@ -184,7 +201,7 @@ Por favor, quisiera más información sobre disponibilidad y precio.`;
                     {product.categoryName?.toUpperCase() || 'PRODUCTO'}
                   </h2>
                   <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">
-                    {product.producto}
+                    {getDisplayTitle()}
                   </h1>
                   <div className="flex flex-wrap gap-4 text-xs font-mono text-gray-600 border-b border-gray-100 pb-4">
                     {!isPublic && (

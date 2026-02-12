@@ -14,6 +14,21 @@ const ProductCard = memo(({ product, onProductClick, priority = false }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [allImagesFailed, setAllImagesFailed] = useState(false);
 
+  // Helper to remove code from title (always public view here)
+  const getDisplayTitle = () => {
+    if (!product?.producto) return 'Sin nombre';
+    if (!product.codigo) return product.producto;
+
+    try {
+      // Escape special chars
+      const escapedCode = product.codigo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(`\\s*\\(?${escapedCode}\\)?`, 'gi');
+      return product.producto.replace(pattern, '').trim();
+    } catch (e) {
+      return product.producto;
+    }
+  };
+
   // Obtener todas las URLs válidas (pre-validadas por formato)
   const validImageUrls = getAllValidImageUrls(product);
   const imageUrl = validImageUrls[currentImageIndex] || null;
@@ -65,7 +80,7 @@ const ProductCard = memo(({ product, onProductClick, priority = false }) => {
               <span className="text-xs mt-2 text-gray-400">Sin imagen</span>
             </div>
           )}
-          <button 
+          <button
             className="absolute top-2 right-2 p-1.5 rounded-full bg-white text-gray-300 hover:text-primary shadow-sm border border-gray-100 transition-colors z-10"
             onClick={(e) => {
               e.stopPropagation();
@@ -84,13 +99,13 @@ const ProductCard = memo(({ product, onProductClick, priority = false }) => {
           {product.categoryName || 'Sin categoría'}
         </p>
         <h3 className="text-sm font-bold text-gray-900 leading-snug mb-3 line-clamp-2">
-          {product.producto || 'Sin nombre'}
+          {getDisplayTitle()}
         </h3>
         <div className="mt-auto flex items-center justify-between gap-3 pt-2">
           <span className="text-base font-bold text-gray-900">
             {product.marcaNombre || 'Sin marca'}
           </span>
-          <button 
+          <button
             className="bg-primary hover:bg-primary-dark text-white text-[10px] font-bold px-3 py-2 rounded uppercase tracking-wide transition-colors shadow-sm"
             onClick={(e) => {
               e.stopPropagation();
