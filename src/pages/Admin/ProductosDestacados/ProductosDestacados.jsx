@@ -187,8 +187,8 @@ const ProductosDestacados = () => {
                     key={i}
                     onClick={() => setCurrentPage(i)}
                     className={`w-8 h-8 flex items-center justify-center text-xs font-bold shadow-sm transition-colors ${currentPage === i
-                        ? 'bg-blue-600 text-white'
-                        : 'border border-gray-200 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50'
+                      ? 'bg-blue-600 text-white'
+                      : 'border border-gray-200 text-gray-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50'
                       }`}
                   >
                     {i}
@@ -265,11 +265,22 @@ const ProductosDestacados = () => {
                         {producto.categoryName || 'Sin categoría'}
                       </p>
                       <h3 className="text-sm font-bold text-gray-900 leading-snug mb-3">
-                        {producto.producto || 'Sin nombre'}
+                        {(() => {
+                          // Helper simple para limpiar el título
+                          if (!producto.producto) return 'Sin nombre';
+                          if (!producto.codigo) return producto.producto;
+                          try {
+                            const escapedCode = producto.codigo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                            const pattern = new RegExp(`\\s*\\(?${escapedCode}\\)?`, 'gi');
+                            return producto.producto.replace(pattern, '').trim();
+                          } catch (e) {
+                            return producto.producto;
+                          }
+                        })()}
                       </h3>
 
                       {/* Códigos (Solo visible en admin) */}
-                      <div className="flex flex-col gap-0.5 mb-3 text-[10px] text-slate-500 font-mono border-l-2 border-blue-100 pl-2">
+                      <div className="flex flex-wrap gap-x-3 gap-y-1 mb-3 text-[10px] text-slate-500 font-mono border-l-2 border-blue-100 pl-2">
                         <div>
                           <span className="font-bold text-slate-700">Cod:</span> {producto.codigo || '-'}
                         </div>
