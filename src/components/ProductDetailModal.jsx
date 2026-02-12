@@ -187,10 +187,12 @@ Por favor, quisiera más información sobre disponibilidad y precio.`;
                     {product.producto}
                   </h1>
                   <div className="flex flex-wrap gap-4 text-xs font-mono text-gray-600 border-b border-gray-100 pb-4">
-                    <span className="flex items-center gap-1">
-                      <span className="text-blue-600 material-symbols-outlined text-sm">qr_code</span>
-                      Código: <span className="font-bold text-gray-900">{product.codigo}</span>
-                    </span>
+                    {!isPublic && (
+                      <span className="flex items-center gap-1">
+                        <span className="text-blue-600 material-symbols-outlined text-sm">qr_code</span>
+                        Código: <span className="font-bold text-gray-900">{product.codigo}</span>
+                      </span>
+                    )}
                     {!isPublic && (
                       <span className="flex items-center gap-1">
                         <span className="text-blue-600 material-symbols-outlined text-sm">tag</span>
