@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import { productService } from '../../services/productService';
 
@@ -61,6 +61,7 @@ const ImportProductsModal = ({
       setProcessedProducts([]);
       setImporting(false);
       setImportProgress(0);
+      setImportDone(false);
       setImportResult(null);
       setError(null);
       setPageSize(15);
@@ -237,6 +238,10 @@ const ImportProductsModal = ({
     setStep(3);
   };
 
+  // Ref to hold import result while animation completes
+  const pendingResultRef = useRef(null);
+  const [importDone, setImportDone] = useState(false);
+
   // Importar productos
   const handleImport = async () => {
     const validProducts = processedProducts.filter(p => p.isValid);
@@ -248,6 +253,8 @@ const ImportProductsModal = ({
 
     setImporting(true);
     setImportProgress(0);
+    setImportDone(false);
+    pendingResultRef.current = null;
     setError(null);
 
     try {
@@ -262,7 +269,8 @@ const ImportProductsModal = ({
 
       const result = await productService.bulkImportProducts(productsToImport);
 
-      setImportResult({
+      // Store result but DON'T go to step 4 yet — let animation finish first
+      pendingResultRef.current = {
         success: true,
         imported: result.imported || 0,
         failed: result.failed || 0,
@@ -271,62 +279,80 @@ const ImportProductsModal = ({
         marcasCreated: result.marcasCreated || 0,
         categoriasCreated: result.categoriasCreated || 0,
         errors: result.errors || []
-      });
+      };
 
-      setStep(4);
+      // Signal that backend is done — animation will rush to 100%
+      setImportDone(true);
 
-      // Notificar éxito
-      if (onImportSuccess) {
-        onImportSuccess();
-      }
     } catch (err) {
       console.error('Error en importación:', err);
       setError(err.response?.data?.message || err.message || 'Error al importar productos');
-    } finally {
       setImporting(false);
+      setImportDone(false);
     }
   };
 
-  // Simulated progress animation during import
+  // Unified progress animation — syncs with backend completion
+  const progressRef = useRef(0);
+
   useEffect(() => {
     if (!importing) return;
 
     let frame;
-    let start = null;
-    const validCount = processedProducts.filter(p => p.isValid).length;
-    // Estimate duration: ~50ms per product, min 2s, max 30s
-    const estimatedDuration = Math.max(2000, Math.min(validCount * 50, 30000));
+    let phaseStart = null;
+    let rushStartProgress = null;
 
     const animate = (timestamp) => {
-      if (!start) start = timestamp;
-      const elapsed = timestamp - start;
-      // Fast to 70%, then slower to 90%, then crawl
-      let progress;
-      const ratio = elapsed / estimatedDuration;
-      if (ratio < 0.5) {
-        // 0-70% in first half of estimated time
-        progress = ratio * 2 * 70;
-      } else if (ratio < 1) {
-        // 70-90% in second half
-        progress = 70 + (ratio - 0.5) * 2 * 20;
+      if (!phaseStart) phaseStart = timestamp;
+      const elapsed = timestamp - phaseStart;
+
+      if (!importDone) {
+        // Phase 1: Climb smoothly while waiting for backend (max 85%)
+        // Exponential deceleration — fast start, gradually slows
+        const ratio = elapsed / 60000;
+        const progress = Math.min(85, 85 * (1 - Math.exp(-ratio * 4)));
+        progressRef.current = progress;
+        setImportProgress(Math.round(progress));
+        frame = requestAnimationFrame(animate);
       } else {
-        // 90-97% slowly after estimated time
-        progress = 90 + Math.min(7, (ratio - 1) * 3);
+        // Phase 2: Backend done — rush to 100%
+        if (rushStartProgress === null) {
+          rushStartProgress = progressRef.current;
+          phaseStart = timestamp; // reset timer for rush phase
+        }
+
+        const rushElapsed = timestamp - phaseStart;
+        const rushDuration = 800; // ms to reach 100%
+        const remaining = 100 - rushStartProgress;
+        const rushRatio = Math.min(1, rushElapsed / rushDuration);
+        // Ease-out curve for smooth finish
+        const eased = 1 - Math.pow(1 - rushRatio, 3);
+        const progress = rushStartProgress + remaining * eased;
+
+        progressRef.current = progress;
+        setImportProgress(Math.min(100, Math.round(progress)));
+
+        if (rushRatio >= 1) {
+          setImportProgress(100);
+          // Hold at 100% briefly, then show results
+          setTimeout(() => {
+            setImportResult(pendingResultRef.current);
+            setStep(4);
+            setImporting(false);
+            if (onImportSuccess) {
+              onImportSuccess();
+            }
+          }, 600);
+          return; // stop animation
+        }
+
+        frame = requestAnimationFrame(animate);
       }
-      setImportProgress(Math.min(97, Math.round(progress)));
-      frame = requestAnimationFrame(animate);
     };
 
     frame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(frame);
-  }, [importing, processedProducts]);
-
-  // Jump to 100% when import finishes
-  useEffect(() => {
-    if (!importing && importResult) {
-      setImportProgress(100);
-    }
-  }, [importing, importResult]);
+  }, [importing, importDone]);
 
   if (!isOpen) return null;
 
@@ -410,10 +436,10 @@ const ImportProductsModal = ({
               <div
                 key={s}
                 className={`w-8 h-8 flex items-center justify-center text-xs font-bold ${s === step
-                    ? 'bg-blue-600 text-white'
-                    : s < step
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-200 text-gray-500'
+                  ? 'bg-blue-600 text-white'
+                  : s < step
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-200 text-gray-500'
                   }`}
               >
                 {s < step ? '✓' : s}
