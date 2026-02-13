@@ -149,8 +149,8 @@ export default function Productos() {
         <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
         {/* Contenedor con scroll - igual que admin */}
-        <div className="flex-1 overflow-y-auto">
-          <main className="w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row">
+        <div className="flex-1 overflow-y-auto flex flex-col">
+          <main className="flex-1 w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row">
           <FiltersSidebar
             categories={categories}
             brands={brands}
