@@ -10,9 +10,9 @@ import { productService } from '../../services/productService';
  * - Validación por fila
  * - Importación parcial (no falla por errores individuales)
  */
-const ImportProductsModal = ({ 
-  isOpen, 
-  onClose, 
+const ImportProductsModal = ({
+  isOpen,
+  onClose,
   onImportSuccess,
   categories = [],
   marcas = []
@@ -24,9 +24,10 @@ const ImportProductsModal = ({
   const [columnMapping, setColumnMapping] = useState({});
   const [processedProducts, setProcessedProducts] = useState([]);
   const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
   const [importResult, setImportResult] = useState(null);
   const [error, setError] = useState(null);
-  
+
   // Paginación para preview
   const [pageSize, setPageSize] = useState(15);
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,6 +60,7 @@ const ImportProductsModal = ({
       setColumnMapping({});
       setProcessedProducts([]);
       setImporting(false);
+      setImportProgress(0);
       setImportResult(null);
       setError(null);
       setPageSize(15);
@@ -88,10 +90,10 @@ const ImportProductsModal = ({
   // Mapeo automático de columnas por similitud
   const autoMapColumns = useCallback((excelColumns) => {
     const mapping = {};
-    
+
     excelColumns.forEach(col => {
       const colLower = col.toLowerCase().trim();
-      
+
       for (const [field, keywords] of Object.entries(fieldKeywords)) {
         if (!mapping[field]) {
           for (const keyword of keywords) {
@@ -115,7 +117,7 @@ const ImportProductsModal = ({
     // Validar extensión
     const validExtensions = ['.xls', '.xlsx'];
     const fileExtension = selectedFile.name.substring(selectedFile.name.lastIndexOf('.')).toLowerCase();
-    
+
     if (!validExtensions.includes(fileExtension)) {
       setError('Formato de archivo no válido. Use archivos .xls o .xlsx');
       return;
@@ -134,11 +136,11 @@ const ImportProductsModal = ({
       const cols = Object.keys(data[0]);
       setColumns(cols);
       setRawData(data);
-      
+
       // Auto-mapear columnas
       const autoMapping = autoMapColumns(cols);
       setColumnMapping(autoMapping);
-      
+
       setStep(2);
     } catch (err) {
       console.error('Error al leer archivo:', err);
@@ -150,16 +152,16 @@ const ImportProductsModal = ({
   const readExcelFile = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = (e) => {
         try {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
-          
+
           // Tomar la primera hoja
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
-          
+
           // Convertir a JSON
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
           resolve(jsonData);
@@ -167,7 +169,7 @@ const ImportProductsModal = ({
           reject(err);
         }
       };
-      
+
       reader.onerror = () => reject(new Error('Error al leer archivo'));
       reader.readAsArrayBuffer(file);
     });
@@ -238,13 +240,14 @@ const ImportProductsModal = ({
   // Importar productos
   const handleImport = async () => {
     const validProducts = processedProducts.filter(p => p.isValid);
-    
+
     if (validProducts.length === 0) {
       setError('No hay productos válidos para importar');
       return;
     }
 
     setImporting(true);
+    setImportProgress(0);
     setError(null);
 
     try {
@@ -271,7 +274,7 @@ const ImportProductsModal = ({
       });
 
       setStep(4);
-      
+
       // Notificar éxito
       if (onImportSuccess) {
         onImportSuccess();
@@ -284,21 +287,101 @@ const ImportProductsModal = ({
     }
   };
 
+  // Simulated progress animation during import
+  useEffect(() => {
+    if (!importing) return;
+
+    let frame;
+    let start = null;
+    const validCount = processedProducts.filter(p => p.isValid).length;
+    // Estimate duration: ~50ms per product, min 2s, max 30s
+    const estimatedDuration = Math.max(2000, Math.min(validCount * 50, 30000));
+
+    const animate = (timestamp) => {
+      if (!start) start = timestamp;
+      const elapsed = timestamp - start;
+      // Fast to 70%, then slower to 90%, then crawl
+      let progress;
+      const ratio = elapsed / estimatedDuration;
+      if (ratio < 0.5) {
+        // 0-70% in first half of estimated time
+        progress = ratio * 2 * 70;
+      } else if (ratio < 1) {
+        // 70-90% in second half
+        progress = 70 + (ratio - 0.5) * 2 * 20;
+      } else {
+        // 90-97% slowly after estimated time
+        progress = 90 + Math.min(7, (ratio - 1) * 3);
+      }
+      setImportProgress(Math.min(97, Math.round(progress)));
+      frame = requestAnimationFrame(animate);
+    };
+
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [importing, processedProducts]);
+
+  // Jump to 100% when import finishes
+  useEffect(() => {
+    if (!importing && importResult) {
+      setImportProgress(100);
+    }
+  }, [importing, importResult]);
+
   if (!isOpen) return null;
 
   const validCount = processedProducts.filter(p => p.isValid).length;
   const invalidCount = processedProducts.filter(p => !p.isValid).length;
 
+  // SVG circular progress helper
+  const CircularProgress = ({ progress, size = 160, strokeWidth = 10 }) => {
+    const radius = (size - strokeWidth) / 2;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (progress / 100) * circumference;
+    return (
+      <svg width={size} height={size} className="transform -rotate-90">
+        {/* Background circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="#e5e7eb"
+          strokeWidth={strokeWidth}
+        />
+        {/* Progress circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="url(#progressGradient)"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          style={{ transition: 'stroke-dashoffset 0.4s ease' }}
+        />
+        <defs>
+          <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#3b82f6" />
+            <stop offset="100%" stopColor="#10b981" />
+          </linearGradient>
+        </defs>
+      </svg>
+    );
+  };
+
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={!importing ? onClose : undefined}
     >
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-      
+
       {/* Modal */}
-      <div 
+      <div
         className="relative bg-white shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
@@ -320,19 +403,18 @@ const ImportProductsModal = ({
               </p>
             </div>
           </div>
-          
+
           {/* Progress indicator */}
           <div className="flex items-center gap-2">
             {[1, 2, 3, 4].map(s => (
-              <div 
+              <div
                 key={s}
-                className={`w-8 h-8 flex items-center justify-center text-xs font-bold ${
-                  s === step 
-                    ? 'bg-blue-600 text-white' 
-                    : s < step 
+                className={`w-8 h-8 flex items-center justify-center text-xs font-bold ${s === step
+                    ? 'bg-blue-600 text-white'
+                    : s < step
                       ? 'bg-green-500 text-white'
                       : 'bg-gray-200 text-gray-500'
-                }`}
+                  }`}
               >
                 {s < step ? '✓' : s}
               </div>
@@ -342,8 +424,32 @@ const ImportProductsModal = ({
 
         {/* Content */}
         <div className="flex-1 overflow-auto p-6">
+          {/* Circular Progress Overlay During Import */}
+          {importing && (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="relative">
+                <CircularProgress progress={importProgress} />
+                {/* Percentage text centered */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-4xl font-bold text-slate-800">{importProgress}%</span>
+                  <span className="text-xs text-slate-500 mt-1 uppercase tracking-wider">Importando</span>
+                </div>
+              </div>
+              <p className="mt-6 text-sm text-slate-600 font-medium">
+                Procesando <span className="font-bold text-blue-600">{validCount}</span> productos...
+              </p>
+              <p className="mt-1 text-xs text-slate-400">Por favor no cierre esta ventana</p>
+              {/* Animated dots */}
+              <div className="flex gap-1.5 mt-4">
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
+            </div>
+          )}
+
           {/* Error Alert */}
-          {error && (
+          {error && !importing && (
             <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 flex items-start gap-3">
               <span className="material-symbols-outlined text-red-500">error</span>
               <div className="flex-1">
@@ -357,12 +463,12 @@ const ImportProductsModal = ({
           )}
 
           {/* Step 1: File Selection */}
-          {step === 1 && (
+          {step === 1 && !importing && (
             <div className="flex flex-col items-center justify-center py-12">
               <div className="w-24 h-24 bg-gray-100 flex items-center justify-center mb-6">
                 <span className="material-symbols-outlined text-4xl text-gray-400">description</span>
               </div>
-              
+
               <label className="cursor-pointer">
                 <input
                   type="file"
@@ -375,7 +481,7 @@ const ImportProductsModal = ({
                   Seleccionar Archivo Excel
                 </div>
               </label>
-              
+
               <p className="mt-4 text-sm text-slate-500">
                 Formatos soportados: .xls, .xlsx
               </p>
@@ -383,16 +489,16 @@ const ImportProductsModal = ({
           )}
 
           {/* Step 2: Column Mapping */}
-          {step === 2 && (
+          {step === 2 && !importing && (
             <div>
               <div className="mb-4 p-3 bg-blue-50 border border-blue-200 text-blue-800 text-sm">
                 <strong>Archivo:</strong> {file?.name} | <strong>Filas encontradas:</strong> {rawData.length}
               </div>
-              
+
               <h3 className="font-bold text-slate-900 uppercase tracking-wide mb-4">
                 Mapeo de Columnas
               </h3>
-              
+
               <div className="grid gap-4">
                 {systemFields.map(field => (
                   <div key={field.key} className="flex items-center gap-4">
@@ -426,7 +532,7 @@ const ImportProductsModal = ({
           )}
 
           {/* Step 3: Preview */}
-          {step === 3 && (
+          {step === 3 && !importing && (
             <div>
               {/* Summary */}
               <div className="mb-4 flex gap-4">
@@ -459,29 +565,29 @@ const ImportProductsModal = ({
                     {processedProducts
                       .slice((currentPage - 1) * pageSize, currentPage * pageSize)
                       .map((product, idx) => (
-                      <tr key={idx} className={product.isValid ? '' : 'bg-red-50'}>
-                        <td className="p-3 text-slate-500">{product.rowIndex}</td>
-                        <td className="p-3">
-                          {product.isValid ? (
-                            <span className="text-green-600">
-                              <span className="material-symbols-outlined text-lg">check_circle</span>
-                            </span>
-                          ) : (
-                            <span className="text-red-500">
-                              <span className="material-symbols-outlined text-lg">error</span>
-                            </span>
-                          )}
-                        </td>
-                        <td className="p-3 font-mono text-xs">{product.codigo || '-'}</td>
-                        <td className="p-3 font-mono text-xs">{product.codigoComercial || '-'}</td>
-                        <td className="p-3 max-w-xs truncate">{product.producto || '-'}</td>
-                        <td className="p-3">{product.marcaNombre || '-'}</td>
-                        <td className="p-3">{product.categoriaNombre || '-'}</td>
-                        <td className="p-3 text-xs text-red-600">
-                          {product.errors.join(', ')}
-                        </td>
-                      </tr>
-                    ))}
+                        <tr key={idx} className={product.isValid ? '' : 'bg-red-50'}>
+                          <td className="p-3 text-slate-500">{product.rowIndex}</td>
+                          <td className="p-3">
+                            {product.isValid ? (
+                              <span className="text-green-600">
+                                <span className="material-symbols-outlined text-lg">check_circle</span>
+                              </span>
+                            ) : (
+                              <span className="text-red-500">
+                                <span className="material-symbols-outlined text-lg">error</span>
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3 font-mono text-xs">{product.codigo || '-'}</td>
+                          <td className="p-3 font-mono text-xs">{product.codigoComercial || '-'}</td>
+                          <td className="p-3 max-w-xs truncate">{product.producto || '-'}</td>
+                          <td className="p-3">{product.marcaNombre || '-'}</td>
+                          <td className="p-3">{product.categoriaNombre || '-'}</td>
+                          <td className="p-3 text-xs text-red-600">
+                            {product.errors.join(', ')}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
@@ -507,7 +613,7 @@ const ImportProductsModal = ({
                     de {processedProducts.length} productos
                   </span>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
@@ -537,11 +643,11 @@ const ImportProductsModal = ({
               <div className="w-20 h-20 bg-green-100 mx-auto mb-6 flex items-center justify-center">
                 <span className="material-symbols-outlined text-5xl text-green-600">check_circle</span>
               </div>
-              
+
               <h3 className="text-xl font-bold text-slate-900 mb-6">
                 ¡Importación Completada!
               </h3>
-              
+
               <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-6">
                 <div className="p-4 bg-green-50 border border-green-200">
                   <div className="text-2xl font-bold text-green-700">{importResult.imported}</div>
@@ -587,7 +693,7 @@ const ImportProductsModal = ({
               </button>
             )}
           </div>
-          
+
           <div className="flex gap-3">
             {step < 4 && (
               <button
@@ -598,7 +704,7 @@ const ImportProductsModal = ({
                 Cancelar
               </button>
             )}
-            
+
             {step === 2 && (
               <button
                 onClick={goToPreview}
@@ -607,7 +713,7 @@ const ImportProductsModal = ({
                 Continuar
               </button>
             )}
-            
+
             {step === 3 && (
               <button
                 onClick={handleImport}
@@ -627,7 +733,7 @@ const ImportProductsModal = ({
                 )}
               </button>
             )}
-            
+
             {step === 4 && (
               <button
                 onClick={onClose}
