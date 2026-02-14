@@ -331,7 +331,7 @@ export default function Productos() {
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <span className="material-symbols-outlined text-accent text-base mt-0.5">location_on</span>
-                    <span className="text-xs text-gray-200">Av. Nicolás Ayllón 4329 - Ate, Lima</span>
+                    <a className="text-xs text-gray-200 hover:text-white transition-colors" href="https://maps.app.goo.gl/iA9sAQACR87o2Bsj7" target="_blank" rel="noopener noreferrer">Av. Nicolás Ayllón 4329 - Ate, Lima</a>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-accent text-base">mail</span>

@@ -574,7 +574,7 @@ export default function Nosotros() {
                     <span>Ref. Puruchuco</span>
                   </div>
                 </div>
-                <iframe allowFullScreen="" height="100%" loading="lazy" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3902.002878465646!2d-76.92429408561803!3d-12.043329091469796!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c6aa157833bd%3A0xc3c94a737471286c!2sReal%20Plaza%20Puruchuco!5e0!3m2!1sen!2spe!4v1645564855421!5m2!1sen!2spe" style={{ border: 0, filter: 'grayscale(100%) contrast(1.2) brightness(0.8)' }} width="100%">
+                <iframe allowFullScreen="" height="100%" loading="lazy" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3902.0!2d-76.9186!3d-12.0286!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c78c19cb26af%3A0x7c183903bc384951!2sORC%20INVERSIONES%20PER%C3%9A%20S.A.C!5e0!3m2!1ses!2spe" style={{ border: 0, filter: 'grayscale(100%) contrast(1.2) brightness(0.8)' }} width="100%">
                 </iframe>
               </div>
             </div>
@@ -631,7 +631,7 @@ export default function Nosotros() {
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
                     <span className="material-symbols-outlined text-accent text-lg mt-0.5">location_on</span>
-                    <span className="text-sm text-gray-200">Av. Nicolás Ayllón 4329 - Ate, Lima</span>
+                    <a className="text-sm text-gray-200 hover:text-white transition-colors" href="https://maps.app.goo.gl/iA9sAQACR87o2Bsj7" target="_blank" rel="noopener noreferrer">Av. Nicolás Ayllón 4329 - Ate, Lima</a>
                   </li>
                   <li className="flex items-center gap-3">
                     <span className="material-symbols-outlined text-accent text-lg">mail</span>

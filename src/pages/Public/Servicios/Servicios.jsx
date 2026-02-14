@@ -415,7 +415,7 @@ export default function Servicios() {
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
                     <span className="material-symbols-outlined text-accent text-lg mt-0.5">location_on</span>
-                    <span className="text-sm text-gray-200">Av. Nicolás Ayllón 4329 - Ate, Lima</span>
+                    <a className="text-sm text-gray-200 hover:text-white transition-colors" href="https://maps.app.goo.gl/iA9sAQACR87o2Bsj7" target="_blank" rel="noopener noreferrer">Av. Nicolás Ayllón 4329 - Ate, Lima</a>
                   </li>
                   <li className="flex items-center gap-3">
                     <span className="material-symbols-outlined text-accent text-lg">mail</span>
