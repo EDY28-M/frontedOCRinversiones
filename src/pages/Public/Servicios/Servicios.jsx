@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import MobileMenu from '../../../components/common/MobileMenu';
 import '../../../styles/inicio.css';
+import { useDocumentMeta } from '../../../hooks/useDocumentMeta';
 
 /**
  * Página Servicios - Placeholder
@@ -10,92 +11,98 @@ import '../../../styles/inicio.css';
 export default function Servicios() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  useDocumentMeta({
+    title: 'Envíos a Provincias - Repuestos a Todo el Perú | ORC Inversiones',
+    description: 'Envíos diarios de repuestos vehiculares a todas las provincias del Perú. Shalom, Flores, ITTSA, Palomino y más. Entrega rápida y segura desde Ate, Lima.',
+    canonicalPath: '/envios-provincias',
+  });
+
   return (
     <div className="h-screen flex flex-col bg-surface font-sans text-text-main antialiased overflow-hidden">
       {/* Header */}
       <header className="flex-shrink-0 w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-          <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
-            <div className="flex items-center gap-3 min-w-fit">
-              <div className="text-primary">
-                <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
-                <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
-              </div>
+        <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
+          <div className="flex items-center gap-3 min-w-fit">
+            <div className="text-primary">
+              <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
             </div>
-            <nav className="hidden md:flex items-center gap-8">
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
-                }
-                end
-              >
-                {({ isActive }) => (
-                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    INICIO
-                  </span>
-                )}
-              </NavLink>
-              <NavLink
-                to="/productos"
-                className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
-                }
-              >
-                {({ isActive }) => (
-                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    CATÁLOGO
-                  </span>
-                )}
-              </NavLink>
-              <NavLink
-                to="/envios-provincias"
-                className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
-                }
-              >
-                {({ isActive }) => (
-                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    ENVÍOS A PROVINCIAS
-                  </span>
-                )}
-              </NavLink>
-              <NavLink
-                to="/nosotros"
-                className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
-                }
-              >
-                {({ isActive }) => (
-                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    EMPRESA
-                  </span>
-                )}
-              </NavLink>
-            </nav>
-
-            <div className="flex-1 max-w-sm hidden lg:block">
-              {/* Spacer to maintain layout positions */}
-            </div>
-
-            <div className="flex items-center gap-2 min-w-fit">
-              <button className="relative p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
-                <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
-                <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary ring-2 ring-white"></span>
-              </button>
-              <button className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
-                <span className="material-symbols-outlined text-[22px]">person</span>
-              </button>
-              <button
-                className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded"
-                onClick={() => setMobileMenuOpen(true)}
-              >
-                <span className="material-symbols-outlined">menu</span>
-              </button>
+            <div>
+              <span className="text-2xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
+              <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
             </div>
           </div>
+          <nav className="hidden md:flex items-center gap-8">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+              end
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  INICIO
+                </span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/productos"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  CATÁLOGO
+                </span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/envios-provincias"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  ENVÍOS A PROVINCIAS
+                </span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/nosotros"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  EMPRESA
+                </span>
+              )}
+            </NavLink>
+          </nav>
+
+          <div className="flex-1 max-w-sm hidden lg:block">
+            {/* Spacer to maintain layout positions */}
+          </div>
+
+          <div className="flex items-center gap-2 min-w-fit">
+            <button className="relative p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
+              <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
+              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary ring-2 ring-white"></span>
+            </button>
+            <button className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
+              <span className="material-symbols-outlined text-[22px]">person</span>
+            </button>
+            <button
+              className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <span className="material-symbols-outlined">menu</span>
+            </button>
+          </div>
+        </div>
       </header>
 
       {/* Mobile Menu Component */}
@@ -367,7 +374,7 @@ export default function Servicios() {
                   <div className="text-accent">
                     <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
                   </div>
-                  <h1 className="text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
+                  <span className="text-2xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
                   <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
                 </div>
                 <p className="text-sm text-gray-200 leading-relaxed">
@@ -422,7 +429,7 @@ export default function Servicios() {
               </div>
             </div>
             <div className="flex flex-col md:flex-row justify-between items-center border-t border-blue-800 pt-8 text-[10px] text-blue-200 uppercase tracking-widest gap-4">
-              <p>© 2024 ORC Inversiones Perú. Todos los derechos reservados.</p>
+              <p>© {new Date().getFullYear()} ORC Inversiones Perú. Todos los derechos reservados.</p>
               <div className="flex gap-6">
                 <a className="hover:text-white transition-colors" href="#">Facebook</a>
                 <a className="hover:text-white transition-colors" href="#">Instagram</a>

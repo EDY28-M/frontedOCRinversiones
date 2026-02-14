@@ -3,12 +3,20 @@ import { Link, NavLink } from 'react-router-dom';
 import MobileMenu from '../../../components/common/MobileMenu';
 import '../../../styles/inicio.css';
 import { contactService } from '../../../services/contactService';
+import { useDocumentMeta } from '../../../hooks/useDocumentMeta';
 
 /**
  * Página Nosotros - V3
  */
 export default function Nosotros() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useDocumentMeta({
+    title: 'Sobre Nosotros - ORC Inversiones Perú | Repuestos Vehiculares',
+    description: 'Conoce ORC Inversiones Perú, empresa líder en importación de repuestos coreanos, chinos y japoneses para vehículos. Más de 15 años en Ate, Lima. Misión, visión y contacto.',
+    canonicalPath: '/nosotros',
+  });
+
   const [contactForm, setContactForm] = useState({
     name: '',
     company: '',
@@ -93,88 +101,88 @@ export default function Nosotros() {
     <div className="h-screen flex flex-col bg-surface font-sans text-text-main antialiased overflow-hidden">
       {/* Header */}
       <header className="flex-shrink-0 w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-          <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
-            <div className="flex items-center gap-3 min-w-fit">
-              <div className="text-primary">
-                <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
-                <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
-              </div>
+        <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
+          <div className="flex items-center gap-3 min-w-fit">
+            <div className="text-primary">
+              <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
             </div>
-            <nav className="hidden md:flex items-center gap-8">
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
-                }
-                end
-              >
-                {({ isActive }) => (
-                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    INICIO
-                  </span>
-                )}
-              </NavLink>
-              <NavLink
-                to="/productos"
-                className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
-                }
-              >
-                {({ isActive }) => (
-                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    CATÁLOGO
-                  </span>
-                )}
-              </NavLink>
-              <NavLink
-                to="/envios-provincias"
-                className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
-                }
-              >
-                {({ isActive }) => (
-                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    ENVÍOS A PROVINCIAS
-                  </span>
-                )}
-              </NavLink>
-              <NavLink
-                to="/nosotros"
-                className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
-                }
-              >
-                {({ isActive }) => (
-                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    EMPRESA
-                  </span>
-                )}
-              </NavLink>
-            </nav>
-
-            <div className="flex-1 max-w-sm hidden lg:block">
-              {/* Spacer to maintain layout positions */}
-            </div>
-
-            <div className="flex items-center gap-2 min-w-fit">
-              <button className="relative p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
-                <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
-                <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary ring-2 ring-white"></span>
-              </button>
-              <button className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
-                <span className="material-symbols-outlined text-[22px]">person</span>
-              </button>
-              <button
-                className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded"
-                onClick={() => setMobileMenuOpen(true)}
-              >
-                <span className="material-symbols-outlined">menu</span>
-              </button>
+            <div>
+              <span className="text-2xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
+              <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
             </div>
           </div>
+          <nav className="hidden md:flex items-center gap-8">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+              end
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  INICIO
+                </span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/productos"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  CATÁLOGO
+                </span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/envios-provincias"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  ENVÍOS A PROVINCIAS
+                </span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/nosotros"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  EMPRESA
+                </span>
+              )}
+            </NavLink>
+          </nav>
+
+          <div className="flex-1 max-w-sm hidden lg:block">
+            {/* Spacer to maintain layout positions */}
+          </div>
+
+          <div className="flex items-center gap-2 min-w-fit">
+            <button className="relative p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
+              <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
+              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary ring-2 ring-white"></span>
+            </button>
+            <button className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
+              <span className="material-symbols-outlined text-[22px]">person</span>
+            </button>
+            <button
+              className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <span className="material-symbols-outlined">menu</span>
+            </button>
+          </div>
+        </div>
       </header>
 
       {/* Mobile Menu Component */}
@@ -203,9 +211,9 @@ export default function Nosotros() {
                 <div>
                   <span className="text-primary font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-xs sm:text-sm">NUESTRA HISTORIA</span>
                 </div>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-matte-dark uppercase font-display leading-tight">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-matte-dark uppercase font-display leading-tight">
                   SOBRE <span className="text-primary">NOSOTROS</span>
-                </h2>
+                </h1>
                 <p className="text-gray-700 leading-relaxed text-sm sm:text-base lg:text-lg">
                   Somos una empresa especializada en la importación y comercialización de repuestos para vehículos de origen chino, japonés y coreano, comprometida con ofrecer productos de calidad y soluciones confiables para el sector automotriz.
                 </p>
@@ -256,9 +264,9 @@ export default function Nosotros() {
                     <div className="absolute left-4 md:left-1/2 transform -translate-x-1/2 bg-white border-4 border-accent w-6 h-6 z-20"></div>
                     <div className="md:w-4/12 order-1 pl-12 md:pl-4">
                       <div className="w-full overflow-hidden relative group shadow-md">
-                        <img 
-                          src="/nosotrosimages/inicioperaciones.jpg" 
-                          alt="Inicio de Operaciones ORC" 
+                        <img
+                          src="/nosotrosimages/inicioperaciones.jpg"
+                          alt="Inicio de Operaciones ORC"
                           className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-secondary"></div>
@@ -281,9 +289,9 @@ export default function Nosotros() {
                     <div className="absolute left-4 md:left-1/2 transform -translate-x-1/2 bg-secondary w-6 h-6 z-20 shadow-lg shadow-secondary/50"></div>
                     <div className="md:w-4/12 pr-0 md:pr-4 pl-12 md:pl-0">
                       <div className="w-full overflow-hidden relative group shadow-md">
-                        <img 
-                          src="/nosotrosimages/logisitca.jpg" 
-                          alt="Expansión Logística ORC" 
+                        <img
+                          src="/nosotrosimages/logisitca.jpg"
+                          alt="Expansión Logística ORC"
                           className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-accent"></div>
@@ -306,9 +314,9 @@ export default function Nosotros() {
                     <div className="absolute left-4 md:left-1/2 transform -translate-x-1/2 bg-matte-dark border-2 border-white w-6 h-6 z-20"></div>
                     <div className="md:w-4/12 order-1 pl-12 md:pl-4">
                       <div className="w-full overflow-hidden relative group shadow-md">
-                        <img 
-                          src="/nosotrosimages/repuestos_originales.jpg" 
-                          alt="Repuestos Originales ORC" 
+                        <img
+                          src="/nosotrosimages/repuestos_originales.jpg"
+                          alt="Repuestos Originales ORC"
                           className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-secondary"></div>
@@ -538,9 +546,8 @@ export default function Nosotros() {
                   </div>
                   {contactStatus.message && (
                     <div
-                      className={`text-sm font-semibold ${
-                        contactStatus.type === 'success' ? 'text-emerald-300' : 'text-red-300'
-                      }`}
+                      className={`text-sm font-semibold ${contactStatus.type === 'success' ? 'text-emerald-300' : 'text-red-300'
+                        }`}
                     >
                       {contactStatus.message}
                       {contactStatus.type === 'success' && contactStatus.confirmationSent === false
@@ -583,7 +590,7 @@ export default function Nosotros() {
                   <div className="text-accent">
                     <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
                   </div>
-                  <h1 className="text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
+                  <span className="text-2xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
                   <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
                 </div>
                 <p className="text-sm text-gray-200 leading-relaxed">
@@ -638,7 +645,7 @@ export default function Nosotros() {
               </div>
             </div>
             <div className="flex flex-col md:flex-row justify-between items-center border-t border-blue-800 pt-8 text-[10px] text-blue-200 uppercase tracking-widest gap-4">
-              <p>© 2024 ORC Inversiones Perú. Todos los derechos reservados.</p>
+              <p>© {new Date().getFullYear()} ORC Inversiones Perú. Todos los derechos reservados.</p>
               <div className="flex gap-6">
                 <a className="hover:text-white transition-colors" href="#">Facebook</a>
                 <a className="hover:text-white transition-colors" href="#">Instagram</a>

@@ -5,6 +5,7 @@ import ProductsGrid from '../../../components/products/ProductsGrid.jsx';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 import MobileMenu from '../../../components/common/MobileMenu';
 import { useProductFilters } from '../../../hooks/useProductFilters';
+import { useDocumentMeta } from '../../../hooks/useDocumentMeta';
 
 /**
  * Página pública de Productos
@@ -42,6 +43,12 @@ export default function Productos() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  useDocumentMeta({
+    title: 'Catálogo de Repuestos para Vehículos | ORC Inversiones Perú',
+    description: 'Explora nuestro catálogo de repuestos coreanos, chinos y japoneses para vehículos. Filtros, frenos, motores y más. JAC, Foton, Hyundai, Toyota, JMC. Precios competitivos en Ate, Lima.',
+    canonicalPath: '/productos',
+  });
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -51,106 +58,106 @@ export default function Productos() {
     <div className="h-screen flex flex-col bg-surface font-sans text-text-main antialiased overflow-hidden">
       {/* Header fijo */}
       <header className="flex-shrink-0 w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-          <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
-            <div className="flex items-center gap-3 min-w-fit">
-              <div className="text-primary">
-                <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
-                <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
-              </div>
+        <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
+          <div className="flex items-center gap-3 min-w-fit">
+            <div className="text-primary">
+              <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
             </div>
-            <nav className="hidden md:flex items-center gap-8">
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
-                }
-                end
-              >
-                {({ isActive }) => (
-                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    INICIO
-                  </span>
-                )}
-              </NavLink>
-              <NavLink
-                to="/productos"
-                className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
-                }
-              >
-                {({ isActive }) => (
-                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    CATÁLOGO
-                  </span>
-                )}
-              </NavLink>
-              <NavLink
-                to="/envios-provincias"
-                className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
-                }
-              >
-                {({ isActive }) => (
-                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    ENVÍOS A PROVINCIAS
-                  </span>
-                )}
-              </NavLink>
-              <NavLink
-                to="/nosotros"
-                className={({ isActive }) =>
-                  `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
-                }
-              >
-                {({ isActive }) => (
-                  <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
-                    EMPRESA
-                  </span>
-                )}
-              </NavLink>
-            </nav>
-            <div className="flex-1 max-w-sm hidden lg:block">
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
-                  <span className="material-symbols-outlined text-[20px]">search</span>
-                </div>
-                <input
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-100 rounded bg-gray-50 text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-primary/30 focus:ring-2 focus:ring-primary/10 transition-all"
-                  placeholder="Buscar refacción..."
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 min-w-fit">
-              <button className="relative p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
-                <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
-                <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary ring-2 ring-white"></span>
-              </button>
-              <button className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
-                <span className="material-symbols-outlined text-[22px]">person</span>
-              </button>
-              <button
-                className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded"
-                onClick={() => setMobileMenuOpen(true)}
-              >
-                <span className="material-symbols-outlined">menu</span>
-              </button>
+            <div>
+              <span className="text-2xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
+              <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
             </div>
           </div>
-        </header>
+          <nav className="hidden md:flex items-center gap-8">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+              end
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  INICIO
+                </span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/productos"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  CATÁLOGO
+                </span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/envios-provincias"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  ENVÍOS A PROVINCIAS
+                </span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/nosotros"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  EMPRESA
+                </span>
+              )}
+            </NavLink>
+          </nav>
+          <div className="flex-1 max-w-sm hidden lg:block">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+                <span className="material-symbols-outlined text-[20px]">search</span>
+              </div>
+              <input
+                className="block w-full pl-10 pr-3 py-2 border border-gray-100 rounded bg-gray-50 text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-primary/30 focus:ring-2 focus:ring-primary/10 transition-all"
+                placeholder="Buscar refacción..."
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
 
-        {/* Mobile Menu Component */}
-        <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+          <div className="flex items-center gap-2 min-w-fit">
+            <button className="relative p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
+              <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
+              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary ring-2 ring-white"></span>
+            </button>
+            <button className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
+              <span className="material-symbols-outlined text-[22px]">person</span>
+            </button>
+            <button
+              className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <span className="material-symbols-outlined">menu</span>
+            </button>
+          </div>
+        </div>
+      </header>
 
-        {/* Contenedor con scroll - igual que admin */}
-        <div className="flex-1 overflow-y-auto flex flex-col">
-          <main className="flex-1 w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row">
+      {/* Mobile Menu Component */}
+      <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+
+      {/* Contenedor con scroll - igual que admin */}
+      <div className="flex-1 overflow-y-auto flex flex-col">
+        <main className="flex-1 w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row">
           <FiltersSidebar
             categories={categories}
             brands={brands}
@@ -170,7 +177,7 @@ export default function Productos() {
             {/* Header con título y paginador compacto */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-gray-100">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Productos Disponibles</h2>
+                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Catálogo de Repuestos para Vehículos</h1>
               </div>
 
               {/* Paginador estilo Admin */}
@@ -283,7 +290,7 @@ export default function Productos() {
                   <div className="text-accent">
                     <span className="material-symbols-outlined text-2xl">settings_b_roll</span>
                   </div>
-                  <h1 className="text-xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
+                  <span className="text-xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
                   <p className="text-accent text-[10px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
                 </div>
                 <p className="text-xs text-gray-200 leading-relaxed">
@@ -338,7 +345,7 @@ export default function Productos() {
               </div>
             </div>
             <div className="flex flex-col md:flex-row justify-between items-center border-t border-blue-800 pt-6 text-[10px] text-blue-200 uppercase tracking-widest gap-4">
-              <p>© 2024 ORC Inversiones Perú. Todos los derechos reservados.</p>
+              <p>© {new Date().getFullYear()} ORC Inversiones Perú. Todos los derechos reservados.</p>
               <div className="flex gap-6">
                 <a className="hover:text-white transition-colors" href="#">Facebook</a>
                 <a className="hover:text-white transition-colors" href="#">Instagram</a>
@@ -347,7 +354,7 @@ export default function Productos() {
             </div>
           </div>
         </footer>
-        </div>{/* Cierre del contenedor con scroll */}
+      </div>{/* Cierre del contenedor con scroll */}
 
       {/* Modal de Detalle del Producto */}
       {selectedProduct && (

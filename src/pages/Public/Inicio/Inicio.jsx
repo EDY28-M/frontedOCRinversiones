@@ -6,6 +6,7 @@ import ProductDetailModal from '../../../components/ProductDetailModal';
 import '../../../styles/inicio.css';
 import { usePublicFeaturedProducts } from '../../../hooks/usePublicFeaturedProducts';
 import { getFirstValidImageUrl } from '../../../utils/imageUtils';
+import { useDocumentMeta } from '../../../hooks/useDocumentMeta';
 
 /**
  * Componente Inicio - Migración pixel-perfect del HTML original (Google Stitch)
@@ -33,6 +34,12 @@ export default function Inicio() {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const { products: featuredProducts, isLoading: isLoadingFeatured } = usePublicFeaturedProducts({ page: 1, pageSize: 9 });
 
+    useDocumentMeta({
+        title: 'ORC Inversiones Perú - Repuestos Coreanos, Chinos y Japoneses para Vehículos',
+        description: 'Líderes en importación de repuestos coreanos, chinos y japoneses para vehículos. Más de 15 años de experiencia en Ate, Lima. JAC, Foton, Hyundai, Toyota y más. Envíos a todo el Perú.',
+        canonicalPath: '/',
+    });
+
     const featuredRows = useMemo(() => {
         const rows = [];
         for (let i = 0; i < featuredProducts.length; i += 3) {
@@ -51,7 +58,7 @@ export default function Inicio() {
                             <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
                         </div>
                         <div>
-                            <h1 className="text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
+                            <span className="text-2xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
                             <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
                         </div>
                     </div>
@@ -155,8 +162,8 @@ export default function Inicio() {
                                     <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold uppercase text-white tracking-tight leading-none mb-4 md:mb-5" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }}>
                                         Expertos en <br />
                                         <span className="text-accent" style={{ textShadow: '0 0 20px rgba(255,204,0,0.5), 2px 2px 8px rgba(0,0,0,0.5)' }}>Repuestos</span> <br />
-                                        Coreanos y <br />
-                                        <span className="text-accent" style={{ textShadow: '0 0 20px rgba(255,204,0,0.5), 2px 2px 8px rgba(0,0,0,0.5)' }}>Chinos</span>
+                                        Coreanos, Chinos <br />
+                                        y <span className="text-accent" style={{ textShadow: '0 0 20px rgba(255,204,0,0.5), 2px 2px 8px rgba(0,0,0,0.5)' }}>Japoneses</span>
                                     </h1>
                                     <p className="text-base md:text-lg text-white max-w-md font-normal mb-6 md:mb-8 leading-relaxed border-l-4 border-accent pl-5" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
                                         Más de 15 años de experiencia atendiendo talleres y flotas en Ate, Lima. Calidad garantizada para tu vehiculo.
@@ -412,7 +419,7 @@ export default function Inicio() {
                                     <div className="text-accent">
                                         <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
                                     </div>
-                                    <h1 className="text-2xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h1>
+                                    <span className="text-2xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
                                     <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
                                 </div>
                                 <p className="text-sm text-gray-200 leading-relaxed">
@@ -467,7 +474,7 @@ export default function Inicio() {
                             </div>
                         </div>
                         <div className="flex flex-col md:flex-row justify-between items-center border-t border-blue-800 pt-8 text-[10px] text-blue-200 uppercase tracking-widest gap-4">
-                            <p>© 2024 ORC Inversiones Perú. Todos los derechos reservados.</p>
+                            <p>© {new Date().getFullYear()} ORC Inversiones Perú. Todos los derechos reservados.</p>
                             <div className="flex gap-6">
                                 <a className="hover:text-white transition-colors" href="#">Facebook</a>
                                 <a className="hover:text-white transition-colors" href="#">Instagram</a>
