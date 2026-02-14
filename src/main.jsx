@@ -15,21 +15,19 @@ register({
   },
 });
 
-// Medir performance de la app
+// Medir Core Web Vitals (LCP, FID, CLS) y métricas de paint
 if (import.meta.env.PROD && 'performance' in window) {
   window.addEventListener('load', () => {
-    // Web Vitals
-    const observer = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        // Enviar métricas a analytics si es necesario
-        console.log(`[Web Vitals] ${entry.name}: ${entry.value}`);
-      }
-    });
-    
     try {
-      observer.observe({ entryTypes: ['web-vitals'] });
+      // Observer para Largest Contentful Paint (LCP) y First Input Delay (FID)
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          console.log(`[Web Vitals] ${entry.entryType} - ${entry.name}: ${entry.startTime}ms`);
+        }
+      });
+      observer.observe({ entryTypes: ['largest-contentful-paint', 'first-input', 'layout-shift', 'paint'] });
     } catch {
-      // Fallback para navegadores sin soporte
+      // Fallback para navegadores sin soporte completo
       const paintEntries = performance.getEntriesByType('paint');
       paintEntries.forEach((entry) => {
         console.log(`[Performance] ${entry.name}: ${entry.startTime}ms`);
