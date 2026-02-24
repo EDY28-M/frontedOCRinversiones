@@ -34,6 +34,8 @@ const Contact = lazyWithRetry(() => import('../pages/Public/Contact/Contact'));
 
 // Lazy loading de páginas de admin
 const AdminLogin = lazyWithRetry(() => import('../pages/Admin/Login/Login'));
+const ForgotPassword = lazyWithRetry(() => import('../pages/Admin/ForgotPassword/ForgotPassword'));
+const ResetPassword = lazyWithRetry(() => import('../pages/Admin/ResetPassword/ResetPassword'));
 const AccessDenied = lazyWithRetry(() => import('../pages/Admin/AccessDenied/AccessDenied'));
 const DashboardRedirect = lazyWithRetry(() => import('../pages/Admin/Dashboard/DashboardRedirect'));
 
@@ -107,6 +109,8 @@ const AppRoutes = () => {
 
         {/* LOGIN ROUTE */}
         <Route path="/admin/login" element={<LazyWrapper><AdminLogin /></LazyWrapper>} />
+        <Route path="/admin/forgot-password" element={<LazyWrapper><ForgotPassword /></LazyWrapper>} />
+        <Route path="/admin/reset-password" element={<LazyWrapper><ResetPassword /></LazyWrapper>} />
 
         {/* ADMIN ROUTES - Solo para Administradores */}
         <Route path="/admin">

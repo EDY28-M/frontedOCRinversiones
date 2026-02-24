@@ -3,19 +3,19 @@ import axiosInstance from '../api/axiosConfig';
 export const authService = {
   login: async (credentials) => {
     console.group('🔐 AuthService.login');
-    console.log('📤 Enviando al backend:', { 
-      username: credentials.usuario, 
-      password: '***' 
+    console.log('📤 Enviando al backend:', {
+      username: credentials.usuario,
+      password: '***'
     });
     console.log('🕐 Timestamp:', new Date().toISOString());
-    
+
     try {
       // El backend espera username y password
       const response = await axiosInstance.post('/auth/login', {
         username: credentials.usuario,
         password: credentials.password
       });
-      
+
       console.log('✅ ¡RESPUESTA RECIBIDA!');
       console.table({
         'Token Recibido': response.data.token ? 'SÍ' : 'NO',
@@ -25,7 +25,7 @@ export const authService = {
         'Expira': response.data.expiresAt
       });
       console.groupEnd();
-      
+
       return response.data; // Retorna: { token, username, email, role, expiresAt }
     } catch (error) {
       console.error('❌ ========== ERROR EN AUTHSERVICE ==========');
@@ -99,5 +99,19 @@ export const authService = {
       console.error('❌ Error decodificando token:', error.message);
       return null;
     }
+  },
+
+  forgotPassword: async (email) => {
+    console.log('🔑 AuthService.forgotPassword:', email);
+    const response = await axiosInstance.post('/auth/forgot-password', { email });
+    console.log('✅ Forgot password response:', response.data);
+    return response.data;
+  },
+
+  resetPassword: async (token, newPassword) => {
+    console.log('🔐 AuthService.resetPassword');
+    const response = await axiosInstance.post('/auth/reset-password', { token, newPassword });
+    console.log('✅ Reset password response:', response.data);
+    return response.data;
   },
 };

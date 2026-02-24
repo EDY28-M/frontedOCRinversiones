@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useNotification } from '../../../context/NotificationContext';
 import { isAdmin } from '../../../utils/permissions';
 import { productKeys } from '../../../hooks/useProducts';
@@ -18,7 +18,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [serverStatus, setServerStatus] = useState('checking'); // 'checking' | 'ready' | 'waking'
   const warmupStarted = useRef(false);
-  
+
   const { login } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -62,8 +62,8 @@ const Login = () => {
     // 🔥 PRELOAD: Cargar chunks del admin layout en paralelo mientras el usuario escribe
     // Así cuando haga login, el navigate es instantáneo (chunks ya descargados)
     const preloadTimer = setTimeout(() => {
-      import('../../../layouts/AdminLayout/AdminLayout').catch(() => {});
-      import('../../Admin/Dashboard/DashboardRedirect').catch(() => {});
+      import('../../../layouts/AdminLayout/AdminLayout').catch(() => { });
+      import('../../Admin/Dashboard/DashboardRedirect').catch(() => { });
     }, 500);
 
     return () => {
@@ -85,9 +85,9 @@ const Login = () => {
 
     try {
       const userData = await login(formData);
-      
+
       showSuccess('¡Bienvenido! Iniciando sesión...');
-      
+
       if (isAdmin(userData.role)) {
         // Navegar PRIMERO (instantáneo porque chunks ya están preloaded)
         navigate('/admin/', { replace: true });
@@ -235,12 +235,12 @@ const Login = () => {
                   </button>
                 </div>
                 <div className="flex items-center justify-end mt-2">
-                  <a
+                  <Link
                     className="text-xs font-bold text-gray-500 hover:text-secondary uppercase tracking-wide transition-colors duration-200 cursor-pointer"
-                    href="#"
+                    to="/admin/forgot-password"
                   >
                     ¿Olvidó su clave?
-                  </a>
+                  </Link>
                 </div>
               </div>
 
@@ -250,8 +250,8 @@ const Login = () => {
                 {serverStatus === 'waking' && (
                   <div className="flex items-center justify-center gap-2 mb-3 text-xs text-amber-600 bg-amber-50 border border-amber-200 py-2 px-3 rounded-sm animate-pulse">
                     <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                     <span className="font-semibold uppercase tracking-wide">Conectando al servidor...</span>
                   </div>
@@ -270,8 +270,8 @@ const Login = () => {
                   {isLoading ? (
                     <span className="flex items-center gap-2">
                       <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
                       Verificando credenciales...
                     </span>
