@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Fondo azul marino (#002060) -->
+  <rect width="64" height="64" fill="#002060" rx="8"/>
+  <!-- Borde dorado inferior -->
+  <rect x="0" y="58" width="64" height="6" fill="#facc15" rx="0"/>
+  <!-- Texto ORC -->
+  <text x="32" y="38"
+    font-family="Arial, Helvetica, sans-serif"
+    font-weight="900"
+    font-size="26"
+    fill="#ffffff"
+    text-anchor="middle"
+    letter-spacing="1">ORC</text>
+  <!-- Punto dorado decorativo (engranaje simplificado) -->
+  <circle cx="12" cy="12" r="5" fill="#facc15"/>
+  <circle cx="12" cy="12" r="2.5" fill="#002060"/>
+  <!-- Punto superior derecho -->
+  <circle cx="52" cy="12" r="5" fill="#facc15"/>
+  <circle cx="52" cy="12" r="2.5" fill="#002060"/>
+</svg>
