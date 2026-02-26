@@ -75,8 +75,8 @@ export const productService = {
   },
 
   // Obtener productos disponibles (con imágenes) paginados
-  getAvailableProducts: async ({ page = 1, pageSize = 12, q = '', categoryId = null, onlyWithImages = true } = {}) => {
-    const params = { page, pageSize, onlyWithImages };
+  getAvailableProducts: async ({ page = 1, pageSize = 12, q = '', categoryId = null, onlyWithImages = true, onlyActive = true } = {}) => {
+    const params = { page, pageSize, onlyWithImages, onlyActive };
     if (q) params.q = q;
     if (categoryId) params.categoryId = categoryId;
 

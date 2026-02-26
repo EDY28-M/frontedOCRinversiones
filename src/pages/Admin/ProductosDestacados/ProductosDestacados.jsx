@@ -31,6 +31,7 @@ const ProductosDestacados = () => {
     pageSize: pageSize,
     q: searchTerm,
     categoryId: getCategoryId(selectedCategory),
+    onlyActive: false,
   });
 
   // Cargar categorías al montar
