@@ -110,6 +110,16 @@ const Productos = () => {
     return true;
   }), [productos, filtroActivo, searchTerm]);
 
+  // Contadores solo de productos CON imagen (visible en tab Publicar)
+  const { productosPublicadosCount, productosNoPublicadosCount } = useMemo(() => {
+    const conImagen = productos.filter(p =>
+      p.imagenPrincipal || p.imagen2 || p.imagen3 || p.imagen4
+    );
+    const publicados = conImagen.filter(p => p.isActive).length;
+    const noPublicados = conImagen.filter(p => !p.isActive).length;
+    return { productosPublicadosCount: publicados, productosNoPublicadosCount: noPublicados };
+  }, [productos]);
+
   // Productos paginados
   const totalPages = Math.ceil(filteredProducts.length / pageSize);
 
@@ -346,12 +356,26 @@ const Productos = () => {
               Borradores
             </button>
           </div>
-          <div className="text-xs text-slate-400 font-mono">
-            {filteredProducts.length > 0 ? (
-              <>MOSTRANDO {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, filteredProducts.length)} DE {filteredProducts.length}</>
-            ) : (
-              <>MOSTRANDO 0 PRODUCTOS</>
+          <div className="flex items-center gap-3 ml-auto">
+            {filtroActivo === 'publicar' && (
+              <>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 border border-green-100 rounded text-xs font-bold uppercase tracking-wide">
+                  <span className="material-symbols-outlined text-[14px]">public</span>
+                  Publicados: {productosPublicadosCount}
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-600 border border-slate-200 rounded text-xs font-bold uppercase tracking-wide">
+                  <span className="material-symbols-outlined text-[14px]">visibility_off</span>
+                  No publicados: {productosNoPublicadosCount}
+                </span>
+              </>
             )}
+            <div className="text-xs text-slate-400 font-mono">
+              {filteredProducts.length > 0 ? (
+                <>MOSTRANDO {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, filteredProducts.length)} DE {filteredProducts.length}</>
+              ) : (
+                <>MOSTRANDO 0 PRODUCTOS</>
+              )}
+            </div>
           </div>
         </div>
 

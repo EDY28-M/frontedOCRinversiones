@@ -10,10 +10,9 @@ export function usePublicCategories() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['public-categories'],
     queryFn: () => publicProductsApi.getPublicCategories(),
-    staleTime: 1000 * 60 * 5, // 5 minutos - mantiene caché al navegar
+    staleTime: 1000 * 10,     // 10 segundos
     gcTime: 1000 * 60 * 10,   // 10 minutos en memoria
-    refetchOnWindowFocus: false, // No refetch al cambiar de tab
-    refetchOnMount: false,       // No refetch automático (usa caché)
+    refetchOnWindowFocus: true,
     retry: 2,
   });
 

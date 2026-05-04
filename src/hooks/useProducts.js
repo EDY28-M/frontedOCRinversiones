@@ -24,14 +24,15 @@ const GC_TIME = 10 * 60 * 1000; // 10 minutos
  * Hook para obtener productos disponibles (con imágenes) con paginación del backend
  * Optimizado con React Query v5
  */
-export function useAvailableProducts({ page = 1, pageSize = 12, q = '', categoryId = null } = {}) {
+export function useAvailableProducts({ page = 1, pageSize = 12, q = '', categoryId = null, onlyActive = true } = {}) {
   // Memoizar filtros para evitar re-renders innecesarios
   const filters = useMemo(() => ({
     page,
     pageSize,
     q: q?.trim() || '',
     categoryId,
-  }), [page, pageSize, q, categoryId]);
+    onlyActive,
+  }), [page, pageSize, q, categoryId, onlyActive]);
 
   return useQuery({
     queryKey: productKeys.availableList(filters),
