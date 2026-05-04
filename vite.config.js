@@ -63,6 +63,8 @@ export default defineConfig(({ mode }) => ({
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           // React Query en chunk separado
           'query-vendor': ['@tanstack/react-query'],
+          // xlsx en chunk separado (solo se carga en admin bulk import)
+          'xlsx-vendor': ['xlsx'],
           // Utilidades
           'utils': ['axios'],
         },

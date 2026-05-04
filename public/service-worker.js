@@ -4,7 +4,7 @@
  * VERSIÓN 3: Más conservador para evitar errores de MIME type
  */
 
-const CACHE_NAME = 'orc-inversiones-v3';
+const CACHE_NAME = 'orc-inversiones-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -110,8 +110,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // ⚠️ NO interceptar assets JS/CSS con hash - el navegador los maneja mejor
-  // Esto evita errores de MIME type cuando el servidor devuelve HTML para rutas SPA
+  // ✅ Assets JS/CSS con hash: el navegador HTTP cache los maneja mejor (Nginx 1-year headers)
+  // NO interceptar — dejar que el browser cache nativo funcione sin overhead del SW
   if (HASHED_ASSETS.test(url)) {
     return;
   }
