@@ -39,15 +39,55 @@ const ImportProductsModal = ({
     { key: 'producto', label: 'Producto', required: true },
     { key: 'marca', label: 'Marca', required: true },
     { key: 'categoria', label: 'Categoría', required: true },
+    { key: 'descripcion', label: 'Descripción', required: false },
+    { key: 'fichaTecnica', label: 'Ficha Técnica', required: false },
+    { key: 'imagenPrincipal', label: 'Imagen Principal', required: false },
+    { key: 'imagen2', label: 'Imagen 2', required: false },
+    { key: 'imagen3', label: 'Imagen 3', required: false },
+    { key: 'imagen4', label: 'Imagen 4', required: false },
+    { key: 'activo', label: 'Activo', required: false },
+    { key: 'destacado', label: 'Destacado', required: false },
   ];
 
   // Palabras clave para mapeo automático
   const fieldKeywords = {
     codigo: ['codigo', 'código', 'code', 'sku', 'id'],
     codigoComercial: ['comercial', 'comer', 'commercial', 'cod comercial', 'código comercial'],
-    producto: ['producto', 'product', 'nombre', 'name', 'descripcion', 'descripción'],
+    producto: ['producto', 'product', 'nombre', 'name'],
     marca: ['marca', 'brand', 'nombre marca'],
     categoria: ['categoria', 'categoría', 'category', 'tipo', 'type'],
+    descripcion: ['descripcion', 'descripción', 'detalle'],
+    fichaTecnica: ['ficha tecnica', 'ficha técnica', 'especificaciones', 'specs'],
+    imagenPrincipal: ['imagen principal', 'imagenprincipal', 'imagen1', 'imagen 1', 'foto principal'],
+    imagen2: ['imagen2', 'imagen 2'],
+    imagen3: ['imagen3', 'imagen 3'],
+    imagen4: ['imagen4', 'imagen 4'],
+    activo: ['activo', 'active', 'estado'],
+    destacado: ['destacado', 'featured'],
+  };
+
+  // Normaliza valores booleanos provenientes del Excel (Sí/No, 1/0, true/false, etc.)
+  const parseBoolean = (raw, defaultValue) => {
+    if (raw === undefined || raw === null || raw === '') return defaultValue;
+    if (typeof raw === 'boolean') return raw;
+    const normalized = raw.toString().trim().toLowerCase();
+    if (['si', 'sí', 'true', '1', 'activo', 'destacado', 'yes', 'x'].includes(normalized)) return true;
+    if (['no', 'false', '0', 'inactivo', 'normal'].includes(normalized)) return false;
+    return defaultValue;
+  };
+
+  // Valida que la URL de imagen sea http/https o data:image, evita que el backend rechace todo el lote
+  const sanitizeImageUrl = (raw) => {
+    if (!raw) return '';
+    const trimmed = raw.toString().trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('data:image/')) return trimmed;
+    try {
+      const url = new URL(trimmed);
+      return ['http:', 'https:'].includes(url.protocol) ? trimmed : '';
+    } catch {
+      return '';
+    }
   };
 
   // Reset al cerrar
@@ -199,6 +239,16 @@ const ImportProductsModal = ({
         codigoComercial = codigo;
       }
 
+      // Campos opcionales (no bloquean la importación si faltan)
+      const descripcion = columnMapping.descripcion ? (row[columnMapping.descripcion]?.toString().trim() || '') : '';
+      const fichaTecnica = columnMapping.fichaTecnica ? (row[columnMapping.fichaTecnica]?.toString().trim() || '') : '';
+      const imagenPrincipal = sanitizeImageUrl(columnMapping.imagenPrincipal ? row[columnMapping.imagenPrincipal] : '');
+      const imagen2 = sanitizeImageUrl(columnMapping.imagen2 ? row[columnMapping.imagen2] : '');
+      const imagen3 = sanitizeImageUrl(columnMapping.imagen3 ? row[columnMapping.imagen3] : '');
+      const imagen4 = sanitizeImageUrl(columnMapping.imagen4 ? row[columnMapping.imagen4] : '');
+      const isActive = parseBoolean(columnMapping.activo ? row[columnMapping.activo] : undefined, true);
+      const isFeatured = parseBoolean(columnMapping.destacado ? row[columnMapping.destacado] : undefined, false);
+
       // Solo validar campos obligatorios vacíos
       const errors = [];
       if (!codigo) errors.push('Código vacío');
@@ -213,6 +263,14 @@ const ImportProductsModal = ({
         producto,
         marcaNombre,
         categoriaNombre,
+        descripcion: descripcion.slice(0, 5000),
+        fichaTecnica: fichaTecnica.slice(0, 10000),
+        imagenPrincipal,
+        imagen2,
+        imagen3,
+        imagen4,
+        isActive,
+        isFeatured,
         isValid: errors.length === 0,
         errors
       };
@@ -264,7 +322,15 @@ const ImportProductsModal = ({
         codigoComer: p.codigoComercial,
         producto: p.producto,
         marcaNombre: p.marcaNombre,
-        categoriaNombre: p.categoriaNombre
+        categoriaNombre: p.categoriaNombre,
+        descripcion: p.descripcion || null,
+        fichaTecnica: p.fichaTecnica || null,
+        imagenPrincipal: p.imagenPrincipal || null,
+        imagen2: p.imagen2 || null,
+        imagen3: p.imagen3 || null,
+        imagen4: p.imagen4 || null,
+        isActive: p.isActive,
+        isFeatured: p.isFeatured
       }));
 
       const result = await productService.bulkImportProducts(productsToImport);

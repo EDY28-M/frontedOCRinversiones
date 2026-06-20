@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import * as XLSX from 'xlsx';
 import { categoryService, nombreMarcaService } from '../../../services/productService';
 import { ErrorAlert, ConfirmModal, ImportProductsModal } from '../../../components/common';
 import { usePermissions } from '../../../hooks/usePermissions';
@@ -165,6 +166,30 @@ const Productos = () => {
     loadCategoriesAndMarcas();
   }, []);
 
+  const handleExport = () => {
+    const rows = productos.map(p => ({
+      'Código': p.codigo || '',
+      'Código Comercial': p.codigoComer || '',
+      'Producto': p.producto || '',
+      'Marca': p.marcaNombre || '',
+      'Categoría': p.categoryName || '',
+      'Descripción': p.descripcion || '',
+      'Ficha Técnica': p.fichaTecnica || '',
+      'Imagen Principal': p.imagenPrincipal || '',
+      'Imagen 2': p.imagen2 || '',
+      'Imagen 3': p.imagen3 || '',
+      'Imagen 4': p.imagen4 || '',
+      'Activo': p.isActive ? 'Sí' : 'No',
+      'Destacado': p.isFeatured ? 'Sí' : 'No'
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Productos');
+    const fecha = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(workbook, `productos_${fecha}.xlsx`);
+  };
+
   const handleImportSuccess = () => {
     queryClient.invalidateQueries({ queryKey: productKeys.all });
     queryClient.invalidateQueries({ queryKey: categoryKeys.all });
@@ -281,6 +306,15 @@ const Productos = () => {
               ELIMINAR TODO
             </button>
           )}
+          {/* Botón Exportar - Visible para quien puede ver productos */}
+          <button
+            onClick={handleExport}
+            disabled={productos.length === 0}
+            className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white hover:bg-green-700 transition-colors text-sm font-bold uppercase tracking-wide shadow-sm border border-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-[20px]">download</span>
+            EXPORTAR
+          </button>
           {/* Botón Importar - Solo Admin */}
           {can(PERMISSIONS.PRODUCTOS_CREATE) && (
             <button
