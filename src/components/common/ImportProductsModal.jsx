@@ -339,6 +339,7 @@ const ImportProductsModal = ({
       pendingResultRef.current = {
         success: true,
         imported: result.imported || 0,
+        updated: result.updated || 0,
         failed: result.failed || 0,
         skipped: processedProducts.filter(p => !p.isValid).length,
         duplicates: result.duplicates || 0,
@@ -740,20 +741,27 @@ const ImportProductsModal = ({
                 ¡Importación Completada!
               </h3>
 
-              <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-6">
+              <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto mb-6">
                 <div className="p-4 bg-green-50 border border-green-200">
                   <div className="text-2xl font-bold text-green-700">{importResult.imported}</div>
-                  <div className="text-xs text-green-600 uppercase">Productos Importados</div>
+                  <div className="text-xs text-green-600 uppercase">Nuevos</div>
+                </div>
+                <div className="p-4 bg-blue-50 border border-blue-200">
+                  <div className="text-2xl font-bold text-blue-700">{importResult.updated || 0}</div>
+                  <div className="text-xs text-blue-600 uppercase">Actualizados</div>
                 </div>
                 <div className="p-4 bg-orange-50 border border-orange-200">
                   <div className="text-2xl font-bold text-orange-700">{importResult.duplicates || 0}</div>
-                  <div className="text-xs text-orange-600 uppercase">Duplicados</div>
+                  <div className="text-xs text-orange-600 uppercase">Repetidos en archivo</div>
                 </div>
                 <div className="p-4 bg-red-50 border border-red-200">
                   <div className="text-2xl font-bold text-red-700">{importResult.failed}</div>
                   <div className="text-xs text-red-600 uppercase">Fallidos</div>
                 </div>
               </div>
+              <p className="text-xs text-slate-500 mb-6 -mt-2">
+                Los productos con código ya existente se actualizaron (excepto las imágenes, que se mantienen).
+              </p>
 
               {/* Entidades creadas */}
               {(importResult.marcasCreated > 0 || importResult.categoriasCreated > 0) && (
