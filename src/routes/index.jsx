@@ -71,7 +71,11 @@ const PrivateRoute = ({ children }) => {
     return null;
   }
 
-  return isAuthenticated ? children : <Navigate to="/admin/login" />;
+  const loginPath = typeof window !== 'undefined' && window.location.hostname.startsWith('admin.')
+    ? '/login'
+    : '/admin/login';
+
+  return isAuthenticated ? children : <Navigate to={loginPath} />;
 };
 
 // Wrapper para lazy loaded components
@@ -89,30 +93,50 @@ const AdminLazyWrapper = ({ children }) => (
 );
 
 const AppRoutes = () => {
+  // El portal admin/vendedor vive exclusivamente en admin.orcinversionesperu.com.
+  // En el dominio principal esas rutas no se renderizan (quedan inaccesibles).
+  const isAdminHost = typeof window !== 'undefined' && window.location.hostname.startsWith('admin.');
+
   return (
     <BrowserRouter>
       <Routes>
         {/* ========================================
             RUTAS PÚBLICAS - Diseño Pixel-Perfect
             Sin layout wrapper (cada página tiene header/footer propio)
+            Solo se renderizan en el dominio principal (no en admin.*)
             ======================================== */}
-        <Route path="/" element={<LazyWrapper><Inicio /></LazyWrapper>} />
-        <Route path="/productos" element={<LazyWrapper><Productos /></LazyWrapper>} />
-        <Route path="/catalogo" element={<Navigate to="/productos" replace />} />
-        <Route path="/envios-provincias" element={<LazyWrapper><Servicios /></LazyWrapper>} />
-        <Route path="/nosotros" element={<LazyWrapper><Nosotros /></LazyWrapper>} />
+        {!isAdminHost && (
+          <>
+            <Route path="/" element={<LazyWrapper><Inicio /></LazyWrapper>} />
+            <Route path="/productos" element={<LazyWrapper><Productos /></LazyWrapper>} />
+            <Route path="/catalogo" element={<Navigate to="/productos" replace />} />
+            <Route path="/envios-provincias" element={<LazyWrapper><Servicios /></LazyWrapper>} />
+            <Route path="/nosotros" element={<LazyWrapper><Nosotros /></LazyWrapper>} />
 
-        {/* Rutas legacy con PublicLayout (contacto usa el diseño antiguo) */}
-        <Route element={<LazyWrapper><PublicLayout /></LazyWrapper>}>
-          <Route path="contacto" element={<LazyWrapper><Contact /></LazyWrapper>} />
-        </Route>
+            {/* Rutas legacy con PublicLayout (contacto usa el diseño antiguo) */}
+            <Route element={<LazyWrapper><PublicLayout /></LazyWrapper>}>
+              <Route path="contacto" element={<LazyWrapper><Contact /></LazyWrapper>} />
+            </Route>
+          </>
+        )}
 
-        {/* LOGIN ROUTE */}
-        <Route path="/admin/login" element={<LazyWrapper><AdminLogin /></LazyWrapper>} />
-        <Route path="/admin/forgot-password" element={<LazyWrapper><ForgotPassword /></LazyWrapper>} />
-        <Route path="/admin/reset-password" element={<LazyWrapper><ResetPassword /></LazyWrapper>} />
+        {/* ========================================
+            PORTAL ADMIN/VENDEDOR - Solo en admin.orcinversionesperu.com
+            ======================================== */}
+        {isAdminHost && (
+          <>
+            {/* Raíz del subdominio y /login van directo al formulario de acceso */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/login" element={<LazyWrapper><AdminLogin /></LazyWrapper>} />
 
-        {/* ADMIN ROUTES - Solo para Administradores */}
+            {/* LOGIN ROUTE (se mantiene también en /admin/login por compatibilidad) */}
+            <Route path="/admin/login" element={<LazyWrapper><AdminLogin /></LazyWrapper>} />
+            <Route path="/admin/forgot-password" element={<LazyWrapper><ForgotPassword /></LazyWrapper>} />
+            <Route path="/admin/reset-password" element={<LazyWrapper><ResetPassword /></LazyWrapper>} />
+          </>
+        )}
+
+        {isAdminHost && (
         <Route path="/admin">
           {/* Admin Protected Routes (con layout) - SOLO ADMIN */}
           <Route
@@ -204,8 +228,9 @@ const AppRoutes = () => {
             } />
           </Route>
         </Route>
+        )}
 
-        {/* VENDEDOR ROUTES - Interfaz separada para vendedores SOLO */}
+        {isAdminHost && (
         <Route path="/vendedor">
           <Route
             element={
@@ -235,9 +260,10 @@ const AppRoutes = () => {
             } />
           </Route>
         </Route>
+        )}
 
         {/* FALLBACK */}
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<Navigate to={isAdminHost ? "/login" : "/"} />} />
       </Routes>
     </BrowserRouter>
   );

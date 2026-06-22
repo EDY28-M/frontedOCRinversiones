@@ -83,7 +83,7 @@ const AdminLayout = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/admin/login');
+    navigate(window.location.hostname.startsWith('admin.') ? '/login' : '/admin/login');
   };
 
   const toggleMenu = (menuKey) => {

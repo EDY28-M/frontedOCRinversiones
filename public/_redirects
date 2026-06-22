@@ -2,6 +2,3 @@
 # Cloudflare Workers handles SPA routing via the asset binding
 # Only keep explicit asset passthrough
 /assets/*  /assets/:splat  200
-
-# Subdominio admin.orcinversionesperu.com: la raíz va directo al login del panel
-https://admin.orcinversionesperu.com/  https://admin.orcinversionesperu.com/admin/login  301

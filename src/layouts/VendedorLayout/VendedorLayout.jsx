@@ -12,7 +12,7 @@ const VendedorLayout = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/admin/login');
+    navigate(window.location.hostname.startsWith('admin.') ? '/login' : '/admin/login');
   };
 
   // Cerrar sidebar al navegar en móvil
