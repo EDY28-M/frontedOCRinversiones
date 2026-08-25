@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import MobileMenu from '../../../components/common/MobileMenu';
 import WhatsAppButton from '../../../components/WhatsAppButton';
 import ProductDetailModal from '../../../components/ProductDetailModal';
+import VehicleSelectorCard from '../../../components/common/VehicleSelectorCard';
 import '../../../styles/inicio.css';
 import { usePublicFeaturedProducts } from '../../../hooks/usePublicFeaturedProducts';
 import { getFirstValidImageUrl } from '../../../utils/imageUtils';
@@ -154,35 +155,50 @@ export default function Inicio() {
 
                         {/* Contenido del Hero */}
                         <div className="absolute inset-0 flex items-center">
-                            <div className="page-container">
-                                <div className="max-w-[580px]">
-                                    <div className="inline-block px-3 py-1 bg-accent text-black text-xs font-bold uppercase tracking-wider mb-4 shadow-lg shadow-yellow-400/30">
-                                        Líderes en Importación
+                            <div className="page-container w-full">
+                                <div className="flex items-center justify-between gap-6 lg:gap-8">
+                                    {/* Contenido Original de Texto y Botones */}
+                                    <div className="max-w-[580px]">
+                                        <div className="inline-block px-3 py-1 bg-accent text-black text-xs font-bold uppercase tracking-wider mb-4 shadow-lg shadow-yellow-400/30">
+                                            Líderes en Importación
+                                        </div>
+                                        <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold uppercase text-white tracking-tight leading-none mb-4 md:mb-5" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }}>
+                                            Expertos en <br />
+                                            <span className="text-accent" style={{ textShadow: '0 0 20px rgba(255,204,0,0.5), 2px 2px 8px rgba(0,0,0,0.5)' }}>Repuestos</span> <br />
+                                            Coreanos, Chinos <br />
+                                            y <span className="text-accent" style={{ textShadow: '0 0 20px rgba(255,204,0,0.5), 2px 2px 8px rgba(0,0,0,0.5)' }}>Japoneses</span>
+                                        </h1>
+                                        <p className="text-base md:text-lg text-white max-w-md font-normal mb-6 md:mb-8 leading-relaxed border-l-4 border-accent pl-5" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
+                                            Más de 15 años de experiencia atendiendo talleres y flotas en Ate, Lima. Calidad garantizada para tu vehiculo.
+                                        </p>
+                                        <div className="flex flex-col sm:flex-row gap-3">
+                                            <Link to="/productos" className="bg-accent hover:bg-yellow-400 text-black px-6 py-3 font-bold uppercase tracking-wider text-xs transition-all shadow-lg shadow-yellow-500/40 hover:shadow-yellow-400/60 hover:scale-105 text-center">
+                                                Ver Catálogo
+                                            </Link>
+                                            <a
+                                                href="https://wa.me/51984244498?text=Hola%2C%20necesito%20más%20información%20sobre%20sus%20productos%20y%20servicios.%20¿Podrían%20ayudarme?"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="bg-white/10 backdrop-blur-md border-2 border-white/50 hover:bg-white hover:text-black text-white px-6 py-3 font-semibold uppercase tracking-wider text-xs transition-all hover:scale-105 text-center"
+                                            >
+                                                Contactar Asesor
+                                            </a>
+                                        </div>
                                     </div>
-                                    <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold uppercase text-white tracking-tight leading-none mb-4 md:mb-5" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.5)' }}>
-                                        Expertos en <br />
-                                        <span className="text-accent" style={{ textShadow: '0 0 20px rgba(255,204,0,0.5), 2px 2px 8px rgba(0,0,0,0.5)' }}>Repuestos</span> <br />
-                                        Coreanos, Chinos <br />
-                                        y <span className="text-accent" style={{ textShadow: '0 0 20px rgba(255,204,0,0.5), 2px 2px 8px rgba(0,0,0,0.5)' }}>Japoneses</span>
-                                    </h1>
-                                    <p className="text-base md:text-lg text-white max-w-md font-normal mb-6 md:mb-8 leading-relaxed border-l-4 border-accent pl-5" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
-                                        Más de 15 años de experiencia atendiendo talleres y flotas en Ate, Lima. Calidad garantizada para tu vehiculo.
-                                    </p>
-                                    <div className="flex flex-col sm:flex-row gap-3">
-                                        <Link to="/productos" className="bg-accent hover:bg-yellow-400 text-black px-6 py-3 font-bold uppercase tracking-wider text-xs transition-all shadow-lg shadow-yellow-500/40 hover:shadow-yellow-400/60 hover:scale-105 text-center">
-                                            Ver Catálogo
-                                        </Link>
-                                        <a
-                                            href="https://wa.me/51984244498?text=Hola%2C%20necesito%20más%20información%20sobre%20sus%20productos%20y%20servicios.%20¿Podrían%20ayudarme?"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="bg-white/10 backdrop-blur-md border-2 border-white/50 hover:bg-white hover:text-black text-white px-6 py-3 font-semibold uppercase tracking-wider text-xs transition-all hover:scale-105 text-center"
-                                        >
-                                            Contactar Asesor
-                                        </a>
+
+                                    {/* Selector en la derecha (Desktop) */}
+                                    <div className="hidden lg:block w-[350px] xl:w-[370px] flex-shrink-0">
+                                        <VehicleSelectorCard />
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Selector en Móvil/Tablet (Debajo del banner para no tapar la imagen) */}
+                    <div className="lg:hidden w-full bg-[#0a173e] py-6 px-4 border-b border-blue-900/50">
+                        <div className="max-w-md mx-auto">
+                            <VehicleSelectorCard />
                         </div>
                     </div>
                 </section>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useTransition, useDeferredValue } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { usePublicProducts } from './usePublicProducts.js';
 import { usePublicBrands } from './usePublicBrands.js';
 import { usePublicCategories } from './usePublicCategories.js';
@@ -6,10 +7,16 @@ import { usePublicCategories } from './usePublicCategories.js';
 // Hook para manejar filtros con paginación 100% server-side
 // Optimizado con useTransition para UI responsiva
 export const useProductFilters = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams] = useSearchParams();
+  const initialCat = searchParams.get('categoria') ? Number(searchParams.get('categoria')) : null;
+  const initialBrandParam = searchParams.get('marca') || searchParams.get('brandIds');
+  const initialBrands = initialBrandParam ? initialBrandParam.split(',').map(Number).filter(n => !isNaN(n) && n > 0) : [];
+  const initialSearch = searchParams.get('q') || '';
+
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedBrands, setSelectedBrands] = useState([]); // Array de números
+  const [selectedCategory, setSelectedCategory] = useState(initialCat);
+  const [selectedBrands, setSelectedBrands] = useState(initialBrands); // Array de números
   const pageSize = 12;
 
   // useTransition para cambios de filtro no urgentes
