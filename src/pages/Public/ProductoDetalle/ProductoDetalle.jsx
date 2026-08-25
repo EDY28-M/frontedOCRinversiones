@@ -311,6 +311,57 @@ export default function ProductoDetalle() {
                     CONSULTAR CON ASESOR
                   </button>
 
+                  {/* Envíos y Asesoría */}
+                  <div className="space-y-4 mb-6 pb-6 border-b border-gray-100">
+                    <div className="flex items-start gap-3">
+                      <span className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                        <span className="material-symbols-outlined text-[22px]">local_shipping</span>
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">Disponible envío a domicilio</p>
+                        <button
+                          type="button"
+                          onClick={() => openWhatsApp('consulta')}
+                          className="text-sm text-primary font-medium hover:underline"
+                        >
+                          Consultar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <span className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                        <span className="material-symbols-outlined text-[22px]">storefront</span>
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">Disponible retiro en tienda</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Av. Nicolás Ayllón 4329 - Ate, Lima</p>
+                        <button
+                          type="button"
+                          onClick={() => openWhatsApp('consulta')}
+                          className="text-sm text-primary font-medium hover:underline"
+                        >
+                          Consultar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <span className="w-10 h-10 rounded-full bg-[#25D366]/15 text-[#25D366] flex items-center justify-center shrink-0">
+                        <span className="material-symbols-outlined text-[22px]">chat</span>
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">Asesoría por WhatsApp</p>
+                        <button
+                          type="button"
+                          onClick={() => openWhatsApp('consulta')}
+                          className="text-sm text-[#25D366] font-medium hover:underline"
+                        >
+                          Escribir ahora
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                   <button
                     type="button"
                     onClick={() => navigate('/productos')}
