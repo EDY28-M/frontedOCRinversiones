@@ -1,10 +1,11 @@
 User-agent: *
 Allow: /
 Allow: /productos
+Allow: /repuestos/
 Allow: /nosotros
 Allow: /envios-provincias
 Disallow: /admin/
 Disallow: /vendedor/
 
-# Sitemap
+# Sitemap Principal
 Sitemap: https://orcinversionesperu.com/sitemap.xml

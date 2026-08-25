@@ -31,7 +31,7 @@ export function getProductUrl(product) {
   }
 
   const prodSlug = `${toSlug(cleanTitle)}-${product.id}`;
-  return `/${catSlug}/${marcaSlug}/${prodSlug}`;
+  return `/repuestos/${catSlug}/${marcaSlug}/${prodSlug}`;
 }
 
 export function extractIdFromSlug(slug) {
