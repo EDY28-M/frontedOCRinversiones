@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { usePublicCategories } from '../../hooks/usePublicCategories';
 import { usePublicSiteSettings } from '../../hooks/usePublicSiteSettings';
 import { resolveMediaUrl } from '../../utils/mediaUrl';
-import { toSlug } from '../../utils/slugUtils';
+import CategoryPartArt from './CategoryPartArt';
 
-const SHAPES = ['gear', 'hex', 'gasket', 'ring', 'plate'];
+const SHAPES = ['plate', 'gear', 'hex', 'gasket', 'ring'];
 
 function normalizeShape(value) {
   const key = String(value || '').toLowerCase();
-  return SHAPES.includes(key) ? key : 'gear';
+  return SHAPES.includes(key) ? key : 'plate';
 }
 
 function cleanDescription(value) {
@@ -17,16 +17,6 @@ function cleanDescription(value) {
   if (!text) return '';
   if (/^categor[ií]a importada/i.test(text)) return '';
   return text;
-}
-
-function fallbackPhoto(name) {
-  const n = String(name || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
-  if (n.includes('diesel') || n.includes('motor')) return '/images/parts-finder-piston.jpg';
-  if (n.includes('accesor') || n.includes('perno')) return '/images/parts-finder-hardware.jpg';
-  return '/images/parts-finder-tools.jpg';
 }
 
 function buildGearPath(cx, cy, teeth, rRoot, rTip, hole) {
@@ -48,141 +38,97 @@ function buildGearPath(cx, cy, teeth, rRoot, rTip, hole) {
 
 function ShapeFrame({ shape, gid }) {
   const steel = `url(#${gid}-steel)`;
+  const grad = (
+    <defs>
+      <linearGradient id={`${gid}-steel`} x1="0.15" y1="0" x2="0.9" y2="1">
+        <stop offset="0%" stopColor="#f8fafc" />
+        <stop offset="48%" stopColor="#94a3b8" />
+        <stop offset="100%" stopColor="#334155" />
+      </linearGradient>
+    </defs>
+  );
   if (shape === 'hex') {
     return (
-      <svg className="line-tile-frame" viewBox="0 0 200 200" aria-hidden="true">
-        <defs>
-          <linearGradient id={`${gid}-steel`} x1="0.2" y1="0" x2="0.9" y2="1">
-            <stop offset="0%" stopColor="#e2e8f0" />
-            <stop offset="55%" stopColor="#94a3b8" />
-            <stop offset="100%" stopColor="#334155" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M100 10 L176 54 L176 146 L100 190 L24 146 L24 54 Z M100 38 L158 72 L158 128 L100 162 L42 128 L42 72 Z"
-          fill={steel}
-          fillRule="evenodd"
-          stroke="#e2e8f0"
-          strokeWidth="1.2"
-        />
-        {[0, 60, 120, 180, 240, 300].map((deg) => {
-          const a = ((deg - 90) * Math.PI) / 180;
-          return <circle key={deg} cx={100 + Math.cos(a) * 78} cy={100 + Math.sin(a) * 78} r="5" fill="#1e293b" stroke="#facc15" strokeWidth="1.2" />;
-        })}
+      <svg className="line-card-frame" viewBox="0 0 200 200" aria-hidden="true">
+        {grad}
+        <path d="M100 12 L174 54 L174 146 L100 188 L26 146 L26 54 Z" fill="none" stroke={steel} strokeWidth="7" />
+        <path d="M100 12 L174 54 L174 146 L100 188 L26 146 L26 54 Z" fill="none" stroke="#0014cc" strokeWidth="1.1" />
       </svg>
     );
   }
   if (shape === 'gasket') {
     return (
-      <svg className="line-tile-frame" viewBox="0 0 220 160" aria-hidden="true">
-        <defs>
-          <linearGradient id={`${gid}-steel`} x1="0.1" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#f1f5f9" />
-            <stop offset="50%" stopColor="#94a3b8" />
-            <stop offset="100%" stopColor="#334155" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M28 16 H192 Q210 16 210 34 V126 Q210 144 192 144 H28 Q10 144 10 126 V34 Q10 16 28 16 Z M40 34 H180 Q190 34 190 44 V116 Q190 126 180 126 H40 Q30 126 30 116 V44 Q30 34 40 34 Z"
-          fill={steel}
-          fillRule="evenodd"
-          stroke="#e2e8f0"
-          strokeWidth="1.1"
-        />
+      <svg className="line-card-frame" viewBox="0 0 200 200" aria-hidden="true">
+        {grad}
+        <rect x="14" y="28" width="172" height="144" rx="18" fill="none" stroke={steel} strokeWidth="8" />
+        <rect x="14" y="28" width="172" height="144" rx="18" fill="none" stroke="#0014cc" strokeWidth="1" />
         {[
-          [22, 28],
-          [198, 28],
-          [22, 132],
-          [198, 132],
+          [24, 40],
+          [176, 40],
+          [24, 160],
+          [176, 160],
         ].map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r="6" fill="#1e293b" stroke="#facc15" strokeWidth="1.3" />
+          <circle key={i} cx={cx} cy={cy} r="5" fill="#0f172a" stroke="#facc15" strokeWidth="1.3" />
         ))}
       </svg>
     );
   }
   if (shape === 'ring') {
     return (
-      <svg className="line-tile-frame" viewBox="0 0 200 200" aria-hidden="true">
-        <defs>
-          <linearGradient id={`${gid}-steel`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#f8fafc" />
-            <stop offset="45%" stopColor="#94a3b8" />
-            <stop offset="100%" stopColor="#1e293b" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M100 8 A 92 92 0 1 1 99.9 8 Z M100 42 A 58 58 0 1 1 99.9 42 Z"
-          fill={steel}
-          fillRule="evenodd"
-          stroke="#e2e8f0"
-          strokeWidth="1.2"
-        />
-        <circle cx="100" cy="100" r="62" fill="none" stroke="#facc15" strokeWidth="4" />
+      <svg className="line-card-frame" viewBox="0 0 200 200" aria-hidden="true">
+        {grad}
+        <circle cx="100" cy="100" r="86" fill="none" stroke={steel} strokeWidth="10" />
+        <circle cx="100" cy="100" r="78" fill="none" stroke="#facc15" strokeWidth="2" />
       </svg>
     );
   }
-  if (shape === 'plate') {
+  if (shape === 'gear') {
+    const d = buildGearPath(100, 100, 18, 82, 94, 70);
     return (
-      <svg className="line-tile-frame" viewBox="0 0 220 150" aria-hidden="true">
-        <defs>
-          <linearGradient id={`${gid}-steel`} x1="0.2" y1="0" x2="0.8" y2="1">
-            <stop offset="0%" stopColor="#e2e8f0" />
-            <stop offset="55%" stopColor="#64748b" />
-            <stop offset="100%" stopColor="#334155" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M22 8 H198 L212 22 V128 L198 142 H22 L8 128 V22 Z M26 24 H194 L202 32 V118 L194 126 H26 L18 118 V32 Z"
-          fill={steel}
-          fillRule="evenodd"
-          stroke="#cbd5e1"
-          strokeWidth="1.1"
-        />
-        {[
-          [20, 20],
-          [200, 20],
-          [20, 130],
-          [200, 130],
-        ].map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r="5.5" fill="#0f172a" stroke="#facc15" strokeWidth="1.2" />
-        ))}
+      <svg className="line-card-frame" viewBox="0 0 200 200" aria-hidden="true">
+        {grad}
+        <path d={d} fill={steel} fillRule="evenodd" />
+        <circle cx="100" cy="100" r="72" fill="none" stroke="#facc15" strokeWidth="2" />
       </svg>
     );
   }
-  const ringPath = buildGearPath(100, 100, 20, 86, 98, 62);
   return (
-    <svg className="line-tile-frame" viewBox="0 0 200 200" aria-hidden="true">
-      <defs>
-        <linearGradient id={`${gid}-steel`} x1="0.15" y1="0" x2="0.9" y2="1">
-          <stop offset="0%" stopColor="#f1f5f9" />
-          <stop offset="45%" stopColor="#94a3b8" />
-          <stop offset="100%" stopColor="#334155" />
-        </linearGradient>
-      </defs>
-      <path d={ringPath} fill={steel} fillRule="evenodd" stroke="#e2e8f0" strokeWidth="1" />
-      <circle cx="100" cy="100" r="64" fill="none" stroke="#facc15" strokeWidth="3.5" />
+    <svg className="line-card-frame" viewBox="0 0 200 200" aria-hidden="true">
+      {grad}
+      <path d="M22 8 H178 L192 22 V178 L178 192 H22 L8 178 V22 Z" fill="none" stroke={steel} strokeWidth="6" />
+      <path d="M22 8 H178 L192 22 V178 L178 192 H22 L8 178 V22 Z" fill="none" stroke="#0014cc" strokeWidth="1" />
+      {[
+        [16, 16],
+        [184, 16],
+        [16, 184],
+        [184, 184],
+      ].map(([cx, cy], i) => (
+        <circle key={i} cx={cx} cy={cy} r="4.5" fill="#0f172a" stroke="#facc15" strokeWidth="1.2" />
+      ))}
     </svg>
   );
 }
 
-const LineTile = memo(function LineTile({ cat, shape }) {
+const LineCard = memo(function LineCard({ cat, shape }) {
   const uid = useId();
-  const gid = `lt${uid.replace(/[^a-zA-Z0-9]/g, '')}`;
-  const photo = resolveMediaUrl(cat.imageUrl) || fallbackPhoto(cat.name);
-  const to = `/productos?categoria=${cat.id}`;
+  const gid = `ln${uid.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const photo = resolveMediaUrl(cat.imageUrl);
 
   return (
-    <Link to={to} className={`line-tile is-${shape}`}>
-      <ShapeFrame shape={shape} gid={gid} />
-      <div className="line-tile-core">
-        <span className="line-tile-photo">
-          <img src={photo} alt="" />
-          {cat.overlayImageUrl ? (
-            <img src={resolveMediaUrl(cat.overlayImageUrl)} alt="" className="line-tile-overlay" />
-          ) : null}
-        </span>
+    <Link to={`/productos?categoria=${cat.id}`} className={`line-card is-${shape}`}>
+      <div className="line-card-art">
+        <ShapeFrame shape={shape} gid={`${gid}f`} />
+        {photo ? (
+          <img src={photo} alt="" className="line-card-photo" />
+        ) : (
+          <CategoryPartArt name={cat.name} gid={gid} />
+        )}
+      </div>
+      <div className="line-card-copy">
+        <p className="line-card-kicker">Línea de pieza</p>
         <h3>{cat.name}</h3>
-        {cat.description ? <p>{cat.description}</p> : null}
+        {cat.description ? <p className="line-card-desc">{cat.description}</p> : null}
+        <span className="line-card-go">Ver stock</span>
       </div>
     </Link>
   );
@@ -201,8 +147,6 @@ export default function CategoryLinesShowcase() {
           name: cat.name || cat.Name || '',
           description: cleanDescription(cat.description || cat.Description),
           imageUrl: cat.imageUrl || cat.ImageUrl || '',
-          overlayImageUrl: cat.overlayImageUrl || cat.OverlayImageUrl || '',
-          slug: toSlug(cat.name || cat.Name || ''),
         }))
         .filter((cat) => cat.id > 0 && cat.name),
     [categories]
@@ -213,21 +157,23 @@ export default function CategoryLinesShowcase() {
   return (
     <section className="line-showcase">
       <div className="page-container">
-        <header className="line-showcase-head">
-          <p>Almacén Ate</p>
-          <h2>Repuestos por línea</h2>
-          <span />
-        </header>
+        <div className="text-center mb-10">
+          <h3 className="font-display text-2xl md:text-3xl font-medium uppercase text-primary mb-2">
+            Repuestos por línea
+          </h3>
+          <div className="w-16 h-1 bg-accent mx-auto" />
+        </div>
 
         {isLoading ? (
           <div className="line-showcase-grid">
-            <div className="line-tile-skeleton" />
-            <div className="line-tile-skeleton" />
+            <div className="line-card-skeleton" />
+            <div className="line-card-skeleton" />
+            <div className="line-card-skeleton" />
           </div>
         ) : (
           <div className="line-showcase-grid">
             {list.map((cat) => (
-              <LineTile key={cat.id} cat={cat} shape={shape} />
+              <LineCard key={cat.id} cat={cat} shape={shape} />
             ))}
           </div>
         )}
@@ -237,16 +183,16 @@ export default function CategoryLinesShowcase() {
 }
 
 export const SHOWCASE_SHAPES = [
+  { id: 'plate', label: 'Placa' },
   { id: 'gear', label: 'Corona' },
   { id: 'hex', label: 'Tuerca' },
   { id: 'gasket', label: 'Empaque' },
   { id: 'ring', label: 'Anillo' },
-  { id: 'plate', label: 'Placa' },
 ];
 
 export function ShowcaseShapePreview({ shape }) {
   return (
-    <div className="relative w-full aspect-square bg-[#020617] overflow-hidden">
+    <div className="relative w-full aspect-square bg-white overflow-hidden">
       <ShapeFrame shape={normalizeShape(shape)} gid={`pv${shape}`} />
     </div>
   );

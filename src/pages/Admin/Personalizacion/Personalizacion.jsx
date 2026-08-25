@@ -195,7 +195,7 @@ export default function Personalizacion() {
           Forma de las líneas en inicio
         </h2>
         <p className="text-xs text-slate-500 mb-4">
-          Marco de pieza para la vitrina debajo de Especialistas en Marcas. El listado sale de Categorías: si creas, editas o borras una línea, se refleja en el inicio.
+          Marco de cada ficha (placa, corona, tuerca, empaque o anillo). El listado y el texto salen de Categorías; si creas, editas o borras una línea, el inicio se actualiza.
         </p>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {SHOWCASE_SHAPES.map((item) => {

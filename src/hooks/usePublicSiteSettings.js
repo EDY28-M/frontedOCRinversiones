@@ -17,7 +17,7 @@ export function usePublicSiteSettings() {
 
   return {
     logoUrl: data?.logoUrl || data?.LogoUrl || '',
-    showcaseShape: data?.showcaseShape || data?.ShowcaseShape || 'gear',
+    showcaseShape: data?.showcaseShape || data?.ShowcaseShape || 'plate',
     updatedAt: data?.updatedAt || data?.UpdatedAt || null,
     isLoading,
   };
