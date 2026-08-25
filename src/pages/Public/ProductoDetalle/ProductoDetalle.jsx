@@ -591,8 +591,73 @@ export default function ProductoDetalle() {
 
         <footer className="mt-auto flex-shrink-0 bg-primary text-white pt-10 pb-6 border-t-4 border-accent">
           <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-            <div className="flex flex-col md:flex-row justify-between items-center text-[10px] text-blue-200 uppercase tracking-widest gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="text-accent">
+                    <span className="material-symbols-outlined text-2xl">settings_b_roll</span>
+                  </div>
+                  <span className="text-xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
+                  <p className="text-accent text-[10px] font-bold uppercase tracking-[0.2em] leading-none mt-1">Inversiones Perú</p>
+                </div>
+                <p className="text-xs text-gray-200 leading-relaxed">
+                  Somos una empresa dedicada a la importación y venta de repuestos para vehículos chinos, japoneses y coreanos, ofreciendo calidad y precios competitivos.
+                </p>
+                <div className="flex gap-3">
+                  <a className="w-7 h-7 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
+                    <span className="text-[10px] font-bold">IG</span>
+                  </a>
+                  <a className="w-7 h-7 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
+                    <span className="text-[10px] font-bold">FB</span>
+                  </a>
+                  <a className="w-7 h-7 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-accent hover:text-secondary transition-colors" href="#">
+                    <span className="text-[10px] font-bold">TW</span>
+                  </a>
+                </div>
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-accent uppercase tracking-wider mb-4">Nuestra Empresa</h4>
+                <ul className="space-y-2">
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/nosotros">Sobre Nosotros</Link></li>
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/envios-provincias">Envíos a Provincias</Link></li>
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/productos">Catálogo</Link></li>
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/">Empresa</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-accent uppercase tracking-wider mb-4">Políticas</h4>
+                <ul className="space-y-2">
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Envíos y Entregas</a></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Devoluciones</a></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Garantía de Piezas</a></li>
+                  <li><a className="text-xs text-gray-200 hover:text-white transition-colors" href="#">Términos de Servicio</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-accent uppercase tracking-wider mb-4">Contacto</h4>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="material-symbols-outlined text-accent text-base mt-0.5">location_on</span>
+                    <a className="text-xs text-gray-200 hover:text-white transition-colors" href="https://maps.app.goo.gl/iA9sAQACR87o2Bsj7" target="_blank" rel="noopener noreferrer">Av. Nicolás Ayllón 4329 - Ate, Lima</a>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-accent text-base">mail</span>
+                    <a className="text-xs text-gray-200 hover:text-white" href="mailto:ventas@orcinversiones.com">ventas@orcinversiones.com</a>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-accent text-base">call</span>
+                    <span className="text-xs text-gray-200">984 244 498</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="flex flex-col md:flex-row justify-between items-center border-t border-blue-800 pt-6 text-[10px] text-blue-200 uppercase tracking-widest gap-4">
               <p>© {new Date().getFullYear()} ORC Inversiones Perú. Todos los derechos reservados.</p>
+              <div className="flex gap-6">
+                <a className="hover:text-white transition-colors" href="#">Facebook</a>
+                <a className="hover:text-white transition-colors" href="#">Instagram</a>
+                <a className="hover:text-white transition-colors" href="#">WhatsApp</a>
+              </div>
             </div>
           </div>
         </footer>
