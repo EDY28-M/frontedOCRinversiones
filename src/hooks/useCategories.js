@@ -128,7 +128,7 @@ export function useDeleteCategory() {
         queryClient.setQueryData(categoryKeys.list({}), context.previousData);
       }
       console.error('Error al eliminar categoría:', err);
-      showError('Error al eliminar la categoría. Puede tener productos asociados.');
+      showError(err?.data?.message || err.message || 'No se pudo eliminar la categoría. Si tiene productos, pásalos a otra categoría primero.');
     },
 
     onSuccess: () => {
@@ -162,7 +162,7 @@ export function useDeleteAllCategories() {
 
     onError: (err) => {
       console.error('Error al eliminar todas las categorías:', err);
-      showError('Error al eliminar todas las categorías');
+      showError(err?.data?.message || err.message || 'No se pudo eliminar todas las categorías');
       queryClient.invalidateQueries({ queryKey: categoryKeys.all });
     },
 

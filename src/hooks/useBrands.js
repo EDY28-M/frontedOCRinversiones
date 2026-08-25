@@ -126,7 +126,7 @@ export function useDeleteBrand() {
         queryClient.setQueryData(brandKeys.list({}), context.previousData);
       }
       console.error('Error al eliminar marca:', err);
-      showError('Error al eliminar la marca. Puede tener productos asociados.');
+      showError(err?.data?.message || err.message || 'No se pudo eliminar la marca. Si tiene productos, cámbialos de marca primero.');
     },
 
     onSuccess: () => {
@@ -159,7 +159,7 @@ export function useDeleteAllBrands() {
 
     onError: (err) => {
       console.error('Error al eliminar todas las marcas:', err);
-      showError('Error al eliminar todas las marcas');
+      showError(err?.data?.message || err.message || 'No se pudo eliminar todas las marcas');
       queryClient.invalidateQueries({ queryKey: brandKeys.all });
     },
 
