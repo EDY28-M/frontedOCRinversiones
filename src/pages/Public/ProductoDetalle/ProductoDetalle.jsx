@@ -448,8 +448,8 @@ export default function ProductoDetalle() {
 
                 <div className="pt-8 sm:pt-10 min-h-[280px]">
                   {activeTab === 'descripcion' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-                      <div className="lg:col-span-7 xl:col-span-8 min-w-0 order-2 lg:order-1">
+                    <div className="max-w-4xl">
+                      <div>
                         <div className="flex flex-wrap items-center gap-3 mb-5">
                           {product.marcaNombre && (
                             <span className="inline-flex items-center text-[11px] font-bold uppercase tracking-[0.14em] text-gray-900 border-2 border-gray-900 px-2.5 py-1 bg-white">
@@ -527,41 +527,6 @@ export default function ProductoDetalle() {
                             </>
                           );
                         })()}
-                      </div>
-
-                      <div className="lg:col-span-5 xl:col-span-4 order-1 lg:order-2">
-                        <div
-                          className="border-2 border-gray-800 bg-[#e8eaed] p-5 sm:p-6 flex items-center justify-center min-h-[220px] sm:min-h-[280px]"
-                          style={{
-                            backgroundImage:
-                              'linear-gradient(45deg, #e2e5e9 25%, transparent 25%), linear-gradient(-45deg, #e2e5e9 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e2e5e9 75%), linear-gradient(-45deg, transparent 75%, #e2e5e9 75%)',
-                            backgroundSize: '12px 12px',
-                            backgroundPosition: '0 0, 0 6px, 6px -6px, -6px 0',
-                            backgroundColor: '#eef0f3',
-                          }}
-                        >
-                          {currentImage ? (
-                            <img
-                              src={currentImage}
-                              alt={title}
-                              className="max-h-[240px] sm:max-h-[280px] w-full object-contain mix-blend-multiply"
-                            />
-                          ) : (
-                            <span className="material-symbols-outlined text-5xl text-gray-400">
-                              precision_manufacturing
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between gap-2 mt-2 px-0.5">
-                          <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-gray-500">
-                            Vista del repuesto
-                          </span>
-                          {product.codigo && (
-                            <span className="text-[11px] font-mono font-bold text-gray-800">
-                              {product.codigo}
-                            </span>
-                          )}
-                        </div>
                       </div>
                     </div>
                   )}
