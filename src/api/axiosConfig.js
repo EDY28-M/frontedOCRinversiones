@@ -42,6 +42,9 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
     
     // Agregar timestamp para evitar caché del navegador en GET requests
     if (config.method === 'get' && config.cache !== true) {

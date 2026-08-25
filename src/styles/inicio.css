@@ -294,107 +294,91 @@ a[aria-current="page"] .nav-link::after {
 }
 
 /* ========================================
-   FICHA DE ALMACÉN (hero) — caja de herramientas
-   Mismos materiales que el footer: primary + barra accent
+   SELECTOR DEL HERO — corona de diferencial
+   Pieza circular con dientes, cubo de vidrio.
    ======================================== */
 .parts-finder {
   position: relative;
-  margin-top: 12px;
-  background: #001aff;
-  color: #fff;
-  box-shadow:
-    0 18px 40px rgba(0, 8, 40, 0.5),
-    0 0 0 1px rgba(250, 204, 21, 0.28);
-}
-
-.parts-finder-handle {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 46%;
-  height: 22px;
-  z-index: 3;
-  background: linear-gradient(180deg, #fde047 0%, #facc15 45%, #ca8a04 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(254, 249, 195, 0.75),
-    0 2px 4px rgba(0, 0, 0, 0.25);
-}
-
-.parts-finder-handle-grip {
-  position: absolute;
-  left: 14%;
-  right: 14%;
-  top: 7px;
-  height: 7px;
-  background: #0014cc;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
-}
-
-.parts-finder-rivet {
-  position: absolute;
-  top: 50%;
-  width: 8px;
-  height: 8px;
-  margin-top: -4px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #fefce8, #a16207 70%);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
-}
-
-.parts-finder-rivet-left {
-  left: 6px;
-}
-
-.parts-finder-rivet-right {
-  right: 6px;
-}
-
-.parts-finder-lid {
-  position: relative;
-  height: 78px;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  flex-shrink: 0;
   overflow: hidden;
-  background: #001aff;
+  color: #fff;
+  filter: drop-shadow(0 18px 32px rgba(0, 8, 40, 0.5));
 }
 
-.parts-finder-lid img {
+.parts-finder-chrome {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: 50% 58%;
-  display: block;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.parts-finder-lid::after {
-  content: '';
+.parts-finder-glass {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, transparent 35%, #001aff 100%);
+  inset: 16%;
+  border-radius: 50%;
+  background: rgba(0, 16, 120, 0.26);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 2;
   pointer-events: none;
 }
 
-.parts-finder-seam {
-  height: 4px;
-  background: #facc15;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
-}
-
-.parts-finder-body {
-  position: relative;
-  padding: 0.95rem 1.1rem 0.9rem;
-}
-
-.parts-finder-body::before {
-  content: '';
+.parts-finder-form {
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.045;
-  background-image: repeating-linear-gradient(
-    -45deg,
-    #ffffff 0 1px,
-    transparent 1px 9px
-  );
+  inset: 21% 22% 23%;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.65rem;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.parts-finder-form.is-compact {
+  inset: 19% 21% 20%;
+  gap: 0.38rem;
+}
+
+.parts-finder-form.is-compact > header h3 {
+  font-size: 20px;
+}
+
+.parts-finder-form.is-compact .parts-finder-select {
+  padding: 0.42rem 2.1rem 0.42rem 0.6rem;
+}
+
+.parts-finder-form.is-compact .parts-finder-submit {
+  padding: 0.55rem 0.7rem;
+}
+
+.parts-finder-form > header,
+.parts-finder-form > .parts-finder-submit {
+  flex: 0 0 auto;
+}
+
+.parts-finder-form > .parts-finder-submit {
+  margin-top: 0.15rem;
+}
+
+.parts-finder-block {
+  flex: 0 0 auto;
+}
+
+.parts-finder-block-lines {
+  flex: 0 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .parts-finder-label {
@@ -411,13 +395,13 @@ a[aria-current="page"] .nav-link::after {
 .parts-finder-select {
   width: 100%;
   appearance: none;
-  background: rgba(0, 10, 90, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(0, 10, 70, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   color: #fff;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.25;
-  padding: 0.7rem 2.25rem 0.7rem 0.75rem;
+  padding: 0.55rem 2.25rem 0.55rem 0.7rem;
   outline: none;
   cursor: pointer;
   border-radius: 0;
@@ -451,48 +435,66 @@ a[aria-current="page"] .nav-link::after {
   pointer-events: none;
 }
 
-.parts-finder-logos {
-  display: flex;
+.parts-finder-empty {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.parts-finder-chips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: min-content;
+  align-content: start;
+  gap: 8px;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  max-height: 8.8rem;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(250, 204, 21, 0.7) transparent;
+}
+
+.parts-finder-chips.is-single {
+  grid-template-columns: 1fr;
+}
+
+.parts-finder-chips.is-single .parts-finder-chip-photo {
+  height: 64px;
+}
+
+.parts-finder-chips.is-many {
   gap: 6px;
+  max-height: 7.2rem;
 }
 
-.parts-finder-logo {
-  flex: 1 1 0;
-  min-width: 0;
-  height: 40px;
-  padding: 0 0.4rem;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: box-shadow 160ms ease, border-color 160ms ease, transform 160ms ease;
+.parts-finder-chips.is-many .parts-finder-chip-photo {
+  height: 36px;
 }
 
-.parts-finder-logo img {
-  height: 22px;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-  display: block;
+.parts-finder-chips.is-many .parts-finder-chip-name {
+  padding: 0.16rem 0.3rem 0.2rem;
+  font-size: 9px;
 }
 
-.parts-finder-logo:hover {
-  transform: translateY(-1px);
+.parts-finder-chips::-webkit-scrollbar {
+  width: 4px;
 }
 
-.parts-finder-logo.is-active {
-  border-color: #facc15;
-  box-shadow: 0 0 0 2px #facc15;
+.parts-finder-chips::-webkit-scrollbar-thumb {
+  background: rgba(250, 204, 21, 0.75);
 }
 
 .parts-finder-chip {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  background: rgba(0, 10, 90, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  flex: 0 0 auto;
+  min-height: 0;
+  background: rgba(0, 10, 70, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   cursor: pointer;
   text-align: left;
   overflow: hidden;
@@ -511,9 +513,20 @@ a[aria-current="page"] .nav-link::after {
 
 .parts-finder-chip-photo {
   display: block;
-  height: 42px;
+  position: relative;
+  flex: 0 0 auto;
+  height: 52px;
   overflow: hidden;
-  background: #001aff;
+  background: rgba(0, 26, 255, 0.25);
+}
+
+.parts-finder-chip-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
 }
 
 .parts-finder-chip-photo img {
@@ -525,13 +538,14 @@ a[aria-current="page"] .nav-link::after {
 }
 
 .parts-finder-chip-name {
+  flex: 0 0 auto;
   font-family: 'Oswald', sans-serif;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #fff;
-  padding: 0.4rem 0.5rem 0.5rem;
+  padding: 0.28rem 0.4rem 0.35rem;
   line-height: 1.15;
 }
 
@@ -547,10 +561,10 @@ a[aria-current="page"] .nav-link::after {
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 0.75rem;
   border: 0;
   cursor: pointer;
-  box-shadow: 0 8px 18px rgba(250, 204, 21, 0.28);
+  box-shadow: 0 8px 16px rgba(250, 204, 21, 0.28);
   transition: background 160ms ease, transform 160ms ease;
 }
 
@@ -562,12 +576,81 @@ a[aria-current="page"] .nav-link::after {
   transform: scale(0.99);
 }
 
-.parts-finder-legend {
-  margin-top: 0.7rem;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(191, 219, 254, 0.85);
-  text-align: center;
-  font-weight: 500;
+@media (max-width: 1023px) {
+  .parts-finder-form {
+    inset: 19% 20% 22%;
+    gap: 0.5rem;
+  }
+
+  .parts-finder-form.is-compact {
+    inset: 17.5% 19% 19%;
+    gap: 0.32rem;
+  }
+
+  .parts-finder-form > header p {
+    margin-bottom: 0.25rem;
+  }
+
+  .parts-finder-form > header h3 {
+    font-size: 20px;
+  }
+
+  .parts-finder-label {
+    margin-bottom: 0.28rem;
+  }
+
+  .parts-finder-select {
+    padding: 0.5rem 2.1rem 0.5rem 0.65rem;
+    font-size: 13px;
+  }
+
+  .parts-finder-submit {
+    padding: 0.62rem 0.7rem;
+    font-size: 11px;
+  }
+
+  .parts-finder-chip-photo {
+    height: 40px;
+  }
+
+  .parts-finder-chips {
+    max-height: 7.4rem;
+    gap: 6px;
+  }
+
+  .parts-finder-chips.is-single .parts-finder-chip-photo {
+    height: 48px;
+  }
+
+  .parts-finder-chips.is-many {
+    max-height: 6.6rem;
+  }
+
+  .parts-finder-chips.is-many .parts-finder-chip-photo {
+    height: 30px;
+  }
+
+  .parts-finder-chip-name {
+    padding: 0.22rem 0.4rem 0.28rem;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .parts-finder-form {
+    inset: 18% 19% 21%;
+    gap: 0.42rem;
+  }
+
+  .parts-finder-form > header h3 {
+    font-size: 18px;
+  }
+
+  .parts-finder-chip-photo {
+    height: 34px;
+  }
+
+  .parts-finder-chips.is-many .parts-finder-chip-photo {
+    height: 28px;
+  }
 }

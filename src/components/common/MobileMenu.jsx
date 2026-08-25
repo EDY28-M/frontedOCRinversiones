@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useEffect } from 'react';
+import SiteLogo from './SiteLogo';
 
 /**
  * MobileMenu - Slide-over drawer navigation
@@ -34,13 +35,7 @@ const MobileMenu = ({ isOpen, onClose }) => {
 
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                    <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-primary text-3xl">settings_b_roll</span>
-                        <div>
-                            <h2 className="text-xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h2>
-                            <p className="text-accent text-[10px] font-bold uppercase tracking-[0.2em] leading-none mt-1">Inversiones Perú</p>
-                        </div>
-                    </div>
+                    <SiteLogo variant="mobile" />
                     <button
                         onClick={onClose}
                         className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors"

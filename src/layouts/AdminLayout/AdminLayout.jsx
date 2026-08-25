@@ -3,6 +3,7 @@ import { Outlet, useNavigate, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import { PERMISSIONS } from '../../utils/permissions';
+import SiteLogo from '../../components/common/SiteLogo';
 
 // Componente de menú acordeón expandible
 const AccordionMenuItem = ({ item, isExpanded, onToggle, currentPath, onNavigate }) => {
@@ -75,6 +76,7 @@ const AdminLayout = () => {
     if (location.pathname.includes('/categorias')) return 'categorias';
     if (location.pathname.includes('/nombre-marca')) return 'nombremarca';
     if (location.pathname.includes('/usuarios')) return 'usuarios';
+    if (location.pathname.includes('/personalizacion')) return 'personalizacion';
     return 'productos'; // Por defecto abrir productos
   });
 
@@ -161,9 +163,18 @@ const AdminLayout = () => {
         ],
       });
     }
+
+    if (isAdmin()) {
+      items.push({
+        key: 'personalizacion',
+        path: '/admin/personalizacion',
+        icon: 'palette',
+        label: 'Personalización',
+      });
+    }
     
     return items;
-  }, [can]);
+  }, [can, isAdmin]);
 
   const getBreadcrumb = () => {
     const path = location.pathname;
@@ -177,6 +188,7 @@ const AdminLayout = () => {
     if (path.includes('/usuarios/editar')) return 'Editar Usuario';
     if (path.includes('/usuarios')) return 'Listado de Usuarios';
     if (path.includes('/configuracion')) return 'Configuración';
+    if (path.includes('/personalizacion')) return 'Personalización';
     return 'Administración';
   };
 
@@ -199,24 +211,40 @@ const AdminLayout = () => {
       `}>
         {/* Logo Section */}
         <div className="flex items-center justify-center py-3 px-6 border-b border-[#1e293b]">
-          <img 
-            src="/logo_orc-removebg-preview.png" 
-            alt="ORC Inversiones" 
-            className="h-20 w-auto object-contain"
-          />
+          <SiteLogo variant="admin" />
         </div>
 
         {/* Navigation - Menú Acordeón */}
         <nav className="flex-1 flex flex-col gap-1 p-4 overflow-y-auto">
           {menuItems.map((item) => (
-            <AccordionMenuItem
-              key={item.key}
-              item={item}
-              isExpanded={expandedMenu === item.key}
-              onToggle={() => toggleMenu(item.key)}
-              currentPath={location.pathname}
-              onNavigate={closeSidebar}
-            />
+            item.children ? (
+              <AccordionMenuItem
+                key={item.key}
+                item={item}
+                isExpanded={expandedMenu === item.key}
+                onToggle={() => toggleMenu(item.key)}
+                currentPath={location.pathname}
+                onNavigate={closeSidebar}
+              />
+            ) : (
+              <NavLink
+                key={item.key}
+                to={item.path}
+                onClick={closeSidebar}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 transition-colors group w-full text-left ${
+                    isActive
+                      ? 'bg-blue-600 text-white font-bold'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`
+                }
+              >
+                <span className="material-symbols-outlined group-hover:text-[#F5C344] transition-colors">
+                  {item.icon}
+                </span>
+                <span className="text-sm font-medium">{item.label}</span>
+              </NavLink>
+            )
           ))}
         </nav>
 

@@ -133,6 +133,11 @@ export default defineConfig(({ mode }) => ({
         changeOrigin: true,
         secure: false,
       },
+      '/uploads': {
+        target: 'http://localhost:5095',
+        changeOrigin: true,
+        secure: false,
+      },
     },
     // HMR auto-detecta el host desde la URL del navegador
     hmr: {

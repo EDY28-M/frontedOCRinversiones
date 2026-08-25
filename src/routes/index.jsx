@@ -63,6 +63,7 @@ const NombreMarcaEdit = lazyWithRetry(() => import('../pages/Admin/NombreMarca/N
 const UsuariosList = lazyWithRetry(() => import('../pages/Admin/Usuarios/UsuariosList'));
 const UsuariosCreate = lazyWithRetry(() => import('../pages/Admin/Usuarios/UsuariosCreate'));
 const UsuariosEdit = lazyWithRetry(() => import('../pages/Admin/Usuarios/UsuariosEdit'));
+const Personalizacion = lazyWithRetry(() => import('../pages/Admin/Personalizacion/Personalizacion'));
 
 // Private Route Component for Admin
 const PrivateRoute = ({ children }) => {
@@ -231,6 +232,10 @@ const AppRoutes = () => {
               <ProtectedRoute permission={PERMISSIONS.USUARIOS_EDIT}>
                 <LazyWrapper><UsuariosEdit /></LazyWrapper>
               </ProtectedRoute>
+            } />
+
+            <Route path="personalizacion" element={
+              <AdminLazyWrapper><Personalizacion /></AdminLazyWrapper>
             } />
           </Route>
         </Route>

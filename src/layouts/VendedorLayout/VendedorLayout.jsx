@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import SiteLogo from '../../components/common/SiteLogo';
 
 const VendedorLayout = () => {
   const { user, logout } = useAuth();
@@ -46,11 +47,7 @@ const VendedorLayout = () => {
       `}>
         {/* Logo Section */}
         <div className="flex items-center justify-center py-3 px-6 border-b border-[#1e293b]">
-          <img 
-            src="/logo_orc-removebg-preview.png" 
-            alt="ORC Inversiones" 
-            className="h-20 w-auto object-contain"
-          />
+          <SiteLogo variant="admin" />
         </div>
 
         {/* Navigation - Solo productos para vendedor */}

@@ -125,6 +125,16 @@ export const publicProductsApi = {
       return [];
     }
   },
+
+  getSiteSettings: async () => {
+    try {
+      const response = await publicAxios.get('/site-settings/public');
+      return response.data || {};
+    } catch (error) {
+      console.warn('Ajustes públicos no disponibles:', error.message);
+      return {};
+    }
+  },
 };
 
 export default publicAxios;

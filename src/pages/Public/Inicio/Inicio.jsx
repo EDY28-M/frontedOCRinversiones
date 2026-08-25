@@ -4,6 +4,7 @@ import MobileMenu from '../../../components/common/MobileMenu';
 import WhatsAppButton from '../../../components/WhatsAppButton';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 import VehicleSelectorCard from '../../../components/common/VehicleSelectorCard';
+import SiteLogo from '../../../components/common/SiteLogo';
 import '../../../styles/inicio.css';
 import { usePublicFeaturedProducts } from '../../../hooks/usePublicFeaturedProducts';
 import { getFirstValidImageUrl } from '../../../utils/imageUtils';
@@ -54,15 +55,7 @@ export default function Inicio() {
             {/* ==================== HEADER ==================== */}
             <header className="flex-shrink-0 w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                 <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
-                    <div className="flex items-center gap-3 min-w-fit">
-                        <div className="text-primary">
-                            <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
-                        </div>
-                        <div>
-                            <span className="text-2xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
-                            <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none mt-1">Inversiones Perú</p>
-                        </div>
-                    </div>
+                    <SiteLogo />
                     <nav className="hidden md:flex items-center gap-8">
                         <NavLink
                             to="/"
@@ -187,7 +180,7 @@ export default function Inicio() {
                                     </div>
 
                                     {/* Ficha de almacén (desktop) */}
-                                    <div className="hidden lg:block w-[340px] xl:w-[372px] flex-shrink-0">
+                                    <div className="hidden lg:block w-[400px] xl:w-[460px] flex-shrink-0 self-center">
                                         <VehicleSelectorCard />
                                     </div>
                                 </div>
@@ -196,8 +189,8 @@ export default function Inicio() {
                     </div>
 
                     {/* Ficha de almacén en móvil/tablet, debajo del banner */}
-                    <div className="lg:hidden w-full bg-surface-alt py-6 px-4 border-b border-gray-100">
-                        <div className="max-w-md mx-auto">
+                    <div className="lg:hidden w-full bg-[#0014cc] pt-8 pb-24 px-4 border-b border-blue-900/40">
+                        <div className="max-w-[420px] mx-auto">
                             <VehicleSelectorCard />
                         </div>
                     </div>
@@ -431,13 +424,7 @@ export default function Inicio() {
                     <div className="max-w-[1400px] mx-auto px-6 md:px-12">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                             <div className="flex flex-col gap-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="text-accent">
-                                        <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
-                                    </div>
-                                    <span className="text-2xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
-                                    <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none mt-1">Inversiones Perú</p>
-                                </div>
+                                <SiteLogo variant="footer" iconClassName="text-accent" />
                                 <p className="text-sm text-gray-200 leading-relaxed">
                                     Somos una empresa dedicada a la importación y venta de repuestos para vehículos chinos, japoneses y coreanos, ofreciendo calidad y precios competitivos.
                                 </p>

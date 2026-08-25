@@ -7,9 +7,9 @@ const WhatsAppButton = () => {
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
     return (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
-            {/* Número de WhatsApp visible */}
-            <div className="bg-green-600 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 animate-bounce-subtle">
+        <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-3">
+            {/* Número visible desde tablet; en móvil solo el botón para no tapar el selector */}
+            <div className="hidden sm:flex bg-green-600 text-white px-4 py-2 rounded-full shadow-lg items-center gap-2 animate-bounce-subtle">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
                 </svg>
@@ -21,7 +21,7 @@ const WhatsAppButton = () => {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative flex items-center justify-center w-16 h-16 bg-green-500 rounded-full shadow-lg hover:bg-green-600 hover:scale-110 transition-all duration-300 group"
+                className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-green-500 rounded-full shadow-lg hover:bg-green-600 hover:scale-110 transition-all duration-300 group"
                 aria-label="Contactar por WhatsApp"
             >
                 {/* WhatsApp Icon */}

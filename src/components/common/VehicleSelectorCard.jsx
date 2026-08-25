@@ -2,25 +2,9 @@ import React, { useId, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePublicBrands } from '../../hooks/usePublicBrands';
 import { usePublicCategories } from '../../hooks/usePublicCategories';
+import { resolveMediaUrl } from '../../utils/mediaUrl';
 
 const FEATURED_BRANDS = ['JAC', 'FOTON', 'TOYOTA', 'CUMMINS'];
-
-const BRAND_LOGOS = {
-  jac: '/svg logos/Logo_jac.svg',
-  foton: '/svg logos/FOTON.svg',
-  jmc: '/svg logos/JMC.svg',
-  cummins: '/svg logos/Cummins_logo.svg',
-  dfm: '/svg logos/DFM.svg',
-  xce: '/svg logos/XCE.svg',
-  yuchai: '/svg logos/YUCHAI.svg',
-  juylong: '/svg logos/juylong.svg',
-  toyota: '/svg_japneses_coreanos/toyoya.svg',
-  hyundai: '/svg_japneses_coreanos/hyunday.svg',
-  mitsubishi: '/svg_japneses_coreanos/motors.svg',
-  nissan: '/svg_japneses_coreanos/nissan.svg',
-  isuzu: '/svg_japneses_coreanos/isuzu.svg',
-  hino: '/svg_japneses_coreanos/Hino-logo.svg',
-};
 
 function normalizeKey(value) {
   return String(value || '')
@@ -30,11 +14,7 @@ function normalizeKey(value) {
     .toLowerCase();
 }
 
-function logoForBrand(nombre) {
-  return BRAND_LOGOS[normalizeKey(nombre)] || null;
-}
-
-function categoryVisual(name) {
+function fallbackCategoryVisual(name) {
   const n = normalizeKey(name);
   if (n.includes('diesel') || n.includes('motor') || n.includes('piston')) {
     return '/images/parts-finder-piston.jpg';
@@ -47,26 +27,104 @@ function categoryVisual(name) {
   return '/images/parts-finder-tools.jpg';
 }
 
+function withCacheBust(url, version) {
+  if (!url) return '';
+  if (!version) return url;
+  const stamp = Date.parse(version);
+  const token = Number.isNaN(stamp) ? encodeURIComponent(String(version)) : String(stamp);
+  return `${url}${url.includes('?') ? '&' : '?'}v=${token}`;
+}
+
+function categoryPhotoSrc(url, version, name) {
+  const resolved = resolveMediaUrl(url);
+  if (!resolved) return fallbackCategoryVisual(name);
+  return withCacheBust(resolved, version);
+}
+
 function MechChevron() {
   return (
     <svg viewBox="0 0 12 8" className="w-3 h-2.5" fill="none" aria-hidden="true">
+      <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="miter" />
+    </svg>
+  );
+}
+
+function buildCrownPath(cx, cy, teeth, rRoot, rTip) {
+  const pts = [];
+  for (let i = 0; i < teeth; i += 1) {
+    const a = (i / teeth) * Math.PI * 2 - Math.PI / 2;
+    const span = (Math.PI * 2) / teeth;
+    const t0 = a + span * 0.1;
+    const t1 = a + span * 0.3;
+    const t2 = a + span * 0.7;
+    const t3 = a + span * 0.9;
+    pts.push(
+      [cx + rRoot * Math.cos(t0), cy + rRoot * Math.sin(t0)],
+      [cx + rTip * Math.cos(t1), cy + rTip * Math.sin(t1)],
+      [cx + rTip * Math.cos(t2), cy + rTip * Math.sin(t2)],
+      [cx + rRoot * Math.cos(t3), cy + rRoot * Math.sin(t3)]
+    );
+  }
+  return `M${pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(' L')} Z`;
+}
+
+function CrownGear({ gid }) {
+  const cx = 250;
+  const cy = 250;
+  const ringPath = useMemo(() => {
+    const outer = buildCrownPath(cx, cy, 36, 214, 248);
+    const hole = `M ${cx} ${cy - 176} A 176 176 0 1 1 ${cx} ${cy + 176} A 176 176 0 1 1 ${cx} ${cy - 176}`;
+    return `${outer} ${hole}`;
+  }, []);
+  const bolts = useMemo(
+    () =>
+      Array.from({ length: 8 }, (_, i) => {
+        const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+        return {
+          cx: cx + Math.cos(a) * 196,
+          cy: cy + Math.sin(a) * 196,
+        };
+      }),
+    []
+  );
+
+  return (
+    <svg className="parts-finder-chrome" viewBox="0 0 500 500" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id={`${gid}-steel`} x1="0.15" y1="0" x2="0.9" y2="1">
+          <stop offset="0%" stopColor="#f1f5f9" />
+          <stop offset="45%" stopColor="#94a3b8" />
+          <stop offset="100%" stopColor="#334155" />
+        </linearGradient>
+      </defs>
+
       <path
-        d="M1 1.5L6 6.5L11 1.5"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinejoin="miter"
+        d={ringPath}
+        fill={`url(#${gid}-steel)`}
+        fillRule="evenodd"
+        stroke="#e2e8f0"
+        strokeWidth="1.1"
       />
+      <circle cx={cx} cy={cy} r="182" fill="none" stroke="#facc15" strokeWidth="7" />
+      <circle cx={cx} cy={cy} r="174" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" />
+
+      {bolts.map((bolt, i) => (
+        <g key={i}>
+          <circle cx={bolt.cx} cy={bolt.cy} r="9.5" fill="#1e293b" stroke="#facc15" strokeWidth="1.6" />
+          <circle cx={bolt.cx} cy={bolt.cy} r="3.2" fill="#cbd5e1" />
+        </g>
+      ))}
     </svg>
   );
 }
 
 /**
- * Ficha de almacén del hero: caja de herramientas ORC (azul + amarillo)
- * para filtrar el catálogo por marca y línea, con piezas reales, no iconos.
+ * Selector del hero: corona de diferencial, vidrio en el cubo.
  */
 export default function VehicleSelectorCard({ className = '' }) {
   const navigate = useNavigate();
   const uid = useId();
+  const gid = `cg${uid.replace(/[^a-zA-Z0-9]/g, '')}`;
   const { brands = [], isLoading: isLoadingBrands } = usePublicBrands();
   const { categories = [], isLoading: isLoadingCategories } = usePublicCategories();
 
@@ -99,22 +157,16 @@ export default function VehicleSelectorCard({ className = '' }) {
         .map((cat) => ({
           id: Number(cat.Id || cat.id),
           name: cat.Name || cat.name || cat.Nombre || cat.nombre || '',
+          imageUrl: cat.imageUrl || cat.ImageUrl || '',
+          overlayImageUrl: cat.overlayImageUrl || cat.OverlayImageUrl || '',
+          updatedAt: cat.updatedAt || cat.UpdatedAt || '',
         }))
         .filter((cat) => cat.id > 0 && cat.name),
     [categories]
   );
 
-  const featuredLogos = useMemo(() => {
-    return FEATURED_BRANDS.map((label) => {
-      const brand = brandList.find((item) => normalizeKey(item.nombre) === normalizeKey(label));
-      if (!brand) return null;
-      const src = logoForBrand(brand.nombre);
-      if (!src) return null;
-      return { ...brand, src, label };
-    }).filter(Boolean);
-  }, [brandList]);
-
-  const useCategoryChips = categoryList.length > 0 && categoryList.length <= 4;
+  const isSingleChip = categoryList.length === 1;
+  const isManyChips = categoryList.length > 2;
 
   const handleSearch = (e) => {
     e?.preventDefault();
@@ -125,11 +177,6 @@ export default function VehicleSelectorCard({ className = '' }) {
     navigate(queryString ? `/productos?${queryString}` : '/productos');
   };
 
-  const toggleBrand = (id) => {
-    const value = String(id);
-    setSelectedBrand((prev) => (prev === value ? '' : value));
-  };
-
   const toggleCategory = (id) => {
     const value = String(id);
     setSelectedCategory((prev) => (prev === value ? '' : value));
@@ -137,151 +184,103 @@ export default function VehicleSelectorCard({ className = '' }) {
 
   return (
     <div className={`parts-finder ${className}`}>
-      <div className="parts-finder-handle" aria-hidden="true">
-        <span className="parts-finder-handle-grip" />
-        <span className="parts-finder-rivet parts-finder-rivet-left" />
-        <span className="parts-finder-rivet parts-finder-rivet-right" />
-      </div>
+      <CrownGear gid={gid} />
+      <div className="parts-finder-glass" />
 
-      <div className="parts-finder-lid">
-        <img
-          src="/images/parts-finder-wrench.jpg"
-          alt=""
-          width="640"
-          height="360"
-          decoding="async"
-        />
-      </div>
-
-      <div className="parts-finder-seam" />
-
-      <form onSubmit={handleSearch} className="parts-finder-body">
-        <header className="mb-4">
+      <form
+        onSubmit={handleSearch}
+        className={`parts-finder-form${isManyChips ? ' is-compact' : ''}`}
+      >
+        <header className="text-center">
           <p className="font-display text-accent text-[11px] font-semibold uppercase tracking-[0.22em] leading-none mb-1.5">
             Almacén Ate
           </p>
-          <h3 className="font-display text-white text-[22px] font-medium uppercase tracking-tight leading-none">
+          <h3 className="font-display text-white text-[22px] sm:text-[24px] font-medium uppercase tracking-tight leading-none">
             Consulta de stock
           </h3>
-          <p className="text-blue-100 text-[12px] mt-2 leading-snug">
-            Stock en Ate para JAC, Foton, Toyota y Cummins.
-          </p>
         </header>
 
-        {featuredLogos.length > 0 && (
-          <div className="mb-3.5">
-            <div className="parts-finder-logos">
-              {featuredLogos.map((brand) => {
-                const active = selectedBrand === String(brand.id);
+        <div className="parts-finder-block">
+          <label htmlFor={`parts-finder-brand-${uid}`} className="parts-finder-label">
+            Marca del repuesto
+          </label>
+          <div className="relative">
+            <select
+              id={`parts-finder-brand-${uid}`}
+              value={selectedBrand}
+              onChange={(e) => setSelectedBrand(e.target.value)}
+              disabled={isLoadingBrands}
+              className="parts-finder-select"
+            >
+              <option value="">{isLoadingBrands ? 'Cargando marcas…' : 'Todas las marcas'}</option>
+              {brandList.map((brand) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.nombre}
+                </option>
+              ))}
+            </select>
+            <span className="parts-finder-chevron">
+              <MechChevron />
+            </span>
+          </div>
+        </div>
+
+        <div className="parts-finder-block-lines">
+          <p className="parts-finder-label" id={`parts-finder-line-${uid}`}>
+            Línea de pieza
+          </p>
+          {isLoadingCategories ? (
+            <div className="parts-finder-chips">
+              <div className="h-[72px] bg-blue-950/30 animate-pulse" />
+              <div className="h-[72px] bg-blue-950/30 animate-pulse" />
+            </div>
+          ) : categoryList.length === 0 ? (
+            <p className="parts-finder-empty">Sin líneas activas</p>
+          ) : (
+            <div
+              className={`parts-finder-chips${isSingleChip ? ' is-single' : ''}${isManyChips ? ' is-many' : ''}`}
+              role="group"
+              aria-labelledby={`parts-finder-line-${uid}`}
+            >
+              {categoryList.map((cat) => {
+                const active = selectedCategory === String(cat.id);
+                const photoSrc = categoryPhotoSrc(cat.imageUrl, cat.updatedAt, cat.name);
                 return (
                   <button
-                    key={brand.id}
+                    key={cat.id}
                     type="button"
-                    onClick={() => toggleBrand(brand.id)}
-                    title={brand.nombre}
+                    onClick={() => toggleCategory(cat.id)}
                     aria-pressed={active}
-                    className={`parts-finder-logo ${active ? 'is-active' : ''}`}
+                    className={`parts-finder-chip ${active ? 'is-active' : ''}`}
                   >
-                    <img src={brand.src} alt={brand.nombre} />
+                    <span className="parts-finder-chip-photo">
+                      <img
+                        src={photoSrc}
+                        alt=""
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = fallbackCategoryVisual(cat.name);
+                        }}
+                      />
+                      {cat.overlayImageUrl ? (
+                        <img
+                          src={withCacheBust(resolveMediaUrl(cat.overlayImageUrl), cat.updatedAt)}
+                          alt=""
+                          className="parts-finder-chip-overlay"
+                        />
+                      ) : null}
+                    </span>
+                    <span className="parts-finder-chip-name">{cat.name}</span>
                   </button>
                 );
               })}
             </div>
-          </div>
-        )}
-
-        <div className="space-y-3">
-          <div>
-            <label htmlFor={`parts-finder-brand-${uid}`} className="parts-finder-label">
-              Marca del repuesto
-            </label>
-            <div className="relative">
-              <select
-                id={`parts-finder-brand-${uid}`}
-                value={selectedBrand}
-                onChange={(e) => setSelectedBrand(e.target.value)}
-                disabled={isLoadingBrands}
-                className="parts-finder-select"
-              >
-                <option value="">
-                  {isLoadingBrands ? 'Cargando marcas…' : 'Todas las marcas del almacén'}
-                </option>
-                {brandList.map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.nombre}
-                  </option>
-                ))}
-              </select>
-              <span className="parts-finder-chevron">
-                <MechChevron />
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <p className="parts-finder-label" id={`parts-finder-line-${uid}`}>
-              Línea de pieza
-            </p>
-            {isLoadingCategories ? (
-              <div className="grid grid-cols-2 gap-2">
-                <div className="h-[72px] bg-blue-950/40 animate-pulse" />
-                <div className="h-[72px] bg-blue-950/40 animate-pulse" />
-              </div>
-            ) : useCategoryChips ? (
-              <div
-                className="grid grid-cols-2 gap-2"
-                role="group"
-                aria-labelledby={`parts-finder-line-${uid}`}
-              >
-                {categoryList.map((cat) => {
-                  const active = selectedCategory === String(cat.id);
-                  return (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => toggleCategory(cat.id)}
-                      aria-pressed={active}
-                      className={`parts-finder-chip ${active ? 'is-active' : ''}`}
-                    >
-                      <span className="parts-finder-chip-photo">
-                        <img src={categoryVisual(cat.name)} alt="" />
-                      </span>
-                      <span className="parts-finder-chip-name">{cat.name}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="relative">
-                <select
-                  id={`parts-finder-category-${uid}`}
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="parts-finder-select"
-                  aria-labelledby={`parts-finder-line-${uid}`}
-                >
-                  <option value="">Todas las líneas</option>
-                  {categoryList.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-                <span className="parts-finder-chevron">
-                  <MechChevron />
-                </span>
-              </div>
-            )}
-          </div>
-
-          <button type="submit" className="parts-finder-submit">
-            Buscar en stock
-          </button>
+          )}
         </div>
 
-        <p className="parts-finder-legend">
-          Envíos a provincias · Av. Nicolás Ayllón 4329
-        </p>
+        <button type="submit" className="parts-finder-submit">
+          Buscar en stock
+        </button>
       </form>
     </div>
   );
