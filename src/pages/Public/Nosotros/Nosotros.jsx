@@ -3,6 +3,8 @@ import { Link, NavLink } from 'react-router-dom';
 import MobileMenu from '../../../components/common/MobileMenu';
 import SiteLogo from '../../../components/common/SiteLogo';
 import '../../../styles/inicio.css';
+import '../../../styles/nosotros.css';
+import EmpresaBloques from './EmpresaBloques';
 import { contactService } from '../../../services/contactService';
 import { useDocumentMeta } from '../../../hooks/useDocumentMeta';
 
@@ -14,7 +16,7 @@ export default function Nosotros() {
 
   useDocumentMeta({
     title: 'Sobre Nosotros - ORC Inversiones Perú | Repuestos Vehiculares',
-    description: 'Conoce ORC Inversiones Perú, empresa líder en importación de repuestos coreanos, chinos y japoneses para vehículos. Más de 15 años en Ate, Lima. Misión, visión y contacto.',
+    description: 'ORC Inversiones Perú: repuestos para autos particulares y vehículos de trabajo. 10 años de rubro, 3 tiendas en Lima, Yape o Plin y envíos a nivel nacional.',
     canonicalPath: '/nosotros',
   });
 
@@ -308,7 +310,7 @@ export default function Nosotros() {
                     <div className="md:w-4/12 order-1 pl-12 md:pl-4">
                       <div className="w-full overflow-hidden relative group shadow-md">
                         <img
-                          src="/nosotrosimages/repuestos_originales.jpg"
+                          src="/imagenes OC/4.jpeg"
                           alt="Repuestos Originales ORC"
                           className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
                         />
@@ -322,138 +324,7 @@ export default function Nosotros() {
             </div>
           </section>
 
-          {/* Cuentas Bancarias Section */}
-          <section className="py-16 md:py-20 bg-white border-y border-gray-100">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                <span className="text-primary text-xs font-bold uppercase tracking-widest mb-2 block">Métodos de Pago</span>
-                <h2 className="text-3xl md:text-4xl font-bold text-matte-dark uppercase font-display mb-4">
-                  Cuentas Bancarias <span className="text-primary">Oficiales</span>
-                </h2>
-                <p className="text-gray-600 max-w-2xl mx-auto">
-                  Realiza tus pagos de forma segura a través de nuestras cuentas verificadas
-                </p>
-                <div className="h-1 w-24 bg-accent mx-auto mt-6"></div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                {/* BCP Card */}
-                <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 lg:p-8 hover:shadow-xl transition-all duration-300 group hover:border-orange-400">
-                  <div className="flex items-center gap-4 mb-6">
-                    {/* BCP Logo */}
-                    <div className="w-20 h-20 bg-white rounded-xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform overflow-hidden p-2">
-                      <img src="/Bancos/BCP.png" alt="BCP" className="w-full h-full object-contain" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 font-display">Banco de Crédito del Perú</h3>
-                      <p className="text-orange-600 text-sm font-semibold">Cuenta Corriente Soles</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="bg-white rounded-xl p-4 border border-gray-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Número de Cuenta</span>
-                      </div>
-                      <p className="text-gray-900 text-lg font-mono font-bold tracking-wider">191 21 22 62 4045</p>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-4 border border-gray-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-gray-500 text-xs uppercase tracking-wider font-semibold">CCI (Interbancario)</span>
-                      </div>
-                      <p className="text-gray-900 text-base font-mono font-bold tracking-wider">002 19100 21 22 6240 45 51</p>
-                    </div>
-
-                    <div className="pt-3 border-t border-gray-200">
-                      <p className="text-gray-700 text-sm">
-                        <span className="text-gray-500">Titular:</span> <span className="font-semibold">ORC INVERSIONES PERU S.A.C</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Yape Card */}
-                <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 lg:p-8 hover:shadow-xl transition-all duration-300 group hover:border-purple-400">
-                  <div className="flex items-center gap-4 mb-6">
-                    {/* Yape Logo */}
-                    <div className="w-20 h-20 bg-white rounded-xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform overflow-hidden p-2">
-                      <img src="/Bancos/yape.png" alt="Yape" className="w-full h-full object-contain" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 font-display">Yape</h3>
-                      <p className="text-purple-600 text-sm font-semibold">Pago Instantáneo</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="bg-white rounded-xl p-4 border border-gray-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-gray-500 text-xs uppercase tracking-wider font-semibold">Número de Celular</span>
-                      </div>
-                      <p className="text-gray-900 text-2xl font-mono font-bold tracking-wider">984 244 498</p>
-                    </div>
-
-                    <div className="pt-3 border-t border-gray-200">
-                      <p className="text-gray-700 text-sm">
-                        <span className="text-gray-500">Titular:</span> <span className="font-semibold">ORC INVERSIONES PERU S.A.C</span>
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-purple-700 text-sm bg-purple-50 px-4 py-3 rounded-xl border border-purple-100">
-                      <span className="material-symbols-outlined text-lg">verified</span>
-                      <span className="font-medium">Verificado y seguro para pagos</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Security Notice */}
-              <div className="mt-10 text-center">
-                <div className="inline-flex items-center gap-3 bg-blue-50 border border-blue-100 px-6 py-3 rounded-full">
-                  <span className="material-symbols-outlined text-primary">shield</span>
-                  <p className="text-gray-700 text-sm">
-                    <span className="text-primary font-bold">Importante:</span> Solo realice pagos a estas cuentas oficiales verificadas
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Mission/Vision Section */}
-          <section className="py-24 bg-surface-alt border-y border-gray-200">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white p-10 relative group border border-gray-200 hover:border-secondary transition-colors duration-300 shadow-sm hover:shadow-xl">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gray-200 group-hover:bg-secondary transition-colors"></div>
-                  <div className="flex justify-between items-start mb-6">
-                    <h3 className="text-3xl font-bold text-matte-dark uppercase font-display tracking-wide">Misión</h3>
-                    <span className="material-symbols-outlined text-4xl text-gray-300 group-hover:text-secondary transition-colors">flag</span>
-                  </div>
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    Proveer soluciones de ingeniería automotriz de <span className="font-bold text-secondary">alta gama</span>.
-                    Optimizamos el rendimiento de cada vehículo mediante refacciones certificadas y un soporte técnico sin precedentes.
-                  </p>
-                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest group-hover:text-secondary transition-colors">
-                    Protocolo: Calidad Total
-                  </div>
-                </div>
-                <div className="bg-white p-10 relative group border border-gray-200 hover:border-accent transition-colors duration-300 shadow-sm hover:shadow-xl">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gray-200 group-hover:bg-accent transition-colors"></div>
-                  <div className="flex justify-between items-start mb-6">
-                    <h3 className="text-3xl font-bold text-matte-dark uppercase font-display tracking-wide">Visión</h3>
-                    <span className="material-symbols-outlined text-4xl text-gray-300 group-hover:text-accent transition-colors">visibility</span>
-                  </div>
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    Ser el eje central de la distribución de autopartes en la región andina para el <span className="font-bold text-gray-900">2030</span>. Innovando en logística digital y estableciendo el estándar de oro en servicio industrial.
-                  </p>
-                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest group-hover:text-accent transition-colors">
-                    Objetivo: Liderazgo Regional
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+          <EmpresaBloques />
 
           {/* Contact Section */}
           <section id="contacto" className="bg-matte-dark text-white scroll-mt-20">
