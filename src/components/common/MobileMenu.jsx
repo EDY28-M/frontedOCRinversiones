@@ -38,7 +38,7 @@ const MobileMenu = ({ isOpen, onClose }) => {
                         <span className="material-symbols-outlined text-primary text-3xl">settings_b_roll</span>
                         <div>
                             <h2 className="text-xl font-display font-medium uppercase tracking-tighter leading-none">ORC</h2>
-                            <p className="text-accent text-[10px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones</p>
+                            <p className="text-accent text-[10px] font-bold uppercase tracking-[0.2em] leading-none mt-1">Inversiones Perú</p>
                         </div>
                     </div>
                     <button

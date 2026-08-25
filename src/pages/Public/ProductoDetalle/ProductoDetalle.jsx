@@ -111,7 +111,7 @@ export default function ProductoDetalle() {
             </div>
             <div>
               <span className="text-2xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
-              <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
+              <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none mt-1">Inversiones Perú</p>
             </div>
           </div>
           <nav className="hidden md:flex items-center gap-8">

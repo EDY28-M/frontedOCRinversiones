@@ -65,7 +65,7 @@ export default function Productos() {
             </div>
             <div>
               <span className="text-2xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
-              <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
+              <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none mt-1">Inversiones Perú</p>
             </div>
           </div>
           <nav className="hidden md:flex items-center gap-8">
@@ -291,7 +291,7 @@ export default function Productos() {
                     <span className="material-symbols-outlined text-2xl">settings_b_roll</span>
                   </div>
                   <span className="text-xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
-                  <p className="text-accent text-[10px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
+                  <p className="text-accent text-[10px] font-bold uppercase tracking-[0.2em] leading-none mt-1">Inversiones Perú</p>
                 </div>
                 <p className="text-xs text-gray-200 leading-relaxed">
                   Somos una empresa dedicada a la importación y venta de repuestos para vehículos chinos, japoneses y coreanos, ofreciendo calidad y precios competitivos.
