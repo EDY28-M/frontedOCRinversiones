@@ -48,6 +48,8 @@ export function useCreateCategory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.all });
       queryClient.invalidateQueries({ queryKey: ['public-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['public-products'] });
+      queryClient.invalidateQueries({ queryKey: ['public-product'] });
       queryClient.invalidateQueries({ queryKey: ['admin-category-media'] });
       success('Categoría creada exitosamente');
     },
@@ -82,6 +84,8 @@ export function useUpdateCategory() {
       queryClient.invalidateQueries({ queryKey: categoryKeys.all });
       queryClient.invalidateQueries({ queryKey: categoryKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: ['public-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['public-products'] });
+      queryClient.invalidateQueries({ queryKey: ['public-product'] });
       queryClient.invalidateQueries({ queryKey: ['admin-category-media'] });
       success('Categoría actualizada exitosamente');
     },
@@ -134,6 +138,8 @@ export function useDeleteCategory() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.all });
       queryClient.invalidateQueries({ queryKey: ['public-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['public-products'] });
+      queryClient.invalidateQueries({ queryKey: ['public-product'] });
       queryClient.invalidateQueries({ queryKey: ['admin-category-media'] });
     },
   });
@@ -167,6 +173,8 @@ export function useDeleteAllCategories() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: categoryKeys.all });
       queryClient.invalidateQueries({ queryKey: ['public-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['public-products'] });
+      queryClient.invalidateQueries({ queryKey: ['public-product'] });
       queryClient.invalidateQueries({ queryKey: ['admin-category-media'] });
     },
   });

@@ -181,6 +181,9 @@ export function useUpdateProduct() {
         queryKey: productKeys.lists(),
         refetchType: 'inactive', // Solo refetch queries inactivas
       });
+      queryClient.invalidateQueries({ queryKey: ['public-products'] });
+      queryClient.invalidateQueries({ queryKey: ['public-product'] });
+      queryClient.invalidateQueries({ queryKey: ['public-featured-products'] });
       
       success('Producto actualizado exitosamente');
     },

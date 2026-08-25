@@ -47,6 +47,9 @@ export function useCreateBrand() {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: brandKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['public-brands'] });
+      queryClient.invalidateQueries({ queryKey: ['public-products'] });
+      queryClient.invalidateQueries({ queryKey: ['public-product'] });
       success('Marca creada exitosamente');
     },
 
@@ -79,6 +82,9 @@ export function useUpdateBrand() {
     onSuccess: (data, { id }) => {
       queryClient.invalidateQueries({ queryKey: brandKeys.all });
       queryClient.invalidateQueries({ queryKey: brandKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: ['public-brands'] });
+      queryClient.invalidateQueries({ queryKey: ['public-products'] });
+      queryClient.invalidateQueries({ queryKey: ['public-product'] });
       success('Marca actualizada exitosamente');
     },
 
@@ -129,6 +135,9 @@ export function useDeleteBrand() {
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: brandKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['public-brands'] });
+      queryClient.invalidateQueries({ queryKey: ['public-products'] });
+      queryClient.invalidateQueries({ queryKey: ['public-product'] });
     },
   });
 }
@@ -160,6 +169,9 @@ export function useDeleteAllBrands() {
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: brandKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['public-brands'] });
+      queryClient.invalidateQueries({ queryKey: ['public-products'] });
+      queryClient.invalidateQueries({ queryKey: ['public-product'] });
     },
   });
 }

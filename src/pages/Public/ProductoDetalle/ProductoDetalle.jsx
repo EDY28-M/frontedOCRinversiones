@@ -1,12 +1,12 @@
-import { useMemo, useState } from 'react';
-import { Link, NavLink, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, NavLink, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import MobileMenu from '../../../components/common/MobileMenu';
 import SiteLogo from '../../../components/common/SiteLogo';
 import { publicProductsApi } from '../../../api/publicApi';
 import { getAllValidImageUrls } from '../../../utils/imageUtils';
 import { useDocumentMeta } from '../../../hooks/useDocumentMeta';
-import { extractIdFromSlug } from '../../../utils/slugUtils';
+import { extractIdFromSlug, getProductUrl } from '../../../utils/slugUtils';
 
 const WHATSAPP = '51984244498';
 
@@ -52,6 +52,7 @@ function parseFicha(raw) {
 
 export default function ProductoDetalle() {
   const { id, productoSlug } = useParams();
+  const location = useLocation();
   const targetId = id || extractIdFromSlug(productoSlug);
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -65,12 +66,20 @@ export default function ProductoDetalle() {
     queryKey: ['public-product', targetId],
     queryFn: () => publicProductsApi.getById(targetId),
     enabled: Boolean(targetId),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 1000,
     gcTime: 15 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
   });
 
   const title = useMemo(() => cleanTitle(product), [product]);
+  const canonicalPath = product ? getProductUrl(product) : (targetId ? `/productos/${targetId}` : '/productos');
+
+  useEffect(() => {
+    if (!product || !canonicalPath) return;
+    if (location.pathname !== canonicalPath) {
+      navigate(canonicalPath, { replace: true });
+    }
+  }, [product, canonicalPath, location.pathname, navigate]);
   const images = useMemo(() => (product ? getAllValidImageUrls(product) : []), [product]);
   const ficha = useMemo(() => parseFicha(product?.fichaTecnica), [product]);
   const visibleImages = images.filter((img) => !imageErrors.has(img));
@@ -83,7 +92,7 @@ export default function ProductoDetalle() {
       ? `${title} | ORC Inversiones Perú`
       : 'Producto | ORC Inversiones Perú',
     description: product?.descripcion || `Repuesto ${title} en ORC Inversiones Perú`,
-    canonicalPath: targetId ? `/productos/${targetId}` : '/productos',
+    canonicalPath,
   });
 
   const openWhatsApp = (mode = 'compra') => {
