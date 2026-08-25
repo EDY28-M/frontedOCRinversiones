@@ -26,6 +26,7 @@ const VendedorLayout = lazyWithRetry(() => import('../layouts/VendedorLayout/Ven
 // Lazy loading de páginas públicas
 const Inicio = lazyWithRetry(() => import('../pages/Public/Inicio/Inicio'));
 const Productos = lazyWithRetry(() => import('../pages/Public/Productos/Productos'));
+const ProductoDetalle = lazyWithRetry(() => import('../pages/Public/ProductoDetalle/ProductoDetalle'));
 const Servicios = lazyWithRetry(() => import('../pages/Public/Servicios/Servicios'));
 const Nosotros = lazyWithRetry(() => import('../pages/Public/Nosotros/Nosotros'));
 const Home = lazyWithRetry(() => import('../pages/Public/Home/Home'));
@@ -109,6 +110,10 @@ const AppRoutes = () => {
           <>
             <Route path="/" element={<LazyWrapper><Inicio /></LazyWrapper>} />
             <Route path="/productos" element={<LazyWrapper><Productos /></LazyWrapper>} />
+            <Route path="/productos/:id" element={<LazyWrapper><ProductoDetalle /></LazyWrapper>} />
+            <Route path="/repuestos/:slug" element={<LazyWrapper><Productos /></LazyWrapper>} />
+            <Route path="/repuestos/:categoriaSlug/:marcaSlug" element={<LazyWrapper><Productos /></LazyWrapper>} />
+            <Route path="/repuestos/:categoriaSlug/:marcaSlug/:productoSlug" element={<LazyWrapper><ProductoDetalle /></LazyWrapper>} />
             <Route path="/catalogo" element={<Navigate to="/productos" replace />} />
             <Route path="/envios-provincias" element={<LazyWrapper><Servicios /></LazyWrapper>} />
             <Route path="/nosotros" element={<LazyWrapper><Nosotros /></LazyWrapper>} />

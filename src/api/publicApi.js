@@ -50,6 +50,16 @@ export const publicProductsApi = {
     }
   },
 
+  getById: async (id) => {
+    try {
+      const response = await publicAxios.get('/products/public/' + id);
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener producto público:', error);
+      throw error;
+    }
+  },
+
   /**
    * Obtiene productos destacados públicos (solo activos con imágenes)
    * @param {Object} params - Parámetros de consulta

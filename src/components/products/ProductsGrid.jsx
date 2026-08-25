@@ -8,7 +8,8 @@ const ProductsGrid = ({
   error,
   refetch,
   total,
-  onProductClick
+  onProductClick,
+  onPreviewClick,
 }) => {
   // Loading inicial (sin datos)
   if (isLoading && products.length === 0) {
@@ -72,6 +73,7 @@ const ProductsGrid = ({
             key={product.id} 
             product={product} 
             onProductClick={onProductClick}
+            onPreviewClick={onPreviewClick}
             priority={index < 4} /* Primeros 4 productos cargan inmediatamente */
           />
         ))}
