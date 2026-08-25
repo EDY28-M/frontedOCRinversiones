@@ -292,3 +292,282 @@ a[aria-current="page"] .nav-link::after {
     height: 4rem;
   }
 }
+
+/* ========================================
+   FICHA DE ALMACÉN (hero) — caja de herramientas
+   Mismos materiales que el footer: primary + barra accent
+   ======================================== */
+.parts-finder {
+  position: relative;
+  margin-top: 12px;
+  background: #001aff;
+  color: #fff;
+  box-shadow:
+    0 18px 40px rgba(0, 8, 40, 0.5),
+    0 0 0 1px rgba(250, 204, 21, 0.28);
+}
+
+.parts-finder-handle {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 46%;
+  height: 22px;
+  z-index: 3;
+  background: linear-gradient(180deg, #fde047 0%, #facc15 45%, #ca8a04 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(254, 249, 195, 0.75),
+    0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.parts-finder-handle-grip {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: 7px;
+  height: 7px;
+  background: #0014cc;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.parts-finder-rivet {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fefce8, #a16207 70%);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.parts-finder-rivet-left {
+  left: 6px;
+}
+
+.parts-finder-rivet-right {
+  right: 6px;
+}
+
+.parts-finder-lid {
+  position: relative;
+  height: 78px;
+  overflow: hidden;
+  background: #001aff;
+}
+
+.parts-finder-lid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 58%;
+  display: block;
+}
+
+.parts-finder-lid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 35%, #001aff 100%);
+  pointer-events: none;
+}
+
+.parts-finder-seam {
+  height: 4px;
+  background: #facc15;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.parts-finder-body {
+  position: relative;
+  padding: 0.95rem 1.1rem 0.9rem;
+}
+
+.parts-finder-body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #ffffff 0 1px,
+    transparent 1px 9px
+  );
+}
+
+.parts-finder-label {
+  display: block;
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fde047;
+  margin-bottom: 0.4rem;
+}
+
+.parts-finder-select {
+  width: 100%;
+  appearance: none;
+  background: rgba(0, 10, 90, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+  padding: 0.7rem 2.25rem 0.7rem 0.75rem;
+  outline: none;
+  cursor: pointer;
+  border-radius: 0;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.parts-finder-select:hover,
+.parts-finder-select:focus {
+  border-color: #facc15;
+  background: rgba(0, 8, 70, 0.72);
+}
+
+.parts-finder-select:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.parts-finder-select option {
+  background: #0014cc;
+  color: #fff;
+}
+
+.parts-finder-chevron {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #facc15;
+  pointer-events: none;
+}
+
+.parts-finder-logos {
+  display: flex;
+  gap: 6px;
+}
+
+.parts-finder-logo {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 40px;
+  padding: 0 0.4rem;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: box-shadow 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.parts-finder-logo img {
+  height: 22px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.parts-finder-logo:hover {
+  transform: translateY(-1px);
+}
+
+.parts-finder-logo.is-active {
+  border-color: #facc15;
+  box-shadow: 0 0 0 2px #facc15;
+}
+
+.parts-finder-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: rgba(0, 10, 90, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+  text-align: left;
+  overflow: hidden;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.parts-finder-chip:hover {
+  border-color: rgba(250, 204, 21, 0.7);
+}
+
+.parts-finder-chip.is-active {
+  border-color: #facc15;
+  box-shadow: inset 0 0 0 1px #facc15;
+  background: rgba(0, 8, 70, 0.7);
+}
+
+.parts-finder-chip-photo {
+  display: block;
+  height: 42px;
+  overflow: hidden;
+  background: #001aff;
+}
+
+.parts-finder-chip-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.parts-finder-chip-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 0.4rem 0.5rem 0.5rem;
+  line-height: 1.15;
+}
+
+.parts-finder-chip.is-active .parts-finder-chip-name {
+  color: #facc15;
+}
+
+.parts-finder-submit {
+  width: 100%;
+  background: #facc15;
+  color: #111827;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.75rem 1rem;
+  border: 0;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(250, 204, 21, 0.28);
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.parts-finder-submit:hover {
+  background: #fde047;
+}
+
+.parts-finder-submit:active {
+  transform: scale(0.99);
+}
+
+.parts-finder-legend {
+  margin-top: 0.7rem;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(191, 219, 254, 0.85);
+  text-align: center;
+  font-weight: 500;
+}

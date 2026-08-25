@@ -128,22 +128,21 @@ const AppRoutes = () => {
         )}
 
         {/* ========================================
-            PORTAL ADMIN/VENDEDOR - Solo en admin.orcinversionesperu.com
+            PORTAL ADMIN/VENDEDOR
+            En admin.* la raíz es el login. En el dominio principal
+            el login vive en /admin/login (también accesible en el subdominio).
             ======================================== */}
         {isAdminHost && (
           <>
-            {/* Raíz del subdominio y /login van directo al formulario de acceso */}
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<LazyWrapper><AdminLogin /></LazyWrapper>} />
-
-            {/* LOGIN ROUTE (se mantiene también en /admin/login por compatibilidad) */}
-            <Route path="/admin/login" element={<LazyWrapper><AdminLogin /></LazyWrapper>} />
-            <Route path="/admin/forgot-password" element={<LazyWrapper><ForgotPassword /></LazyWrapper>} />
-            <Route path="/admin/reset-password" element={<LazyWrapper><ResetPassword /></LazyWrapper>} />
           </>
         )}
 
-        {isAdminHost && (
+        <Route path="/admin/login" element={<LazyWrapper><AdminLogin /></LazyWrapper>} />
+        <Route path="/admin/forgot-password" element={<LazyWrapper><ForgotPassword /></LazyWrapper>} />
+        <Route path="/admin/reset-password" element={<LazyWrapper><ResetPassword /></LazyWrapper>} />
+
         <Route path="/admin">
           {/* Admin Protected Routes (con layout) - SOLO ADMIN */}
           <Route
@@ -235,9 +234,7 @@ const AppRoutes = () => {
             } />
           </Route>
         </Route>
-        )}
 
-        {isAdminHost && (
         <Route path="/vendedor">
           <Route
             element={
@@ -267,7 +264,6 @@ const AppRoutes = () => {
             } />
           </Route>
         </Route>
-        )}
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to={isAdminHost ? "/login" : "/"} />} />

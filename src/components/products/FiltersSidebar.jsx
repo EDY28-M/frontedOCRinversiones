@@ -15,11 +15,11 @@ const FiltersSidebar = ({
 }) => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  // Normalizar IDs de marcas seleccionadas a números para comparación consistente
-  const selectedBrandIds = useMemo(() => 
-    new Set(selectedBrands.map(id => Number(id))), 
+  const selectedBrandIds = useMemo(
+    () => new Set(selectedBrands.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0)),
     [selectedBrands]
   );
+  const selectedCategoryId = Number(selectedCategory) > 0 ? Number(selectedCategory) : null;
 
   // Handler robusto para toggle de marca
   const handleBrandClick = useCallback((brandId) => {
@@ -93,8 +93,8 @@ const FiltersSidebar = ({
                 className="group flex items-center gap-3 py-2 px-2 -mx-2 rounded hover:bg-gray-50 cursor-pointer transition-colors text-left w-full"
                 onClick={() => onCategoryChange(null)}
               >
-                <span className={`w-1 h-5 rounded-full transition-colors ${selectedCategory === null ? 'bg-primary' : 'bg-gray-300 group-hover:bg-primary/50'}`}></span>
-                <span className={`text-sm ${selectedCategory === null ? 'font-bold text-gray-900' : 'font-medium text-gray-700 group-hover:text-gray-900'}`}>
+                <span className={`w-1 h-5 rounded-full transition-colors ${selectedCategoryId === null ? 'bg-primary' : 'bg-gray-300 group-hover:bg-primary/50'}`}></span>
+                <span className={`text-sm ${selectedCategoryId === null ? 'font-bold text-gray-900' : 'font-medium text-gray-700 group-hover:text-gray-900'}`}>
                   Todas las Categorías
                 </span>
               </button>
@@ -106,8 +106,8 @@ const FiltersSidebar = ({
                   className="group flex items-center gap-3 py-2 px-2 -mx-2 rounded hover:bg-gray-50 cursor-pointer transition-colors text-left w-full"
                   onClick={() => onCategoryChange(cat.id)}
                 >
-                  <span className={`w-1 h-5 rounded-full transition-colors ${selectedCategory === cat.id ? 'bg-primary' : 'bg-gray-300 group-hover:bg-primary/50'}`}></span>
-                  <span className={`text-sm ${selectedCategory === cat.id ? 'font-bold text-gray-900' : 'font-medium text-gray-700 group-hover:text-gray-900'}`}>
+                  <span className={`w-1 h-5 rounded-full transition-colors ${selectedCategoryId === cat.id ? 'bg-primary' : 'bg-gray-300 group-hover:bg-primary/50'}`}></span>
+                  <span className={`text-sm ${selectedCategoryId === cat.id ? 'font-bold text-gray-900' : 'font-medium text-gray-700 group-hover:text-gray-900'}`}>
                     {cat.name}
                     {cat.count > 0 && <span className="ml-1 text-gray-500">({cat.count})</span>}
                   </span>

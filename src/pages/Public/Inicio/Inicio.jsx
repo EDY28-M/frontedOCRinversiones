@@ -186,8 +186,8 @@ export default function Inicio() {
                                         </div>
                                     </div>
 
-                                    {/* Selector en la derecha (Desktop) */}
-                                    <div className="hidden lg:block w-[350px] xl:w-[370px] flex-shrink-0">
+                                    {/* Ficha de almacén (desktop) */}
+                                    <div className="hidden lg:block w-[340px] xl:w-[372px] flex-shrink-0">
                                         <VehicleSelectorCard />
                                     </div>
                                 </div>
@@ -195,8 +195,8 @@ export default function Inicio() {
                         </div>
                     </div>
 
-                    {/* Selector en Móvil/Tablet (Debajo del banner para no tapar la imagen) */}
-                    <div className="lg:hidden w-full bg-[#0a173e] py-6 px-4 border-b border-blue-900/50">
+                    {/* Ficha de almacén en móvil/tablet, debajo del banner */}
+                    <div className="lg:hidden w-full bg-surface-alt py-6 px-4 border-b border-gray-100">
                         <div className="max-w-md mx-auto">
                             <VehicleSelectorCard />
                         </div>

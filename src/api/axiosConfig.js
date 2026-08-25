@@ -123,7 +123,9 @@ axiosInstance.interceptors.response.use(
     logger.groupEnd();
     
     // Manejo de errores específicos
-    if (response?.status === 401) {
+    const requestUrl = String(config?.url || '');
+    const isAuthAttempt = requestUrl.includes('/auth/login') || requestUrl.includes('/auth/forgot-password') || requestUrl.includes('/auth/reset-password');
+    if (response?.status === 401 && !isAuthAttempt) {
       logger.warn('⚠️ Token inválido/expirado (401)');
       localStorage.removeItem('token');
       window.dispatchEvent(new CustomEvent('auth:logout'));

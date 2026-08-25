@@ -1,38 +1,117 @@
-import { useState, useEffect, useCallback, useTransition, useDeferredValue } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useCallback, useTransition, useDeferredValue, useMemo } from 'react';
+import { useSearchParams, useParams } from 'react-router-dom';
 import { usePublicProducts } from './usePublicProducts.js';
 import { usePublicBrands } from './usePublicBrands.js';
 import { usePublicCategories } from './usePublicCategories.js';
+import { toSlug } from '../utils/slugUtils.js';
 
-// Hook para manejar filtros con paginación 100% server-side
-// Optimizado con useTransition para UI responsiva
+function toPositiveInt(value) {
+  const n = Number(value);
+  return Number.isInteger(n) && n > 0 ? n : null;
+}
+
+function parseBrandIds(raw) {
+  if (!raw) return [];
+  return raw
+    .split(',')
+    .map(toPositiveInt)
+    .filter(Boolean);
+}
+
+function categoryName(cat) {
+  return cat?.Name || cat?.name || cat?.Nombre || cat?.nombre || '';
+}
+
+function brandName(brand) {
+  return brand?.Nombre || brand?.nombre || brand?.Name || brand?.name || '';
+}
+
+function categoryIdOf(cat) {
+  return toPositiveInt(cat?.Id ?? cat?.id);
+}
+
+function brandIdOf(brand) {
+  return toPositiveInt(brand?.Id ?? brand?.id);
+}
+
 export const useProductFilters = () => {
-  const [searchParams] = useSearchParams();
-  const initialCat = searchParams.get('categoria') ? Number(searchParams.get('categoria')) : null;
-  const initialBrandParam = searchParams.get('marca') || searchParams.get('brandIds');
-  const initialBrands = initialBrandParam ? initialBrandParam.split(',').map(Number).filter(n => !isNaN(n) && n > 0) : [];
-  const initialSearch = searchParams.get('q') || '';
-
-  const [searchQuery, setSearchQuery] = useState(initialSearch);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState(initialCat);
-  const [selectedBrands, setSelectedBrands] = useState(initialBrands); // Array de números
+  const [searchParams, setSearchParams] = useSearchParams();
+  const routeParams = useParams();
   const pageSize = 12;
 
-  // useTransition para cambios de filtro no urgentes
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [currentPage, setCurrentPage] = useState(1);
   const [isPending, startTransition] = useTransition();
-
-  // Debounce de búsqueda con useDeferredValue
   const deferredSearchQuery = useDeferredValue(searchQuery);
 
-  // Resetear página cuando cambian los filtros (con transición)
+  const selectedCategory = toPositiveInt(searchParams.get('categoria'));
+  const selectedBrands = useMemo(
+    () => parseBrandIds(searchParams.get('marca') || searchParams.get('brandIds')),
+    [searchParams]
+  );
+
+  const { brands, isLoading: isLoadingBrands, error: brandsError } = usePublicBrands();
+  const { categories, isLoading: isLoadingCategories, error: categoriesError } = usePublicCategories();
+
+  const patchParams = useCallback((mutator) => {
+    startTransition(() => {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        mutator(next);
+        return next;
+      }, { replace: true });
+      setCurrentPage(1);
+    });
+  }, [setSearchParams]);
+
+  // Apply /repuestos/:slug or /repuestos/:categoriaSlug/:marcaSlug when the URL has no query filters.
+  useEffect(() => {
+    const hasQueryFilter = searchParams.get('categoria') || searchParams.get('marca') || searchParams.get('brandIds');
+    if (hasQueryFilter) return;
+
+    const catSlug = routeParams.categoriaSlug || routeParams.slug;
+    const marcaFromRoute = routeParams.marcaSlug;
+    if (!catSlug && !marcaFromRoute) return;
+
+    const next = new URLSearchParams(searchParams);
+    let changed = false;
+
+    if (catSlug && categories.length) {
+      const cat = categories.find((c) => toSlug(categoryName(c)) === catSlug);
+      const id = cat ? categoryIdOf(cat) : null;
+      if (id && !next.get('categoria')) {
+        next.set('categoria', String(id));
+        changed = true;
+      } else if (!id && brands.length && !next.get('marca')) {
+        const brand = brands.find((b) => toSlug(brandName(b)) === catSlug);
+        const brandId = brand ? brandIdOf(brand) : null;
+        if (brandId) {
+          next.set('marca', String(brandId));
+          changed = true;
+        }
+      }
+    }
+
+    if (marcaFromRoute && brands.length && !next.get('marca')) {
+      const brand = brands.find((b) => toSlug(brandName(b)) === marcaFromRoute);
+      const brandId = brand ? brandIdOf(brand) : null;
+      if (brandId) {
+        next.set('marca', String(brandId));
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      setSearchParams(next, { replace: true });
+    }
+  }, [categories, brands, routeParams.slug, routeParams.categoriaSlug, routeParams.marcaSlug, searchParams, setSearchParams]);
+
   useEffect(() => {
     startTransition(() => {
       setCurrentPage(1);
     });
   }, [deferredSearchQuery, selectedCategory, selectedBrands]);
 
-  // Cargar productos con filtros del servidor (100% SERVER-SIDE)
   const {
     products,
     total,
@@ -50,46 +129,39 @@ export const useProductFilters = () => {
     brandIds: selectedBrands.length > 0 ? selectedBrands.join(',') : undefined
   });
 
-  // Cargar datos adicionales (marcas/categorías)
-  const { brands, isLoading: isLoadingBrands, error: brandsError } = usePublicBrands();
-  const { categories, isLoading: isLoadingCategories, error: categoriesError } = usePublicCategories();
-
-  // Handler robusto para categorías (toggle) - con transición
   const handleCategoryChange = useCallback((categoryId) => {
-    const numericId = categoryId !== null ? Number(categoryId) : null;
-    startTransition(() => {
-      setSelectedCategory(prev => prev === numericId ? null : numericId);
+    const numericId = toPositiveInt(categoryId);
+    patchParams((next) => {
+      if (!numericId || selectedCategory === numericId) {
+        next.delete('categoria');
+      } else {
+        next.set('categoria', String(numericId));
+      }
     });
-  }, []);
+  }, [patchParams, selectedCategory]);
 
-  // Handler robusto para marcas (multi-select toggle) - con transición
   const handleBrandToggle = useCallback((brandId) => {
-    const numericId = Number(brandId);
-    if (isNaN(numericId) || numericId <= 0) return;
-    
-    startTransition(() => {
-      setSelectedBrands(prev => {
-        const exists = prev.includes(numericId);
-        if (exists) {
-          return prev.filter(id => id !== numericId);
-        } else {
-          return [...prev, numericId];
-        }
-      });
+    const numericId = toPositiveInt(brandId);
+    if (!numericId) return;
+    patchParams((next) => {
+      const current = parseBrandIds(next.get('marca') || next.get('brandIds'));
+      const exists = current.includes(numericId);
+      const updated = exists ? current.filter((id) => id !== numericId) : [...current, numericId];
+      next.delete('brandIds');
+      if (updated.length === 0) next.delete('marca');
+      else next.set('marca', updated.join(','));
     });
-  }, []);
+  }, [patchParams]);
 
   const handleClearFilters = useCallback(() => {
     startTransition(() => {
-      setSelectedCategory(null);
-      setSelectedBrands([]);
       setSearchQuery('');
       setCurrentPage(1);
+      setSearchParams({}, { replace: true });
     });
-  }, []);
+  }, [setSearchParams]);
 
   return {
-    // Estados
     searchQuery,
     setSearchQuery,
     currentPage,
@@ -102,19 +174,15 @@ export const useProductFilters = () => {
     isLoadingCategories,
     brandsError,
     categoriesError,
-
-    // Datos procesados (ya paginados desde el servidor)
     products,
     total,
     totalPages,
     pageSize,
     isLoading: isLoadingProducts,
-    isFetching: isFetching || isPending, // Incluye transiciones pendientes
+    isFetching: isFetching || isPending,
     isError,
     error,
     refetch: refetchProducts,
-
-    // Funciones
     handleCategoryChange,
     handleBrandToggle,
     handleClearFilters,

@@ -39,8 +39,13 @@ export const publicProductsApi = {
     try {
       const params = { page, pageSize };
       if (q && q.trim()) params.q = q.trim();
-      if (categoryId) params.categoryId = categoryId;
-      if (brandIds) params.brandIds = brandIds;
+      const numericCategoryId = Number(categoryId);
+      if (Number.isInteger(numericCategoryId) && numericCategoryId > 0) {
+        params.categoryId = numericCategoryId;
+      }
+      if (brandIds && String(brandIds).trim()) {
+        params.brandIds = String(brandIds).trim();
+      }
 
       const response = await publicAxios.get('/products/public/active', { params });
       return response.data;
