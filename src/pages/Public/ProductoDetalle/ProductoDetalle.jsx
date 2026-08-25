@@ -102,33 +102,70 @@ export default function ProductoDetalle() {
 
   return (
     <div className="h-screen flex flex-col bg-surface font-sans text-text-main antialiased overflow-hidden">
-      {/* Header fijo */}
+      {/* Header fijo — idéntico al de Catálogo */}
       <header className="flex-shrink-0 w-full bg-white border-b border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
         <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between gap-8">
-          <div className="flex items-center gap-3.5 min-w-fit">
-            <Link to="/" className="text-primary">
+          <div className="flex items-center gap-3 min-w-fit">
+            <div className="text-primary">
               <span className="material-symbols-outlined text-3xl">settings_b_roll</span>
-            </Link>
-            <Link to="/" className="hidden sm:block">
+            </div>
+            <div>
               <span className="text-2xl font-display font-medium uppercase tracking-tighter leading-none block">ORC</span>
-              <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none mt-1">Inversiones Perú</p>
-            </Link>
+              <p className="text-accent text-[11px] font-bold uppercase tracking-[0.2em] leading-none">Inversiones Perú</p>
+            </div>
           </div>
           <nav className="hidden md:flex items-center gap-8">
-            <NavLink to="/" end className={({ isActive }) => `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`}>
-              {({ isActive }) => <span className={`relative nav-link ${isActive ? 'active' : ''}`}>INICIO</span>}
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+              end
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  INICIO
+                </span>
+              )}
             </NavLink>
-            <NavLink to="/productos" className={({ isActive }) => `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`}>
-              {({ isActive }) => <span className={`relative nav-link ${isActive ? 'active' : ''}`}>CATÁLOGO</span>}
+            <NavLink
+              to="/productos"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  CATÁLOGO
+                </span>
+              )}
             </NavLink>
-            <NavLink to="/envios-provincias" className={({ isActive }) => `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`}>
-              {({ isActive }) => <span className={`relative nav-link ${isActive ? 'active' : ''}`}>ENVÍOS A PROVINCIAS</span>}
+            <NavLink
+              to="/envios-provincias"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  ENVÍOS A PROVINCIAS
+                </span>
+              )}
             </NavLink>
-            <NavLink to="/nosotros" className={({ isActive }) => `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`}>
-              {({ isActive }) => <span className={`relative nav-link ${isActive ? 'active' : ''}`}>EMPRESA</span>}
+            <NavLink
+              to="/nosotros"
+              className={({ isActive }) =>
+                `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
+              }
+            >
+              {({ isActive }) => (
+                <span className={`relative nav-link ${isActive ? 'active' : ''}`}>
+                  EMPRESA
+                </span>
+              )}
             </NavLink>
           </nav>
-          <form onSubmit={handleSearchSubmit} className="flex-1 max-w-sm hidden lg:block">
+          <div className="flex-1 max-w-sm hidden lg:block">
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
                 <span className="material-symbols-outlined text-[20px]">search</span>
@@ -139,12 +176,20 @@ export default function ProductoDetalle() {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && searchTerm.trim()) navigate('/productos', { state: { initialQuery: searchTerm.trim() } }); }}
               />
             </div>
-          </form>
+          </div>
+
           <div className="flex items-center gap-2 min-w-fit">
+            <button className="relative p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
+              <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
+              <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary ring-2 ring-white"></span>
+            </button>
+            <button className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 rounded transition-colors group">
+              <span className="material-symbols-outlined text-[22px]">person</span>
+            </button>
             <button
-              type="button"
               className="lg:hidden p-2 text-gray-500 hover:text-gray-900 rounded"
               onClick={() => setMobileMenuOpen(true)}
             >
