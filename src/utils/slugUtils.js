@@ -17,20 +17,36 @@ export function toSlug(str) {
 export function getProductUrl(product) {
   if (!product) return '/productos';
 
-  const catSlug = toSlug(product.categoryName || product.category?.name || 'repuestos');
-  const marcaSlug = toSlug(product.marcaNombre || product.marca?.nombre || 'multimarca');
-  
-  let cleanTitle = product.producto || 'producto';
-  if (product.codigo) {
+  const catName =
+    product.categoryName ||
+    product.CategoryName ||
+    product.category?.name ||
+    product.category?.Name ||
+    product.Category?.Name ||
+    '';
+  const marcaName =
+    product.marcaNombre ||
+    product.MarcaNombre ||
+    product.marca?.nombre ||
+    product.marca?.Nombre ||
+    product.Marca?.Nombre ||
+    '';
+  const productId = product.id || product.Id;
+  const catSlug = toSlug(catName || 'repuestos');
+  const marcaSlug = toSlug(marcaName || 'multimarca');
+
+  let cleanTitle = product.producto || product.Producto || 'producto';
+  const codigo = product.codigo || product.Codigo;
+  if (codigo) {
     try {
-      const escaped = product.codigo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      cleanTitle = cleanTitle.replace(new RegExp(`\\s*\\(?${escaped}\\)?`, 'gi'), '').trim();
+      const escaped = String(codigo).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      cleanTitle = String(cleanTitle).replace(new RegExp(`\\s*\\(?${escaped}\\)?`, 'gi'), '').trim();
     } catch {
       // ignore
     }
   }
 
-  const prodSlug = `${toSlug(cleanTitle)}-${product.id}`;
+  const prodSlug = `${toSlug(cleanTitle)}-${productId}`;
   return `/repuestos/${catSlug}/${marcaSlug}/${prodSlug}`;
 }
 

@@ -10,8 +10,9 @@ export function usePublicBrands() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['public-brands'],
     queryFn: () => publicProductsApi.getBrands(),
-    staleTime: 1000 * 10,     // 10 segundos
-    gcTime: 1000 * 60 * 10,   // 10 minutos en memoria
+    staleTime: 0,
+    gcTime: 1000 * 60 * 10,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: true,
     retry: 2,
   });

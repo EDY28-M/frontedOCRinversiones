@@ -66,9 +66,12 @@ export default function ProductoDetalle() {
     queryKey: ['public-product', targetId],
     queryFn: () => publicProductsApi.getById(targetId),
     enabled: Boolean(targetId),
-    staleTime: 10 * 1000,
+    staleTime: 0,
     gcTime: 15 * 60 * 1000,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: true,
+    refetchInterval: 5000,
+    refetchIntervalInBackground: false,
   });
 
   const title = useMemo(() => cleanTitle(product), [product]);

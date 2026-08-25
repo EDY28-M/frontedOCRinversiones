@@ -24,8 +24,9 @@ export function usePublicProducts({
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ['public-products', { page, pageSize, q, categoryId, brandIds }],
     queryFn: () => publicProductsApi.getActiveProducts({ page, pageSize, q, categoryId, brandIds }),
-    staleTime: 1000 * 5,         // 5 segundos
-    gcTime: 1000 * 60 * 5,      // 5 minutos en memoria
+    staleTime: 0,
+    gcTime: 1000 * 60 * 5,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: true,
     placeholderData: keepPreviousData, // v5: mantiene datos anteriores mientras carga
   });
