@@ -277,7 +277,7 @@ export default function Productos() {
               error={error}
               refetch={refetch}
               total={total}
-              onProductClick={(product) => setSelectedProduct(product)}
+              onPreviewClick={(product) => setSelectedProduct(product)}
             />
           </section>
         </main>
