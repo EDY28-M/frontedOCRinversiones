@@ -11,6 +11,11 @@ export const siteSettingsService = {
     return response.data;
   },
 
+  updateShowcase: async (shape) => {
+    const response = await axiosInstance.put('/site-settings/showcase', { shape });
+    return response.data;
+  },
+
   uploadLogo: async (file) => {
     const body = new FormData();
     body.append('file', file);

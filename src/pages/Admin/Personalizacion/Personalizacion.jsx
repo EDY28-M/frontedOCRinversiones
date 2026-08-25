@@ -5,6 +5,7 @@ import { useNotification } from '../../../context/NotificationContext';
 import { siteSettingsService } from '../../../services/siteSettingsService';
 import { siteSettingsKeys } from '../../../hooks/usePublicSiteSettings';
 import { resolveMediaUrl } from '../../../utils/mediaUrl';
+import { SHOWCASE_SHAPES, ShowcaseShapePreview } from '../../../components/common/CategoryLinesShowcase';
 
 function previewSrc(url) {
   return resolveMediaUrl(url);
@@ -106,6 +107,15 @@ export default function Personalizacion() {
     onError: (err) => showError(err?.data?.message || err.message || 'No se pudo subir el logo'),
   });
 
+  const showcaseMutation = useMutation({
+    mutationFn: (shape) => siteSettingsService.updateShowcase(shape),
+    onSuccess: () => {
+      invalidatePublic();
+      success('Forma de la vitrina actualizada');
+    },
+    onError: (err) => showError(err?.data?.message || err.message || 'No se pudo guardar la forma'),
+  });
+
   const clearLogoMutation = useMutation({
     mutationFn: () => siteSettingsService.updateLogoUrl(''),
     onSuccess: () => {
@@ -144,11 +154,13 @@ export default function Personalizacion() {
   });
 
   const logoUrl = settingsQuery.data?.logoUrl || settingsQuery.data?.LogoUrl || '';
+  const showcaseShape = settingsQuery.data?.showcaseShape || settingsQuery.data?.ShowcaseShape || 'gear';
   const categories = categoriesQuery.data || [];
   const loading = settingsQuery.isLoading || categoriesQuery.isLoading;
   const saving =
     logoMutation.isPending ||
     clearLogoMutation.isPending ||
+    showcaseMutation.isPending ||
     categoryImageMutation.isPending ||
     categoryOverlayMutation.isPending ||
     clearCategoryMutation.isPending;
@@ -176,6 +188,36 @@ export default function Personalizacion() {
           onUpload={(file) => logoMutation.mutate(file)}
           onClear={() => clearLogoMutation.mutate()}
         />
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3">
+          Forma de las líneas en inicio
+        </h2>
+        <p className="text-xs text-slate-500 mb-4">
+          Marco de pieza para la vitrina debajo de Especialistas en Marcas. El listado sale de Categorías: si creas, editas o borras una línea, se refleja en el inicio.
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          {SHOWCASE_SHAPES.map((item) => {
+            const active = showcaseShape === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                disabled={saving}
+                onClick={() => showcaseMutation.mutate(item.id)}
+                className={`border text-left overflow-hidden ${
+                  active ? 'border-[#F5C344] ring-2 ring-[#F5C344]' : 'border-gray-200 hover:border-slate-400'
+                } disabled:opacity-50`}
+              >
+                <ShowcaseShapePreview shape={item.id} />
+                <span className="block px-2 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-700">
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </section>
 
       <section>

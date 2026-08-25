@@ -9,13 +9,15 @@ export function usePublicSiteSettings() {
   const { data, isLoading } = useQuery({
     queryKey: siteSettingsKeys.public,
     queryFn: () => publicProductsApi.getSiteSettings(),
-    staleTime: 5 * 1000,
+    staleTime: 0,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: true,
     retry: 1,
   });
 
   return {
     logoUrl: data?.logoUrl || data?.LogoUrl || '',
+    showcaseShape: data?.showcaseShape || data?.ShowcaseShape || 'gear',
     updatedAt: data?.updatedAt || data?.UpdatedAt || null,
     isLoading,
   };

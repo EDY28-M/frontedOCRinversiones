@@ -654,3 +654,168 @@ a[aria-current="page"] .nav-link::after {
     height: 28px;
   }
 }
+
+/* ========================================
+   VITRINA DE LÍNEAS — marcos de pieza
+   ======================================== */
+.line-showcase {
+  width: 100%;
+  background:
+    radial-gradient(1200px 420px at 50% -10%, rgba(0, 26, 255, 0.35), transparent 60%),
+    #020617;
+  border-bottom: 1px solid rgba(250, 204, 21, 0.18);
+  padding: 3.2rem 0 3.6rem;
+}
+
+.line-showcase-head {
+  text-align: center;
+  margin-bottom: 2.2rem;
+}
+
+.line-showcase-head p {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #facc15;
+  margin: 0 0 0.45rem;
+}
+
+.line-showcase-head h2 {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  margin: 0 0 0.75rem;
+}
+
+.line-showcase-head span {
+  display: block;
+  width: 3.5rem;
+  height: 3px;
+  margin: 0 auto;
+  background: #facc15;
+}
+
+.line-showcase-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.75rem 2rem;
+}
+
+.line-tile {
+  position: relative;
+  display: block;
+  width: min(100%, 340px);
+  aspect-ratio: 1 / 1;
+  color: #fff;
+  text-decoration: none;
+  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.45));
+}
+
+.line-tile.is-gasket,
+.line-tile.is-plate {
+  aspect-ratio: 1.4 / 1;
+  width: min(100%, 380px);
+}
+
+.line-tile-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.line-tile-core {
+  position: absolute;
+  inset: 22%;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.line-tile.is-gasket .line-tile-core,
+.line-tile.is-plate .line-tile-core {
+  inset: 18% 14%;
+}
+
+.line-tile-photo {
+  position: relative;
+  display: block;
+  width: 72%;
+  max-width: 9.5rem;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 50%;
+  margin-bottom: 0.55rem;
+  background: rgba(0, 20, 120, 0.35);
+  box-shadow: inset 0 0 0 2px rgba(250, 204, 21, 0.55);
+}
+
+.line-tile.is-plate .line-tile-photo,
+.line-tile.is-gasket .line-tile-photo {
+  border-radius: 2px;
+  width: 86%;
+  max-width: none;
+  aspect-ratio: 2.2 / 1;
+}
+
+.line-tile-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.line-tile-overlay {
+  position: absolute;
+  inset: 0;
+  object-fit: contain;
+}
+
+.line-tile-core h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #fff;
+  line-height: 1.15;
+}
+
+.line-tile-core p {
+  margin: 0.35rem 0 0;
+  font-size: 11px;
+  line-height: 1.35;
+  color: rgba(226, 232, 240, 0.86);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-tile:hover .line-tile-core h3 {
+  color: #facc15;
+}
+
+.line-tile:hover {
+  transform: translateY(-3px);
+}
+
+.line-tile-skeleton {
+  width: min(100%, 340px);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.12);
+}

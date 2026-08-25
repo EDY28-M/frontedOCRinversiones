@@ -4,6 +4,7 @@ import MobileMenu from '../../../components/common/MobileMenu';
 import WhatsAppButton from '../../../components/WhatsAppButton';
 import ProductDetailModal from '../../../components/ProductDetailModal';
 import VehicleSelectorCard from '../../../components/common/VehicleSelectorCard';
+import CategoryLinesShowcase from '../../../components/common/CategoryLinesShowcase';
 import SiteLogo from '../../../components/common/SiteLogo';
 import '../../../styles/inicio.css';
 import { usePublicFeaturedProducts } from '../../../hooks/usePublicFeaturedProducts';
@@ -268,63 +269,7 @@ export default function Inicio() {
                     </div>
                 </section>
 
-                {/* ==================== FEATURES SECTION ==================== */}
-                <section className="w-full bg-gradient-to-b from-gray-50 to-white border-b border-gray-100">
-                    <div className="page-container py-12 md:py-16">
-                        <div className="grid md:grid-cols-3 gap-8">
-                            {/* Feature 1 - Calidad Original */}
-                            <div className="group bg-white rounded-xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-transparent hover:-translate-y-1">
-                                <div className="flex items-start gap-5">
-                                    <div className="relative">
-                                        <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center border-l-4 border-primary group-hover:scale-110 transition-transform duration-300">
-                                            <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-display text-lg font-bold uppercase text-gray-900 mb-2 group-hover:text-primary transition-colors">Calidad Original</h3>
-                                        <p className="text-sm text-gray-600 leading-relaxed">Importamos directamente repuestos certificados para garantizar la durabilidad de su flota.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Feature 2 - Precios Competitivos */}
-                            <div className="group bg-white rounded-xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-transparent hover:-translate-y-1">
-                                <div className="flex items-start gap-5">
-                                    <div className="relative">
-                                        <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center border-l-4 border-primary group-hover:scale-110 transition-transform duration-300">
-                                            <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-display text-lg font-bold uppercase text-gray-900 mb-2 group-hover:text-primary transition-colors">Precios Competitivos</h3>
-                                        <p className="text-sm text-gray-600 leading-relaxed">Optimizamos costos para ofrecer la mejor relación precio-calidad del mercado en Ate.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Feature 3 - Stock Disponible */}
-                            <div className="group bg-white rounded-xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-transparent hover:-translate-y-1">
-                                <div className="flex items-start gap-5">
-                                    <div className="relative">
-                                        <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center border-l-4 border-primary group-hover:scale-110 transition-transform duration-300">
-                                            <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-display text-lg font-bold uppercase text-gray-900 mb-2 group-hover:text-primary transition-colors">Stock Disponible</h3>
-                                        <p className="text-sm text-gray-600 leading-relaxed">Amplio inventario listo para entrega inmediata. Motores, filtros y sistemas de freno.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <CategoryLinesShowcase />
 
                 {/* ==================== PRODUCTS SECTION ==================== */}
                 <section className="bg-surface-alt py-14 md:py-16 border-t border-border-light">
