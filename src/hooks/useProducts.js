@@ -175,11 +175,23 @@ export function useUpdateProduct() {
     onSuccess: (data, { id }) => {
       // Actualizar caché inmediatamente sin esperar refetch
       queryClient.setQueryData(productKeys.detail(id), data);
-      
-      // Invalidar listas para actualizar en background
-      queryClient.invalidateQueries({ 
-        queryKey: productKeys.lists(),
-        refetchType: 'inactive', // Solo refetch queries inactivas
+
+      queryClient.setQueriesData({ queryKey: productKeys.lists() }, (oldData) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.map((p) => {
+          if (p.id !== id && p.Id !== id) return p;
+          return {
+            ...p,
+            ...data,
+            descripcion: data?.descripcion ?? data?.Descripcion ?? null,
+            fichaTecnica: data?.fichaTecnica ?? data?.FichaTecnica ?? null,
+          };
+        });
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: productKeys.all,
+        refetchType: 'all',
       });
       queryClient.invalidateQueries({ queryKey: ['public-products'] });
       queryClient.invalidateQueries({ queryKey: ['public-product'] });

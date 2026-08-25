@@ -96,13 +96,14 @@ const Productos = () => {
         const matchCodigo = producto.codigo?.toString().toLowerCase().includes(token);
         const matchCodigoComer = producto.codigoComer?.toString().toLowerCase().includes(token);
         const matchProducto = producto.producto?.toLowerCase().includes(token);
+        const matchDescripcion = producto.descripcion?.toLowerCase().includes(token);
         const matchMarca = producto.marcaNombre?.toLowerCase().includes(token);
         const matchCategoria = producto.categoryName?.toLowerCase().includes(token) ||
           producto.categoria?.toLowerCase().includes(token) ||
           producto.category?.nombre?.toLowerCase().includes(token) ||
           producto.category?.toLowerCase().includes(token);
 
-        return matchCodigo || matchCodigoComer || matchProducto || matchMarca || matchCategoria;
+        return matchCodigo || matchCodigoComer || matchProducto || matchDescripcion || matchMarca || matchCategoria;
       });
 
       if (!allTokensMatch) return false;
@@ -171,9 +172,9 @@ const Productos = () => {
       'Código': p.codigo || '',
       'Código Comercial': p.codigoComer || '',
       'Producto': p.producto || '',
+      'Descripción': p.descripcion || '',
       'Marca': p.marcaNombre || '',
       'Categoría': p.categoryName || '',
-      'Descripción': p.descripcion || '',
       'Ficha Técnica': p.fichaTecnica || '',
       'Imagen Principal': p.imagenPrincipal || '',
       'Imagen 2': p.imagen2 || '',
@@ -421,6 +422,7 @@ const Productos = () => {
                 <th className="p-4 py-3 font-bold text-yellow-700 font-mono w-40">Código</th>
                 <th className="p-4 py-3 font-bold text-yellow-700 font-mono w-48">Código Comer.</th>
                 <th className="p-4 py-3 font-bold text-slate-500">Producto</th>
+                <th className="p-4 py-3 font-bold text-slate-500 min-w-[220px]">Descripción</th>
                 <th className="p-4 py-3 font-bold text-slate-500">Marca</th>
                 <th className="p-4 py-3 font-bold text-slate-500 text-center w-48">Categoría</th>
                 {filtroActivo === 'publicar' && (
@@ -435,7 +437,7 @@ const Productos = () => {
             <tbody className="divide-y divide-gray-100">
               {paginatedProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={filtroActivo === 'publicar' ? "8" : "6"} className="p-8 text-center text-slate-500">
+                  <td colSpan={filtroActivo === 'publicar' ? "9" : "7"} className="p-8 text-center text-slate-500">
                     No hay productos para mostrar
                   </td>
                 </tr>
@@ -451,6 +453,11 @@ const Productos = () => {
                     <td className="p-4 py-3">
                       <span className="text-sm text-slate-900 font-semibold">
                         {producto.producto || 'Sin nombre'}
+                      </span>
+                    </td>
+                    <td className="p-4 py-3 max-w-[280px]">
+                      <span className="text-sm text-slate-600 line-clamp-2" title={producto.descripcion || ''}>
+                        {producto.descripcion || '—'}
                       </span>
                     </td>
                     <td className="p-4 py-3">
