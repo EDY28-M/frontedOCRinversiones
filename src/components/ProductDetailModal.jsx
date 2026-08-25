@@ -195,64 +195,38 @@ Por favor, quisiera más información sobre disponibilidad y precio.`;
             <div className="lg:col-span-5 flex">
               <div className="bg-white border border-gray-200 shadow-sm p-4 sm:p-6 md:p-8 w-full flex flex-col">
 
-                {/* Título y códigos */}
+                {/* Título y Marca */}
                 <div className="mb-3 sm:mb-4">
-                  <h2 className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-widest mb-1">
-                    {product.categoryName?.toUpperCase() || 'PRODUCTO'}
-                  </h2>
-                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">
+                  {product.marcaNombre && (
+                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                      {product.marcaNombre}
+                    </p>
+                  )}
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug mb-3">
                     {getDisplayTitle()}
                   </h1>
-                  <div className="flex flex-wrap gap-4 text-xs font-mono text-gray-600 border-b border-gray-100 pb-4">
-                    {!isPublic && (
-                      <span className="flex items-center gap-1">
-                        <span className="text-blue-600 material-symbols-outlined text-sm">qr_code</span>
-                        Código: <span className="font-bold text-gray-900">{product.codigo}</span>
-                      </span>
+
+                  <div className="space-y-1 text-sm text-gray-600 mb-4 pb-4 border-b border-gray-100">
+                    {product.codigo && (
+                      <p>
+                        SKU <span className="font-semibold text-gray-900 font-mono">{product.codigo}</span>
+                      </p>
                     )}
-                    {!isPublic && (
-                      <span className="flex items-center gap-1">
-                        <span className="text-blue-600 material-symbols-outlined text-sm">tag</span>
-                        Código Com.: <span className="font-bold text-gray-900">{product.codigoComer}</span>
-                      </span>
+                    <p>
+                      Vendido por <span className="font-semibold text-gray-900">ORC Inversiones Perú</span>
+                    </p>
+                    {product.categoryName && (
+                      <p>
+                        Categoría <span className="font-semibold text-gray-900">{product.categoryName}</span>
+                      </p>
                     )}
                   </div>
                 </div>
 
-                {/* Descripción */}
+                {/* Descripción (si existe) */}
                 {product.descripcion && (
-                  <div className="prose prose-sm text-gray-600 mb-4 sm:mb-6 md:mb-8 max-w-none">
+                  <div className="prose prose-sm text-gray-600 mb-4 max-w-none">
                     <p>{product.descripcion}</p>
-                  </div>
-                )}
-
-                {/* Ficha Técnica - Solo visible en vista privada (admin) */}
-                {!isPublic && (
-                  <div className="mb-4 sm:mb-6 md:mb-8">
-                    <div className="flex justify-between items-center mb-3">
-                      <h3 className="text-sm font-bold text-gray-900 uppercase border-l-4 border-blue-600 pl-2">
-                        Ficha Técnica
-                      </h3>
-                    </div>
-
-                    {fichaTecnica.length > 0 ? (
-                      <div className="overflow-x-auto overflow-hidden border border-gray-200">
-                        <table className="min-w-full text-xs sm:text-sm text-left">
-                          <tbody className="divide-y divide-gray-200">
-                            {fichaTecnica.map((item, index) => (
-                              <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                                <td className="px-2 sm:px-4 py-2 font-medium text-gray-700 w-1/3">{item.label}</td>
-                                <td className="px-2 sm:px-4 py-2 text-gray-600 font-mono">{item.value}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      <div className="border border-gray-200 p-4 bg-gray-50 text-center">
-                        <p className="text-sm text-gray-400">No hay ficha técnica disponible</p>
-                      </div>
-                    )}
                   </div>
                 )}
 
@@ -260,61 +234,107 @@ Por favor, quisiera más información sobre disponibilidad y precio.`;
                 <div className="mt-auto">
                   {/* Estado de disponibilidad */}
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="flex h-3 w-3 relative">
-                      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${product.isActive ? 'bg-green-400' : 'bg-red-400'} opacity-75`}></span>
-                      <span className={`relative inline-flex rounded-full h-3 w-3 ${product.isActive ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                    </span>
-                    <span className={`text-sm font-medium ${product.isActive ? 'text-green-600' : 'text-red-600'}`}>
+                    <span className="w-3 h-3 rounded-full bg-green-500 shrink-0"></span>
+                    <span className="text-sm font-semibold text-green-600">
                       {product.isActive ? 'Disponible en Stock' : 'No Disponible'}
                     </span>
                   </div>
 
                   {/* Selector de cantidad y botón Comprar */}
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-3">
-                    {/* Selector de cantidad */}
-                    <div className="flex border border-gray-300 bg-white w-full sm:w-32">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center h-12 border-2 border-gray-300 rounded overflow-hidden shrink-0">
                       <button
+                        type="button"
                         onClick={() => handleQuantityChange(-1)}
-                        className="px-4 py-2 hover:bg-gray-100 text-gray-600 font-bold transition-colors"
+                        className="w-10 h-full text-lg font-bold text-gray-700 hover:bg-gray-100 transition-colors"
                       >
                         -
                       </button>
-                      <input
-                        className="w-full text-center border-none bg-transparent focus:ring-0 text-gray-800 font-bold"
-                        type="text"
-                        value={quantity}
-                        readOnly
-                      />
+                      <span className="w-10 text-center font-bold tabular-nums border-x border-gray-300">
+                        {quantity}
+                      </span>
                       <button
+                        type="button"
                         onClick={() => handleQuantityChange(1)}
-                        className="px-4 py-2 hover:bg-gray-100 text-gray-600 font-bold transition-colors"
+                        className="w-10 h-full text-lg font-bold text-gray-700 hover:bg-gray-100 transition-colors"
                       >
                         +
                       </button>
                     </div>
 
-                    {/* Botón Comprar */}
                     <button
+                      type="button"
                       onClick={handleComprar}
-                      className="flex-1 bg-yellow-500 text-gray-900 hover:bg-yellow-400 transition-colors font-bold uppercase tracking-wide py-3 px-4 sm:px-6 shadow-md flex justify-center items-center gap-2 text-sm sm:text-base"
+                      className="flex-1 h-12 rounded bg-[#d4a017] hover:bg-[#b8860b] text-white font-bold text-sm sm:text-base uppercase tracking-wide transition-colors shadow-sm flex items-center justify-center gap-2"
                     >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-                      </svg>
-                      Comprar
+                      <span className="material-symbols-outlined text-[20px]">shopping_cart</span>
+                      COMPRAR
                     </button>
                   </div>
 
                   {/* Botón Consultar con Asesor */}
                   <button
+                    type="button"
                     onClick={handleConsultar}
-                    className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white transition-colors font-bold uppercase tracking-wide py-3 px-4 sm:px-6 flex justify-center items-center gap-2 rounded-lg text-sm sm:text-base"
+                    className="w-full h-12 rounded bg-[#25D366] hover:bg-[#1da851] text-white font-bold text-sm sm:text-base uppercase tracking-wide transition-colors shadow-sm flex items-center justify-center gap-2 mb-5"
                   >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                     </svg>
-                    Consultar con Asesor
+                    CONSULTAR CON ASESOR
                   </button>
+
+                  {/* Envíos y Asesoría */}
+                  <div className="space-y-3 pt-3 border-t border-gray-100">
+                    <div className="flex items-start gap-3">
+                      <span className="w-8 h-8 rounded-full bg-blue-50 text-primary flex items-center justify-center shrink-0">
+                        <span className="material-symbols-outlined text-[18px]">local_shipping</span>
+                      </span>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-900">Disponible envío a domicilio</p>
+                        <button
+                          type="button"
+                          onClick={handleConsultar}
+                          className="text-xs text-primary font-medium hover:underline"
+                        >
+                          Consultar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <span className="w-8 h-8 rounded-full bg-blue-50 text-primary flex items-center justify-center shrink-0">
+                        <span className="material-symbols-outlined text-[18px]">storefront</span>
+                      </span>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-900">Disponible retiro en tienda</p>
+                        <p className="text-[11px] text-gray-500">Av. Nicolás Ayllón 4329 - Ate, Lima</p>
+                        <button
+                          type="button"
+                          onClick={handleConsultar}
+                          className="text-xs text-primary font-medium hover:underline"
+                        >
+                          Consultar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <span className="w-8 h-8 rounded-full bg-green-50 text-[#25D366] flex items-center justify-center shrink-0">
+                        <span className="material-symbols-outlined text-[18px]">chat</span>
+                      </span>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-900">Asesoría por WhatsApp</p>
+                        <button
+                          type="button"
+                          onClick={handleConsultar}
+                          className="text-xs text-[#25D366] font-medium hover:underline"
+                        >
+                          Escribir ahora
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
               </div>
