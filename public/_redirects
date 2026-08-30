@@ -2,3 +2,9 @@
 # Cloudflare Workers handles SPA routing via the asset binding
 # Only keep explicit asset passthrough
 /assets/*  /assets/:splat  200
+
+# Unificar catálogo: /productos duplicaba /repuestos (ya indexada por Google)
+/productos  /repuestos  301
+/productos/  /repuestos  301
+/catalogo  /repuestos  301
+/catalogo/  /repuestos  301

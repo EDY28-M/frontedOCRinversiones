@@ -39,7 +39,7 @@ export default function Servicios() {
               )}
             </NavLink>
             <NavLink
-              to="/productos"
+              to="/repuestos"
               className={({ isActive }) =>
                 `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
               }
@@ -384,7 +384,7 @@ export default function Servicios() {
                 <ul className="space-y-4">
                   <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/nosotros">Sobre Nosotros</Link></li>
                   <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/envios-provincias">Envíos a Provincias</Link></li>
-                  <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/productos">Catálogo</Link></li>
+                  <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/repuestos">Catálogo</Link></li>
                   <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/">Empresa</Link></li>
                 </ul>
               </div>

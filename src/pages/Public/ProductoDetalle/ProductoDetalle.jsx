@@ -75,7 +75,7 @@ export default function ProductoDetalle() {
   });
 
   const title = useMemo(() => cleanTitle(product), [product]);
-  const canonicalPath = product ? getProductUrl(product) : (targetId ? `/productos/${targetId}` : '/productos');
+  const canonicalPath = product ? getProductUrl(product) : (targetId ? `/repuestos/${targetId}` : '/repuestos');
 
   useEffect(() => {
     if (!product || !canonicalPath) return;
@@ -109,7 +109,7 @@ export default function ProductoDetalle() {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      navigate('/productos', { state: { initialQuery: searchTerm.trim() } });
+      navigate(`/repuestos?q=${encodeURIComponent(searchTerm.trim())}`);
     }
   };
 
@@ -134,7 +134,7 @@ export default function ProductoDetalle() {
               )}
             </NavLink>
             <NavLink
-              to="/productos"
+              to="/repuestos"
               className={({ isActive }) =>
                 `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
               }
@@ -181,7 +181,7 @@ export default function ProductoDetalle() {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && searchTerm.trim()) navigate('/productos', { state: { initialQuery: searchTerm.trim() } }); }}
+                onKeyDown={(e) => { if (e.key === 'Enter' && searchTerm.trim()) navigate(`/repuestos?q=${encodeURIComponent(searchTerm.trim())}`); }}
               />
             </div>
           </div>
@@ -222,7 +222,7 @@ export default function ProductoDetalle() {
               <p className="text-sm text-gray-500 mb-4">{error?.message || 'Error desconocido'}</p>
               <div className="flex gap-3 justify-center">
                 <button type="button" onClick={() => refetch()} className="px-5 py-2 bg-primary text-white rounded-full text-sm font-bold">Reintentar</button>
-                <button type="button" onClick={() => navigate('/productos')} className="px-5 py-2 border border-gray-300 rounded-full text-sm font-bold">Volver al catálogo</button>
+                <button type="button" onClick={() => navigate('/repuestos')} className="px-5 py-2 border border-gray-300 rounded-full text-sm font-bold">Volver al catálogo</button>
               </div>
             </div>
           )}
@@ -414,7 +414,7 @@ export default function ProductoDetalle() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => navigate('/productos')}
+                    onClick={() => navigate('/repuestos')}
                     className="self-start inline-flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-primary transition-colors"
                   >
                     <span className="material-symbols-outlined text-[18px]">arrow_back</span>
@@ -619,7 +619,7 @@ export default function ProductoDetalle() {
                 <ul className="space-y-2">
                   <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/nosotros">Sobre Nosotros</Link></li>
                   <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/envios-provincias">Envíos a Provincias</Link></li>
-                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/productos">Catálogo</Link></li>
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/repuestos">Catálogo</Link></li>
                   <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/">Empresa</Link></li>
                 </ul>
               </div>

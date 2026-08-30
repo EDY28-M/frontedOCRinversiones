@@ -1,12 +1,14 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { getCatalogUrl, toSlug } from '../../utils/slugUtils';
 
 const FiltersSidebar = ({
   categories,
   brands,
   selectedCategory,
   selectedBrands,
-  onCategoryChange,
-  onBrandToggle,
+  selectedCategoryName,
+  selectedBrandName,
   onClearFilters,
   isLoadingCategories,
   isLoadingBrands,
@@ -21,16 +23,7 @@ const FiltersSidebar = ({
   );
   const selectedCategoryId = Number(selectedCategory) > 0 ? Number(selectedCategory) : null;
 
-  // Handler robusto para toggle de marca
-  const handleBrandClick = useCallback((brandId) => {
-    const numericId = Number(brandId);
-    if (!isNaN(numericId) && numericId > 0) {
-      onBrandToggle(numericId);
-    }
-  }, [onBrandToggle]);
-
-  // Normalizar categorías
-  const normalizedCategories = useMemo(() => 
+  const normalizedCategories = useMemo(() =>
     categories.map(cat => ({
       id: Number(cat.Id || cat.id),
       name: cat.Name || cat.name || cat.Nombre || cat.nombre || 'Sin nombre',
@@ -39,14 +32,15 @@ const FiltersSidebar = ({
     [categories]
   );
 
-  // Normalizar marcas
-  const normalizedBrands = useMemo(() => 
+  const normalizedBrands = useMemo(() =>
     brands.map(brand => ({
       id: Number(brand.Id || brand.id),
       name: brand.Nombre || brand.nombre || brand.Name || brand.name || 'Sin nombre'
     })),
     [brands]
   );
+
+  const allCategoriesHref = getCatalogUrl({ brandName: selectedBrandName });
 
   return (
     <>
@@ -61,13 +55,11 @@ const FiltersSidebar = ({
         </button>
       </div>
 
-      {/* Sidebar - Categorías y marcas dinámicas del backend */}
       <aside className={`w-full lg:w-64 flex-shrink-0 border-r border-gray-200 bg-white p-6 ${mobileFiltersOpen ? 'block' : 'hidden lg:block'}`}>
-
-        {/* Header de Filtros con Reset */}
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-xs font-bold tracking-widest uppercase text-gray-400">FILTRAR POR</h3>
           <button
+            type="button"
             onClick={onClearFilters}
             className="text-xs font-bold text-blue-600 hover:text-blue-700 tracking-wider transition-colors uppercase"
           >
@@ -87,37 +79,40 @@ const FiltersSidebar = ({
             <p className="text-xs text-red-500">Error al cargar categorías</p>
           ) : (
             <div className="flex flex-col gap-2">
-              {/* Opción "Todas" */}
-              <button
-                type="button"
-                className="group flex items-center gap-3 py-2 px-2 -mx-2 rounded hover:bg-gray-50 cursor-pointer transition-colors text-left w-full"
-                onClick={() => onCategoryChange(null)}
+              <Link
+                to={allCategoriesHref}
+                className="group flex items-center gap-3 py-2 px-2 -mx-2 rounded hover:bg-gray-50 cursor-pointer transition-colors text-left w-full no-underline"
               >
                 <span className={`w-1 h-5 rounded-full transition-colors ${selectedCategoryId === null ? 'bg-primary' : 'bg-gray-300 group-hover:bg-primary/50'}`}></span>
                 <span className={`text-sm ${selectedCategoryId === null ? 'font-bold text-gray-900' : 'font-medium text-gray-700 group-hover:text-gray-900'}`}>
                   Todas las Categorías
                 </span>
-              </button>
-              {/* Categorías del backend */}
-              {normalizedCategories.map(cat => (
-                <button
-                  type="button"
-                  key={cat.id}
-                  className="group flex items-center gap-3 py-2 px-2 -mx-2 rounded hover:bg-gray-50 cursor-pointer transition-colors text-left w-full"
-                  onClick={() => onCategoryChange(cat.id)}
-                >
-                  <span className={`w-1 h-5 rounded-full transition-colors ${selectedCategoryId === cat.id ? 'bg-primary' : 'bg-gray-300 group-hover:bg-primary/50'}`}></span>
-                  <span className={`text-sm ${selectedCategoryId === cat.id ? 'font-bold text-gray-900' : 'font-medium text-gray-700 group-hover:text-gray-900'}`}>
-                    {cat.name}
-                    {cat.count > 0 && <span className="ml-1 text-gray-500">({cat.count})</span>}
-                  </span>
-                </button>
-              ))}
+              </Link>
+              {normalizedCategories.map(cat => {
+                const href = getCatalogUrl({
+                  categoryName: cat.name,
+                  brandName: selectedBrandName,
+                });
+                const isActive = selectedCategoryId === cat.id
+                  || (selectedCategoryName && toSlug(selectedCategoryName) === toSlug(cat.name));
+                return (
+                  <Link
+                    key={cat.id}
+                    to={href}
+                    className="group flex items-center gap-3 py-2 px-2 -mx-2 rounded hover:bg-gray-50 cursor-pointer transition-colors text-left w-full no-underline"
+                  >
+                    <span className={`w-1 h-5 rounded-full transition-colors ${isActive ? 'bg-primary' : 'bg-gray-300 group-hover:bg-primary/50'}`}></span>
+                    <span className={`text-sm ${isActive ? 'font-bold text-gray-900' : 'font-medium text-gray-700 group-hover:text-gray-900'}`}>
+                      {cat.name}
+                      {cat.count > 0 && <span className="ml-1 text-gray-500">({cat.count})</span>}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
 
-        {/* Filtros de marcas */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xs font-bold tracking-widest uppercase text-gray-900">Marcas</h3>
@@ -137,17 +132,21 @@ const FiltersSidebar = ({
           ) : (
             <div className="flex flex-col gap-1 max-h-60 overflow-y-auto pr-2">
               {normalizedBrands.map(brand => {
-                const isSelected = selectedBrandIds.has(brand.id);
+                const isSelected = selectedBrandIds.has(brand.id)
+                  || (selectedBrandName && toSlug(selectedBrandName) === toSlug(brand.name));
+                const href = getCatalogUrl({
+                  categoryName: selectedCategoryName,
+                  brandName: isSelected ? '' : brand.name,
+                });
                 return (
-                  <button
-                    type="button"
+                  <Link
                     key={brand.id}
-                    className="group flex items-center gap-3 py-2 px-2 -mx-2 rounded hover:bg-gray-50 cursor-pointer transition-colors text-left w-full"
-                    onClick={() => handleBrandClick(brand.id)}
+                    to={href}
+                    className="group flex items-center gap-3 py-2 px-2 -mx-2 rounded hover:bg-gray-50 cursor-pointer transition-colors text-left w-full no-underline"
                   >
                     <span className={`w-4 h-4 flex items-center justify-center border rounded transition-colors ${
-                      isSelected 
-                        ? 'bg-blue-600 border-blue-600' 
+                      isSelected
+                        ? 'bg-blue-600 border-blue-600'
                         : 'border-gray-300 group-hover:border-gray-400'
                     }`}>
                       {isSelected && (
@@ -159,7 +158,7 @@ const FiltersSidebar = ({
                     <span className={`text-sm ${isSelected ? 'font-bold text-gray-900' : 'font-medium text-gray-700 group-hover:text-gray-900'}`}>
                       {brand.name}
                     </span>
-                  </button>
+                  </Link>
                 );
               })}
             </div>

@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import MobileMenu from '../../../components/common/MobileMenu';
 import WhatsAppButton from '../../../components/WhatsAppButton';
-import ProductDetailModal from '../../../components/ProductDetailModal';
 import VehicleSelectorCard from '../../../components/common/VehicleSelectorCard';
 import CategoryLinesShowcase from '../../../components/common/CategoryLinesShowcase';
 import SiteLogo from '../../../components/common/SiteLogo';
@@ -10,6 +9,7 @@ import '../../../styles/inicio.css';
 import { usePublicFeaturedProducts } from '../../../hooks/usePublicFeaturedProducts';
 import { getFirstValidImageUrl } from '../../../utils/imageUtils';
 import { useDocumentMeta } from '../../../hooks/useDocumentMeta';
+import { getProductUrl } from '../../../utils/slugUtils';
 
 /**
  * Componente Inicio - Migración pixel-perfect del HTML original (Google Stitch)
@@ -34,11 +34,10 @@ const getDisplayName = (product) => {
 
 export default function Inicio() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState(null);
     const { products: featuredProducts, isLoading: isLoadingFeatured } = usePublicFeaturedProducts({ page: 1, pageSize: 9 });
 
     useDocumentMeta({
-        title: 'ORC Inversiones Perú - Repuestos Coreanos, Chinos y Japoneses para Vehículos',
+        title: 'ORC Inversiones Perú | Venta de Repuestos Automotrices en Lima',
         description: 'Líderes en importación de repuestos coreanos, chinos y japoneses para vehículos. Más de 15 años de experiencia en Ate, Lima. JAC, Foton, Hyundai, Toyota y más. Envíos a todo el Perú.',
         canonicalPath: '/',
     });
@@ -72,7 +71,7 @@ export default function Inicio() {
                             )}
                         </NavLink>
                         <NavLink
-                            to="/productos"
+                            to="/repuestos"
                             className={({ isActive }) =>
                                 `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
                             }
@@ -166,7 +165,7 @@ export default function Inicio() {
                                             Más de 15 años de experiencia atendiendo talleres y flotas en Ate, Lima. Calidad garantizada para tu vehiculo.
                                         </p>
                                         <div className="flex flex-col sm:flex-row gap-3">
-                                            <Link to="/productos" className="bg-accent hover:bg-yellow-400 text-black px-6 py-3 font-bold uppercase tracking-wider text-xs transition-all shadow-lg shadow-yellow-500/40 hover:shadow-yellow-400/60 hover:scale-105 text-center">
+                                            <Link to="/repuestos" className="bg-accent hover:bg-yellow-400 text-black px-6 py-3 font-bold uppercase tracking-wider text-xs transition-all shadow-lg shadow-yellow-500/40 hover:shadow-yellow-400/60 hover:scale-105 text-center">
                                                 Ver Catálogo
                                             </Link>
                                             <a
@@ -201,7 +200,7 @@ export default function Inicio() {
                 <section className="w-full bg-white border-b border-gray-100 py-12 overflow-hidden">
                     <div className="page-container">
                         <div className="text-center mb-10">
-                            <h3 className="font-display text-2xl md:text-3xl font-medium uppercase text-primary mb-2">Especialistas en Marcas</h3>
+                            <h2 className="font-display text-2xl md:text-3xl font-medium uppercase text-primary mb-2">Especialistas en Marcas</h2>
                             <div className="w-16 h-1 bg-accent mx-auto"></div>
                         </div>
 
@@ -209,9 +208,9 @@ export default function Inicio() {
                         <div className="mb-8">
                             <div className="flex items-center justify-center gap-3 mb-6">
                                 <div className="h-px bg-gray-200 flex-1 max-w-[100px]"></div>
-                                <span className="text-xs font-bold uppercase tracking-widest text-red-600 bg-red-50 px-4 py-1.5 rounded-full border border-red-100">
-                                    🇨🇳 Línea China
-                                </span>
+                                <h3 className="text-xs font-bold uppercase tracking-widest text-red-600 bg-red-50 px-4 py-1.5 rounded-full border border-red-100">
+                                    Línea China
+                                </h3>
                                 <div className="h-px bg-gray-200 flex-1 max-w-[100px]"></div>
                             </div>
                             <div className="brand-carousel">
@@ -242,9 +241,9 @@ export default function Inicio() {
                         <div>
                             <div className="flex items-center justify-center gap-3 mb-6">
                                 <div className="h-px bg-gray-200 flex-1 max-w-[100px]"></div>
-                                <span className="text-xs font-bold uppercase tracking-widest text-primary bg-blue-50 px-4 py-1.5 rounded-full border border-blue-100">
-                                    🇯🇵🇰🇷 Línea Japonesa y Coreana
-                                </span>
+                                <h3 className="text-xs font-bold uppercase tracking-widest text-primary bg-blue-50 px-4 py-1.5 rounded-full border border-blue-100">
+                                    Línea Japonesa y Coreana
+                                </h3>
                                 <div className="h-px bg-gray-200 flex-1 max-w-[100px]"></div>
                             </div>
                             <div className="brand-carousel">
@@ -280,7 +279,7 @@ export default function Inicio() {
                                 <span className="text-primary text-xs font-bold uppercase tracking-widest mb-1 block">Catálogo Online</span>
                                 <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-medium uppercase text-black">Productos Destacados</h2>
                             </div>
-                            <Link className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary hover:text-black transition-colors" to="/productos">
+                            <Link className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary hover:text-black transition-colors" to="/repuestos">
                                 Ver Catálogo Completo <span className="material-symbols-outlined text-base">arrow_forward</span>
                             </Link>
                         </div>
@@ -310,47 +309,38 @@ export default function Inicio() {
                                 >
                                     {row.map((producto) => {
                                         const imageUrl = getFirstValidImageUrl(producto);
+                                        const productUrl = getProductUrl(producto);
                                         return (
-                                            <div
+                                            <article
                                                 key={producto.id}
-                                                onClick={() => setSelectedProduct(producto)}
-                                                className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300 flex flex-col h-full cursor-pointer"
+                                                className="bg-white border border-gray-200 group grid-card hover:border-primary/30 hover:shadow-lg transition-all duration-300 flex flex-col h-full"
                                             >
-                                                {/* Image container with fixed aspect ratio */}
-                                                <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative flex-shrink-0">
-                                                    {imageUrl ? (
-                                                        <div
-                                                            className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
-                                                            style={{ backgroundImage: `url("${imageUrl}")` }}
-                                                        ></div>
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                            <span className="material-symbols-outlined text-4xl">image</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                {/* Content container with flex-grow to fill remaining space */}
-                                                <div className="p-5 md:p-6 product-card-content flex flex-col flex-grow">
-                                                    {/* Title with fixed height (2 lines max) */}
-                                                    <h3 className="font-display text-lg font-medium uppercase text-primary mb-1.5 line-clamp-2 min-h-[3.5rem]">
-                                                        {getDisplayName(producto)}
-                                                    </h3>
-                                                    {/* Description with fixed height (2 lines max) */}
-                                                    <p className="text-sm text-gray-500 mb-4 font-light leading-relaxed line-clamp-2 min-h-[2.5rem]">
-                                                        {producto.descripcion || 'Descripción no disponible.'}
-                                                    </p>
-                                                    {/* Button pushed to bottom with mt-auto */}
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setSelectedProduct(producto);
-                                                        }}
-                                                        className="w-full bg-accent hover:bg-accent-hover text-black py-2.5 font-bold uppercase text-xs tracking-wider transition-colors mt-auto"
-                                                    >
-                                                        Cotizar Ahora
-                                                    </button>
-                                                </div>
-                                            </div>
+                                                <Link to={productUrl} className="flex flex-col h-full text-inherit no-underline">
+                                                    <div className="aspect-[16/9] bg-gray-50 overflow-hidden relative flex-shrink-0">
+                                                        {imageUrl ? (
+                                                            <div
+                                                                className="w-full h-full bg-cover bg-center card-img transition-transform duration-500"
+                                                                style={{ backgroundImage: `url("${imageUrl}")` }}
+                                                            ></div>
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                                                <span className="material-symbols-outlined text-4xl">image</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="p-5 md:p-6 product-card-content flex flex-col flex-grow">
+                                                        <h3 className="font-display text-lg font-medium uppercase text-primary mb-1.5 line-clamp-2 min-h-[3.5rem]">
+                                                            {getDisplayName(producto)}
+                                                        </h3>
+                                                        <p className="text-sm text-gray-500 mb-4 font-light leading-relaxed line-clamp-2 min-h-[2.5rem]">
+                                                            {producto.descripcion || 'Descripción no disponible.'}
+                                                        </p>
+                                                        <span className="w-full bg-accent hover:bg-accent-hover text-black py-2.5 font-bold uppercase text-xs tracking-wider transition-colors mt-auto text-center">
+                                                            Cotizar Ahora
+                                                        </span>
+                                                    </div>
+                                                </Link>
+                                            </article>
                                         );
                                     })}
                                 </div>
@@ -359,7 +349,7 @@ export default function Inicio() {
 
                         {/* Mobile CTA */}
                         <div className="mt-8 text-center md:hidden">
-                            <button className="bg-white border border-gray-300 text-black px-6 py-2.5 font-semibold uppercase tracking-wider text-xs w-full">Ver Catálogo Completo</button>
+                            <Link to="/repuestos" className="inline-block bg-white border border-gray-300 text-black px-6 py-2.5 font-semibold uppercase tracking-wider text-xs w-full">Ver Catálogo Completo</Link>
                         </div>
                     </div>
                 </section>
@@ -390,7 +380,7 @@ export default function Inicio() {
                                 <ul className="space-y-4">
                                     <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/nosotros">Sobre Nosotros</Link></li>
                                     <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/envios-provincias">Envíos a Provincias</Link></li>
-                                    <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/productos">Catálogo</Link></li>
+                                    <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/repuestos">Catálogo</Link></li>
                                     <li><Link className="text-sm text-gray-200 hover:text-white transition-colors" to="/">Empresa</Link></li>
                                 </ul>
                             </div>
@@ -436,14 +426,6 @@ export default function Inicio() {
                 <WhatsAppButton />
             </div>{/* Cierre del contenedor con scroll */}
 
-            {/* Modal de Detalle del Producto */}
-            {selectedProduct && (
-                <ProductDetailModal
-                    product={selectedProduct}
-                    onClose={() => setSelectedProduct(null)}
-                    isPublic={true}
-                />
-            )}
         </div>
     );
 }

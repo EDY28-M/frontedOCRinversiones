@@ -59,7 +59,7 @@ const MobileMenu = ({ isOpen, onClose }) => {
                     </NavLink>
 
                     <NavLink
-                        to="/productos"
+                        to="/repuestos"
                         onClick={onClose}
                         className={({ isActive }) =>
                             `text-xl font-display font-medium tracking-wide transition-colors flex items-center justify-between group ${isActive ? 'text-primary' : 'text-gray-800 hover:text-primary'

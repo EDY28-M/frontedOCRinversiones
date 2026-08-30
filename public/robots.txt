@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
-Allow: /productos
+Allow: /repuestos
 Allow: /repuestos/
 Allow: /nosotros
 Allow: /envios-provincias

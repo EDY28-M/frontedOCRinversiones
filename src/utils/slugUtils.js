@@ -2,6 +2,8 @@
  * Helper de utilidades para generación de Slugs y URLs amigables SEO
  */
 
+export const CATALOG_PATH = '/repuestos';
+
 export function toSlug(str) {
   if (!str) return 'general';
   return String(str)
@@ -14,8 +16,17 @@ export function toSlug(str) {
     .replace(/-+/g, '-');
 }
 
+export function getCatalogUrl({ categoryName, brandName } = {}) {
+  const cat = categoryName ? toSlug(categoryName) : '';
+  const brand = brandName ? toSlug(brandName) : '';
+  if (cat && brand) return `${CATALOG_PATH}/${cat}/${brand}`;
+  if (cat) return `${CATALOG_PATH}/${cat}`;
+  if (brand) return `${CATALOG_PATH}/${brand}`;
+  return CATALOG_PATH;
+}
+
 export function getProductUrl(product) {
-  if (!product) return '/productos';
+  if (!product) return CATALOG_PATH;
 
   const catName =
     product.categoryName ||

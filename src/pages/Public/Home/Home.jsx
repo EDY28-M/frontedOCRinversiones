@@ -21,7 +21,7 @@ const Home = () => {
                     </div>
                     <nav className="hidden md:flex items-center gap-8">
                         <Link className="text-xs font-semibold hover:text-primary transition-colors tracking-wide" to="/">INICIO</Link>
-                        <Link className="text-xs font-bold text-primary border-b-2 border-primary py-1 tracking-wide" to="/productos">CATÁLOGO</Link>
+                        <Link className="text-xs font-bold text-primary border-b-2 border-primary py-1 tracking-wide" to="/repuestos">CATÁLOGO</Link>
                         <Link className="text-xs font-semibold hover:text-primary transition-colors tracking-wide" to="/servicios">SERVICIOS</Link>
                         <Link className="text-xs font-semibold hover:text-primary transition-colors tracking-wide" to="/nosotros">EMPRESA</Link>
                     </nav>

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Suspense } from 'react';
 import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/common/ProtectedRoute';
@@ -94,6 +94,11 @@ const AdminLazyWrapper = ({ children }) => (
   </Suspense>
 );
 
+function RedirectToCatalog() {
+  const location = useLocation();
+  return <Navigate to={`/repuestos${location.search}${location.hash}`} replace />;
+}
+
 const AppRoutes = () => {
   // El portal admin/vendedor vive exclusivamente en admin.orcinversionesperu.com.
   // En el dominio principal esas rutas no se renderizan (quedan inaccesibles).
@@ -110,14 +115,14 @@ const AppRoutes = () => {
         {!isAdminHost && (
           <>
             <Route path="/" element={<LazyWrapper><Inicio /></LazyWrapper>} />
-            <Route path="/productos" element={<LazyWrapper><Productos /></LazyWrapper>} />
+            <Route path="/productos" element={<RedirectToCatalog />} />
             <Route path="/productos/:id" element={<LazyWrapper><ProductoDetalle /></LazyWrapper>} />
             <Route path="/repuestos" element={<LazyWrapper><Productos /></LazyWrapper>} />
             <Route path="/repuestos/:slug" element={<LazyWrapper><Productos /></LazyWrapper>} />
             <Route path="/repuestos/:categoriaSlug/:marcaSlug" element={<LazyWrapper><Productos /></LazyWrapper>} />
             <Route path="/repuestos/:categoriaSlug/:marcaSlug/:productoSlug" element={<LazyWrapper><ProductoDetalle /></LazyWrapper>} />
             <Route path="/:categoriaSlug/:marcaSlug/:productoSlug" element={<LazyWrapper><ProductoDetalle /></LazyWrapper>} />
-            <Route path="/catalogo" element={<Navigate to="/productos" replace />} />
+            <Route path="/catalogo" element={<RedirectToCatalog />} />
             <Route path="/envios-provincias" element={<LazyWrapper><Servicios /></LazyWrapper>} />
             <Route path="/nosotros" element={<LazyWrapper><Nosotros /></LazyWrapper>} />
 

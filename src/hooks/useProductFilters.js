@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useTransition, useDeferredValue, useMemo } from 'react';
-import { useSearchParams, useParams } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { usePublicProducts } from './usePublicProducts.js';
 import { usePublicBrands } from './usePublicBrands.js';
 import { usePublicCategories } from './usePublicCategories.js';
-import { toSlug } from '../utils/slugUtils.js';
+import { toSlug, getCatalogUrl, CATALOG_PATH } from '../utils/slugUtils.js';
 
 function toPositiveInt(value) {
   const n = Number(value);
@@ -34,9 +34,21 @@ function brandIdOf(brand) {
   return toPositiveInt(brand?.Id ?? brand?.id);
 }
 
+function withPreservedQuery(path, searchParams, { dropLegacy = true } = {}) {
+  const next = new URLSearchParams(searchParams);
+  if (dropLegacy) {
+    next.delete('categoria');
+    next.delete('marca');
+    next.delete('brandIds');
+  }
+  const qs = next.toString();
+  return qs ? `${path}?${qs}` : path;
+}
+
 export const useProductFilters = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const routeParams = useParams();
+  const navigate = useNavigate();
   const pageSize = 12;
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -44,67 +56,71 @@ export const useProductFilters = () => {
   const [isPending, startTransition] = useTransition();
   const deferredSearchQuery = useDeferredValue(searchQuery);
 
-  const selectedCategory = toPositiveInt(searchParams.get('categoria'));
-  const selectedBrands = useMemo(
-    () => parseBrandIds(searchParams.get('marca') || searchParams.get('brandIds')),
-    [searchParams]
-  );
-
   const { brands, isLoading: isLoadingBrands, error: brandsError } = usePublicBrands();
   const { categories, isLoading: isLoadingCategories, error: categoriesError } = usePublicCategories();
 
-  const patchParams = useCallback((mutator) => {
-    startTransition(() => {
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        mutator(next);
-        return next;
-      }, { replace: true });
-      setCurrentPage(1);
-    });
-  }, [setSearchParams]);
+  const catSlug = routeParams.categoriaSlug || routeParams.slug || '';
+  const marcaSlug = routeParams.marcaSlug || '';
 
-  // Apply /repuestos/:slug or /repuestos/:categoriaSlug/:marcaSlug when the URL has no query filters.
+  const resolvedCategory = useMemo(() => {
+    if (!catSlug || !categories.length) return null;
+    return categories.find((c) => toSlug(categoryName(c)) === catSlug) || null;
+  }, [catSlug, categories]);
+
+  const resolvedBrand = useMemo(() => {
+    if (!brands.length) return null;
+    if (marcaSlug) {
+      return brands.find((b) => toSlug(brandName(b)) === marcaSlug) || null;
+    }
+    if (catSlug && !resolvedCategory) {
+      return brands.find((b) => toSlug(brandName(b)) === catSlug) || null;
+    }
+    return null;
+  }, [brands, marcaSlug, catSlug, resolvedCategory]);
+
+  const selectedCategory = categoryIdOf(resolvedCategory);
+  const selectedCategoryName = resolvedCategory ? categoryName(resolvedCategory) : '';
+  const selectedBrandName = resolvedBrand ? brandName(resolvedBrand) : '';
+
+  const selectedBrands = useMemo(() => {
+    const fromQuery = parseBrandIds(searchParams.get('marca') || searchParams.get('brandIds'));
+    if (fromQuery.length > 1) return fromQuery;
+    const one = brandIdOf(resolvedBrand);
+    if (one) return [one];
+    return fromQuery;
+  }, [searchParams, resolvedBrand]);
+
+  // Convert legacy ?categoria=ID / ?marca=ID into crawlable slug paths.
   useEffect(() => {
-    const hasQueryFilter = searchParams.get('categoria') || searchParams.get('marca') || searchParams.get('brandIds');
-    if (hasQueryFilter) return;
+    const catId = toPositiveInt(searchParams.get('categoria'));
+    const brandIds = parseBrandIds(searchParams.get('marca') || searchParams.get('brandIds'));
+    if (!catId && brandIds.length === 0) return;
+    if (catId && !categories.length) return;
+    if (brandIds.length > 0 && !brands.length) return;
 
-    const catSlug = routeParams.categoriaSlug || routeParams.slug;
-    const marcaFromRoute = routeParams.marcaSlug;
-    if (!catSlug && !marcaFromRoute) return;
+    const cat = catId ? categories.find((c) => categoryIdOf(c) === catId) : resolvedCategory;
+    const singleBrand = brandIds.length === 1
+      ? brands.find((b) => brandIdOf(b) === brandIds[0])
+      : null;
+
+    const path = getCatalogUrl({
+      categoryName: cat ? categoryName(cat) : '',
+      brandName: singleBrand ? brandName(singleBrand) : '',
+    });
 
     const next = new URLSearchParams(searchParams);
-    let changed = false;
-
-    if (catSlug && categories.length) {
-      const cat = categories.find((c) => toSlug(categoryName(c)) === catSlug);
-      const id = cat ? categoryIdOf(cat) : null;
-      if (id && !next.get('categoria')) {
-        next.set('categoria', String(id));
-        changed = true;
-      } else if (!id && brands.length && !next.get('marca')) {
-        const brand = brands.find((b) => toSlug(brandName(b)) === catSlug);
-        const brandId = brand ? brandIdOf(brand) : null;
-        if (brandId) {
-          next.set('marca', String(brandId));
-          changed = true;
-        }
-      }
+    next.delete('categoria');
+    if (brandIds.length <= 1) {
+      next.delete('marca');
+      next.delete('brandIds');
     }
-
-    if (marcaFromRoute && brands.length && !next.get('marca')) {
-      const brand = brands.find((b) => toSlug(brandName(b)) === marcaFromRoute);
-      const brandId = brand ? brandIdOf(brand) : null;
-      if (brandId) {
-        next.set('marca', String(brandId));
-        changed = true;
-      }
+    const qs = next.toString();
+    const target = qs ? `${path}?${qs}` : path;
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (current !== target) {
+      navigate(target, { replace: true });
     }
-
-    if (changed) {
-      setSearchParams(next, { replace: true });
-    }
-  }, [categories, brands, routeParams.slug, routeParams.categoriaSlug, routeParams.marcaSlug, searchParams, setSearchParams]);
+  }, [categories, brands, searchParams, navigate, resolvedCategory]);
 
   useEffect(() => {
     startTransition(() => {
@@ -131,35 +147,36 @@ export const useProductFilters = () => {
 
   const handleCategoryChange = useCallback((categoryId) => {
     const numericId = toPositiveInt(categoryId);
-    patchParams((next) => {
-      if (!numericId || selectedCategory === numericId) {
-        next.delete('categoria');
-      } else {
-        next.set('categoria', String(numericId));
-      }
+    const cat = numericId ? categories.find((c) => categoryIdOf(c) === numericId) : null;
+    const keepBrand = selectedBrands.length === 1
+      ? brands.find((b) => brandIdOf(b) === selectedBrands[0])
+      : null;
+    const path = getCatalogUrl({
+      categoryName: cat ? categoryName(cat) : '',
+      brandName: keepBrand ? brandName(keepBrand) : '',
     });
-  }, [patchParams, selectedCategory]);
+    navigate(withPreservedQuery(path, searchParams));
+  }, [categories, brands, selectedBrands, navigate, searchParams]);
 
   const handleBrandToggle = useCallback((brandId) => {
     const numericId = toPositiveInt(brandId);
     if (!numericId) return;
-    patchParams((next) => {
-      const current = parseBrandIds(next.get('marca') || next.get('brandIds'));
-      const exists = current.includes(numericId);
-      const updated = exists ? current.filter((id) => id !== numericId) : [...current, numericId];
-      next.delete('brandIds');
-      if (updated.length === 0) next.delete('marca');
-      else next.set('marca', updated.join(','));
+    const isOnlySelected = selectedBrands.length === 1 && selectedBrands[0] === numericId;
+    const brand = isOnlySelected ? null : brands.find((b) => brandIdOf(b) === numericId);
+    const path = getCatalogUrl({
+      categoryName: selectedCategoryName,
+      brandName: brand ? brandName(brand) : '',
     });
-  }, [patchParams]);
+    navigate(withPreservedQuery(path, searchParams));
+  }, [brands, selectedBrands, selectedCategoryName, navigate, searchParams]);
 
   const handleClearFilters = useCallback(() => {
     startTransition(() => {
       setSearchQuery('');
       setCurrentPage(1);
-      setSearchParams({}, { replace: true });
+      navigate(CATALOG_PATH);
     });
-  }, [setSearchParams]);
+  }, [navigate]);
 
   return {
     searchQuery,
@@ -168,6 +185,8 @@ export const useProductFilters = () => {
     setCurrentPage,
     selectedCategory,
     selectedBrands,
+    selectedCategoryName,
+    selectedBrandName,
     categories,
     brands,
     isLoadingBrands,

@@ -8,7 +8,7 @@ import { useEffect } from 'react';
  * @param {Object} options
  * @param {string} options.title - Título de la página (aparece en la pestaña del navegador)
  * @param {string} options.description - Meta description para SEO
- * @param {string} [options.canonicalPath] - Path canónico (ej: '/productos')
+ * @param {string} [options.canonicalPath] - Path canónico (ej: '/repuestos')
  * @param {string} [options.ogTitle] - Título para Open Graph (si difiere del title)
  * @param {string} [options.ogDescription] - Descripción para Open Graph
  * @param {string} [options.ogImage] - Imagen para Open Graph
@@ -83,7 +83,7 @@ export function useDocumentMeta({
 
         // Cleanup: restaurar valores por defecto al desmontar
         return () => {
-            document.title = 'ORC Inversiones Perú - Repuestos Coreanos y Chinos para Vehículos';
+            document.title = 'ORC Inversiones Perú | Venta de Repuestos Automotrices en Lima';
         };
     }, [title, description, canonicalPath, ogTitle, ogDescription, ogImage]);
 }

@@ -158,7 +158,7 @@ export default function EmpresaBloques() {
               <a href={WA} target="_blank" rel="noopener noreferrer" className="emp-btn emp-btn--wa">
                 Confirmar por WhatsApp
               </a>
-              <Link to="/productos" className="emp-btn emp-btn--ghost">
+              <Link to="/repuestos" className="emp-btn emp-btn--ghost">
                 Ver catálogo
               </Link>
             </div>

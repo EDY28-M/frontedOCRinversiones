@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import FiltersSidebar from '../../../components/products/FiltersSidebar.jsx';
 import ProductsGrid from '../../../components/products/ProductsGrid.jsx';
@@ -7,6 +7,7 @@ import MobileMenu from '../../../components/common/MobileMenu';
 import SiteLogo from '../../../components/common/SiteLogo';
 import { useProductFilters } from '../../../hooks/useProductFilters';
 import { useDocumentMeta } from '../../../hooks/useDocumentMeta';
+import { getCatalogUrl } from '../../../utils/slugUtils';
 
 /**
  * Página pública de Productos
@@ -36,18 +37,54 @@ export default function Productos() {
     isError,
     error,
     refetch,
-    handleCategoryChange,
-    handleBrandToggle,
     handleClearFilters,
+    selectedCategoryName,
+    selectedBrandName,
   } = useProductFilters();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  const seo = useMemo(() => {
+    const cat = selectedCategoryName;
+    const brand = selectedBrandName;
+    const canonicalPath = getCatalogUrl({ categoryName: cat, brandName: brand });
+    if (cat && brand) {
+      return {
+        title: `Repuestos ${cat} ${brand} | ORC Inversiones Perú`,
+        heading: `Repuestos ${cat} ${brand}`,
+        description: `Repuestos ${cat} de la marca ${brand} en ORC Inversiones Perú. Piezas coreanas, chinas y japonesas en Ate, Lima. Envíos a todo el Perú.`,
+        canonicalPath,
+      };
+    }
+    if (cat) {
+      return {
+        title: `Repuestos ${cat} | ORC Inversiones Perú`,
+        heading: `Repuestos ${cat}`,
+        description: `Catálogo de ${cat} para vehículos. Repuestos coreanos, chinos y japoneses en ORC Inversiones Perú, Ate, Lima.`,
+        canonicalPath,
+      };
+    }
+    if (brand) {
+      return {
+        title: `Repuestos ${brand} | ORC Inversiones Perú`,
+        heading: `Repuestos ${brand}`,
+        description: `Catálogo de repuestos ${brand} para vehículos en ORC Inversiones Perú. Stock en Ate, Lima y envíos a todo el Perú.`,
+        canonicalPath,
+      };
+    }
+    return {
+      title: 'Catálogo de Repuestos para Vehículos | ORC Inversiones Perú',
+      heading: 'Catálogo de Repuestos para Vehículos',
+      description: 'Explora nuestro catálogo de repuestos coreanos, chinos y japoneses para vehículos. Filtros, frenos, motores y más. JAC, Foton, Hyundai, Toyota, JMC. Precios competitivos en Ate, Lima.',
+      canonicalPath: '/repuestos',
+    };
+  }, [selectedCategoryName, selectedBrandName]);
+
   useDocumentMeta({
-    title: 'Catálogo de Repuestos para Vehículos | ORC Inversiones Perú',
-    description: 'Explora nuestro catálogo de repuestos coreanos, chinos y japoneses para vehículos. Filtros, frenos, motores y más. JAC, Foton, Hyundai, Toyota, JMC. Precios competitivos en Ate, Lima.',
-    canonicalPath: '/productos',
+    title: seo.title,
+    description: seo.description,
+    canonicalPath: seo.canonicalPath,
   });
 
   const handlePageChange = (page) => {
@@ -76,7 +113,7 @@ export default function Productos() {
               )}
             </NavLink>
             <NavLink
-              to="/productos"
+              to="/repuestos"
               className={({ isActive }) =>
                 `text-xs font-semibold transition-colors tracking-wide ${isActive ? 'text-primary font-bold' : 'hover:text-primary'}`
               }
@@ -156,8 +193,8 @@ export default function Productos() {
             brands={brands}
             selectedCategory={selectedCategory}
             selectedBrands={selectedBrands}
-            onCategoryChange={handleCategoryChange}
-            onBrandToggle={handleBrandToggle}
+            selectedCategoryName={selectedCategoryName}
+            selectedBrandName={selectedBrandName}
             onClearFilters={handleClearFilters}
             isLoadingCategories={isLoadingCategories}
             isLoadingBrands={isLoadingBrands}
@@ -170,7 +207,7 @@ export default function Productos() {
             {/* Header con título y paginador compacto */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-gray-100">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Catálogo de Repuestos para Vehículos</h1>
+                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{seo.heading}</h1>
               </div>
 
               {/* Paginador estilo Admin */}
@@ -300,7 +337,7 @@ export default function Productos() {
                 <ul className="space-y-2">
                   <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/nosotros">Sobre Nosotros</Link></li>
                   <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/envios-provincias">Envíos a Provincias</Link></li>
-                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/productos">Catálogo</Link></li>
+                  <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/repuestos">Catálogo</Link></li>
                   <li><Link className="text-xs text-gray-200 hover:text-white transition-colors" to="/">Empresa</Link></li>
                 </ul>
               </div>

@@ -4,6 +4,7 @@ import { usePublicCategories } from '../../hooks/usePublicCategories';
 import { usePublicSiteSettings } from '../../hooks/usePublicSiteSettings';
 import { resolveMediaUrl } from '../../utils/mediaUrl';
 import CategoryPartArt from './CategoryPartArt';
+import { getCatalogUrl } from '../../utils/slugUtils';
 
 const SHAPES = ['plate', 'gear', 'hex', 'gasket', 'ring'];
 
@@ -115,7 +116,7 @@ const LineCard = memo(function LineCard({ cat, shape }) {
   const photo = resolveMediaUrl(cat.imageUrl);
 
   return (
-    <Link to={`/productos?categoria=${cat.id}`} className={`line-card is-${shape}`}>
+    <Link to={getCatalogUrl({ categoryName: cat.name })} className={`line-card is-${shape}`}>
       <div className="line-card-art">
         <ShapeFrame shape={shape} gid={`${gid}f`} />
         {photo ? (
@@ -158,9 +159,9 @@ export default function CategoryLinesShowcase() {
     <section className="line-showcase">
       <div className="page-container">
         <div className="text-center mb-10">
-          <h3 className="font-display text-2xl md:text-3xl font-medium uppercase text-primary mb-2">
-            Repuestos por línea
-          </h3>
+          <h2 className="font-display text-2xl md:text-3xl font-medium uppercase text-primary mb-2">
+            Repuestos por Línea
+          </h2>
           <div className="w-16 h-1 bg-accent mx-auto" />
         </div>
 

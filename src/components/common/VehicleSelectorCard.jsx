@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { usePublicBrands } from '../../hooks/usePublicBrands';
 import { usePublicCategories } from '../../hooks/usePublicCategories';
 import { resolveMediaUrl } from '../../utils/mediaUrl';
+import { getCatalogUrl } from '../../utils/slugUtils';
 
 const FEATURED_BRANDS = ['JAC', 'FOTON', 'TOYOTA', 'CUMMINS'];
 
@@ -170,11 +171,12 @@ export default function VehicleSelectorCard({ className = '' }) {
 
   const handleSearch = (e) => {
     e?.preventDefault();
-    const params = new URLSearchParams();
-    if (selectedBrand) params.set('marca', String(selectedBrand));
-    if (selectedCategory) params.set('categoria', String(selectedCategory));
-    const queryString = params.toString();
-    navigate(queryString ? `/productos?${queryString}` : '/productos');
+    const cat = categoryList.find((c) => String(c.id) === String(selectedCategory));
+    const brand = brandList.find((b) => String(b.id) === String(selectedBrand));
+    navigate(getCatalogUrl({
+      categoryName: cat?.name || '',
+      brandName: brand?.nombre || brand?.name || '',
+    }));
   };
 
   const toggleCategory = (id) => {
