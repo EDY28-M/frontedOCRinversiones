@@ -19,7 +19,9 @@ export function useDocumentMeta({
     canonicalPath,
     ogTitle,
     ogDescription,
-    ogImage
+    ogImage,
+    robots,
+    jsonLd,
 }) {
     useEffect(() => {
         const BASE_URL = 'https://orcinversionesperu.com';
@@ -81,9 +83,34 @@ export function useDocumentMeta({
             if (twImageMeta) twImageMeta.setAttribute('content', ogImage);
         }
 
+        let robotsMeta = document.querySelector('meta[name="robots"]');
+        if (robots) {
+            if (!robotsMeta) {
+                robotsMeta = document.createElement('meta');
+                robotsMeta.setAttribute('name', 'robots');
+                document.head.appendChild(robotsMeta);
+            }
+            robotsMeta.setAttribute('content', robots);
+        }
+
+        const JSON_LD_ID = 'page-jsonld';
+        let jsonLdEl = document.getElementById(JSON_LD_ID);
+        if (jsonLd) {
+            if (!jsonLdEl) {
+                jsonLdEl = document.createElement('script');
+                jsonLdEl.type = 'application/ld+json';
+                jsonLdEl.id = JSON_LD_ID;
+                document.head.appendChild(jsonLdEl);
+            }
+            jsonLdEl.textContent = JSON.stringify(jsonLd);
+        }
+
         // Cleanup: restaurar valores por defecto al desmontar
         return () => {
             document.title = 'ORC Inversiones Perú | Venta de Repuestos Automotrices en Lima';
+            const leftover = document.getElementById(JSON_LD_ID);
+            if (leftover) leftover.remove();
+            if (robotsMeta && robots) robotsMeta.remove();
         };
-    }, [title, description, canonicalPath, ogTitle, ogDescription, ogImage]);
+    }, [title, description, canonicalPath, ogTitle, ogDescription, ogImage, robots, jsonLd]);
 }

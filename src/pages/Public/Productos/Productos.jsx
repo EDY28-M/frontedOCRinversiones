@@ -40,12 +40,22 @@ export default function Productos() {
     handleClearFilters,
     selectedCategoryName,
     selectedBrandName,
+    unresolvedSlug,
   } = useProductFilters();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const seo = useMemo(() => {
+    if (unresolvedSlug) {
+      return {
+        title: 'Listado no encontrado | ORC Inversiones Perú',
+        heading: 'No encontramos ese listado',
+        description: 'La categoría o marca solicitada no existe en el catálogo de ORC Inversiones Perú.',
+        canonicalPath: '/repuestos',
+        robots: 'noindex, follow',
+      };
+    }
     const cat = selectedCategoryName;
     const brand = selectedBrandName;
     const canonicalPath = getCatalogUrl({ categoryName: cat, brandName: brand });
@@ -79,12 +89,13 @@ export default function Productos() {
       description: 'Explora nuestro catálogo de repuestos coreanos, chinos y japoneses para vehículos. Filtros, frenos, motores y más. JAC, Foton, Hyundai, Toyota, JMC. Precios competitivos en Ate, Lima.',
       canonicalPath: '/repuestos',
     };
-  }, [selectedCategoryName, selectedBrandName]);
+  }, [selectedCategoryName, selectedBrandName, unresolvedSlug]);
 
   useDocumentMeta({
     title: seo.title,
     description: seo.description,
     canonicalPath: seo.canonicalPath,
+    robots: seo.robots,
   });
 
   const handlePageChange = (page) => {

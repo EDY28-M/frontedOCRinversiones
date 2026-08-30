@@ -58,11 +58,16 @@ export function getProductUrl(product) {
   }
 
   const prodSlug = `${toSlug(cleanTitle)}-${productId}`;
-  return `/repuestos/${catSlug}/${marcaSlug}/${prodSlug}`;
+  // Ficha indexable: /repuestos/{categoria}/{nombre}-{id}
+  return `${CATALOG_PATH}/${catSlug}/${prodSlug}`;
 }
 
 export function extractIdFromSlug(slug) {
   if (!slug) return null;
-  const match = slug.match(/-(\d+)$/);
+  const match = String(slug).match(/-(\d+)$/);
   return match ? parseInt(match[1], 10) : null;
+}
+
+export function looksLikeProductSlug(slug) {
+  return extractIdFromSlug(slug) != null;
 }

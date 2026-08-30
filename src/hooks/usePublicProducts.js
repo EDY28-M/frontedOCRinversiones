@@ -19,11 +19,13 @@ export function usePublicProducts({
   pageSize = 16,
   q = '',
   categoryId = null,
-  brandIds = undefined
+  brandIds = undefined,
+  enabled = true,
 } = {}) {
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ['public-products', { page, pageSize, q, categoryId, brandIds }],
     queryFn: () => publicProductsApi.getActiveProducts({ page, pageSize, q, categoryId, brandIds }),
+    enabled,
     staleTime: 0,
     gcTime: 1000 * 60 * 5,
     refetchOnMount: 'always',

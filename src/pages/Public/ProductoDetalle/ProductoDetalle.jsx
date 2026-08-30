@@ -51,9 +51,12 @@ function parseFicha(raw) {
 }
 
 export default function ProductoDetalle() {
-  const { id, productoSlug } = useParams();
+  const { id, productoSlug, leafSlug, marcaSlug } = useParams();
   const location = useLocation();
-  const targetId = id || extractIdFromSlug(productoSlug);
+  const targetId = id
+    || extractIdFromSlug(productoSlug)
+    || extractIdFromSlug(leafSlug)
+    || extractIdFromSlug(marcaSlug);
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -90,12 +93,45 @@ export default function ProductoDetalle() {
     ? selectedImage
     : visibleImages[0] || null;
 
+  const jsonLd = useMemo(() => {
+    if (!product || !title) return null;
+    const images = getAllValidImageUrls(product);
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: title,
+      sku: product.codigo || undefined,
+      mpn: product.codigoComer || undefined,
+      description: product.descripcion || `Repuesto ${title} marca ${product.marcaNombre || ''} en ORC Inversiones Perú.`,
+      image: images.length ? images : undefined,
+      brand: product.marcaNombre ? { '@type': 'Brand', name: product.marcaNombre } : undefined,
+      category: product.categoryName || undefined,
+      url: `https://orcinversionesperu.com${canonicalPath}`,
+      offers: {
+        '@type': 'Offer',
+        url: `https://orcinversionesperu.com${canonicalPath}`,
+        availability: 'https://schema.org/InStock',
+        itemCondition: 'https://schema.org/NewCondition',
+        seller: {
+          '@type': 'AutoPartsStore',
+          name: 'ORC Inversiones Perú',
+          url: 'https://orcinversionesperu.com',
+        },
+      },
+    };
+  }, [product, title, canonicalPath]);
+
   useDocumentMeta({
     title: product
       ? `${title} | ORC Inversiones Perú`
       : 'Producto | ORC Inversiones Perú',
-    description: product?.descripcion || `Repuesto ${title} en ORC Inversiones Perú`,
+    description: product?.descripcion
+      || (title
+        ? `Compra ${title}${product?.marcaNombre ? ` ${product.marcaNombre}` : ''}${product?.codigo ? ` (SKU ${product.codigo})` : ''} en ORC Inversiones Perú. Ate, Lima. Envíos a todo el Perú.`
+        : 'Repuesto en ORC Inversiones Perú'),
     canonicalPath,
+    ogImage: product ? getAllValidImageUrls(product)[0] : undefined,
+    jsonLd,
   });
 
   const openWhatsApp = (mode = 'compra') => {

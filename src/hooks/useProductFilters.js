@@ -60,7 +60,7 @@ export const useProductFilters = () => {
   const { categories, isLoading: isLoadingCategories, error: categoriesError } = usePublicCategories();
 
   const catSlug = routeParams.categoriaSlug || routeParams.slug || '';
-  const marcaSlug = routeParams.marcaSlug || '';
+  const marcaSlug = routeParams.marcaSlug || routeParams.leafSlug || '';
 
   const resolvedCategory = useMemo(() => {
     if (!catSlug || !categories.length) return null;
@@ -89,6 +89,14 @@ export const useProductFilters = () => {
     if (one) return [one];
     return fromQuery;
   }, [searchParams, resolvedBrand]);
+
+  const slugsReady = !catSlug || (!isLoadingCategories && !isLoadingBrands);
+  const unresolvedSlug = Boolean(
+    slugsReady
+    && (catSlug || marcaSlug)
+    && !resolvedCategory
+    && !resolvedBrand
+  );
 
   // Convert legacy ?categoria=ID / ?marca=ID into crawlable slug paths.
   useEffect(() => {
@@ -142,7 +150,8 @@ export const useProductFilters = () => {
     pageSize: pageSize,
     q: deferredSearchQuery.trim() || '',
     categoryId: selectedCategory,
-    brandIds: selectedBrands.length > 0 ? selectedBrands.join(',') : undefined
+    brandIds: selectedBrands.length > 0 ? selectedBrands.join(',') : undefined,
+    enabled: slugsReady && !unresolvedSlug,
   });
 
   const handleCategoryChange = useCallback((categoryId) => {
@@ -205,5 +214,6 @@ export const useProductFilters = () => {
     handleCategoryChange,
     handleBrandToggle,
     handleClearFilters,
+    unresolvedSlug,
   };
 };

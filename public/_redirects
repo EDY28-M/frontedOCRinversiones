@@ -8,3 +8,6 @@
 /productos/  /repuestos  301
 /catalogo  /repuestos  301
 /catalogo/  /repuestos  301
+
+# Ficha antigua /repuestos/{cat}/{marca}/{producto} → /repuestos/{cat}/{producto}
+/repuestos/:cat/:marca/:product  /repuestos/:cat/:product  301
