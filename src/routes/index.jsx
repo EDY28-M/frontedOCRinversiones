@@ -127,6 +127,7 @@ const AppRoutes = () => {
             <Route path="/productos" element={<RedirectToCatalog />} />
             <Route path="/productos/:id" element={<LazyWrapper><ProductoDetalle /></LazyWrapper>} />
             <Route path="/repuestos" element={<LazyWrapper><Productos /></LazyWrapper>} />
+            <Route path="/repuestos/marcas/:marcaSlug" element={<LazyWrapper><Productos /></LazyWrapper>} />
             <Route path="/repuestos/:slug" element={<LazyWrapper><Productos /></LazyWrapper>} />
             <Route path="/repuestos/:categoriaSlug/:leafSlug" element={<RepuestosLeaf />} />
             <Route path="/repuestos/:categoriaSlug/:marcaSlug/:productoSlug" element={<LazyWrapper><ProductoDetalle /></LazyWrapper>} />

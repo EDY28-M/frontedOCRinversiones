@@ -60,9 +60,15 @@ function productTitle(product) {
 
 function productPath(product) {
   const cat = toSlug(product.categoryName || product.CategoryName || 'repuestos');
+  const marca = toSlug(product.marcaNombre || product.MarcaNombre || 'multimarca');
   const title = toSlug(productTitle(product));
   const id = product.id || product.Id;
-  return `/repuestos/${cat}/${title}-${id}`;
+  return `/repuestos/${cat}/${marca}/${title}-${id}`;
+}
+
+function toPositiveInt(value) {
+  const n = Number(value);
+  return Number.isInteger(n) && n > 0 ? n : null;
 }
 
 export function parseCatalogPath(pathname) {
@@ -75,6 +81,9 @@ export function parseCatalogPath(pathname) {
     return { kind: 'catalog', pathname: clean };
   }
   if (parts.length === 2) {
+    if (extractIdFromSlug(parts[1])) {
+      return { kind: 'product', productId: extractIdFromSlug(parts[1]), pathname: clean };
+    }
     return { kind: 'filter', slug: parts[1], pathname: clean };
   }
   if (parts.length >= 3) {
@@ -87,6 +96,9 @@ export function parseCatalogPath(pathname) {
         categoriaSlug: parts[1],
         pathname: clean,
       };
+    }
+    if (parts[1] === 'marcas') {
+      return { kind: 'filter', marcaSlug: parts[2], pathname: clean };
     }
     return {
       kind: 'filter',
@@ -124,8 +136,11 @@ export async function buildSeo(pathname) {
     }
     const title = productTitle(product);
     const path = productPath(product);
+    const brand = product.marcaNombre || '';
+    const sku = product.codigo || '';
     const desc = product.descripcion
-      || `Compra ${title}${product.marcaNombre ? ` ${product.marcaNombre}` : ''}${product.codigo ? ` (SKU ${product.codigo})` : ''} en ORC Inversiones Perú. Ate, Lima. Envíos a todo el Perú.`;
+      || `${title}${brand ? ` marca ${brand}` : ''}${sku ? `. SKU ${sku}` : ''}. Stock en Ate, Lima. Envíos a todo el Perú.`;
+    const pageTitle = [title, brand, sku ? `SKU ${sku}` : '', 'ORC Perú'].filter(Boolean).join(' | ');
     const images = [product.imagenPrincipal, product.imagen2, product.imagen3, product.imagen4].filter(Boolean);
     const jsonLd = {
       '@context': 'https://schema.org',
@@ -154,12 +169,13 @@ export async function buildSeo(pathname) {
   <p><a href="/repuestos">Catálogo de repuestos</a></p>
 </article>`;
     return {
-      title: `${title} | ORC Inversiones Perú`,
+      title: pageTitle,
       description: desc,
       canonical: `${SITE}${path}`,
       ogImage: images[0],
       jsonLd,
       body,
+      redirectTo: path !== parsed.pathname ? path : null,
     };
   }
 
@@ -173,7 +189,9 @@ export async function buildSeo(pathname) {
   let category = null;
   let brand = null;
   if (parsed.kind === 'filter') {
-    if (parsed.categoriaSlug && parsed.marcaSlug) {
+    if (parsed.marcaSlug && !parsed.categoriaSlug) {
+      brand = brandList.find((b) => toSlug(nameOf(b)) === parsed.marcaSlug) || null;
+    } else if (parsed.categoriaSlug && parsed.marcaSlug) {
       category = catList.find((c) => toSlug(nameOf(c)) === parsed.categoriaSlug) || null;
       brand = brandList.find((b) => toSlug(nameOf(b)) === parsed.marcaSlug) || null;
     } else if (parsed.slug) {
@@ -289,6 +307,65 @@ export function applySeoToHtml(html, seo) {
     );
   }
   return out;
+}
+
+async function mapIdsToPath(catId, brandId) {
+  const [categories, brands] = await Promise.all([
+    fetchJson(`${API}/products/public/categories`),
+    fetchJson(`${API}/products/public/brands`),
+  ]);
+  const catList = Array.isArray(categories) ? categories : [];
+  const brandList = Array.isArray(brands) ? brands : [];
+  const cat = catId ? catList.find((c) => idOf(c) === catId) : null;
+  const brand = brandId ? brandList.find((b) => idOf(b) === brandId) : null;
+  const catSlug = cat ? toSlug(nameOf(cat)) : '';
+  const brandSlug = brand ? toSlug(nameOf(brand)) : '';
+  if (catSlug && brandSlug) return `/repuestos/${catSlug}/${brandSlug}`;
+  if (catSlug) return `/repuestos/${catSlug}`;
+  if (brandSlug) return `/repuestos/marcas/${brandSlug}`;
+  return '/repuestos';
+}
+
+export async function resolveLegacyRedirect(url) {
+  const path = (url.pathname || '/').replace(/\/+$/, '') || '/';
+  const catId = toPositiveInt(url.searchParams.get('categoria'));
+  const brandRaw = url.searchParams.get('marca') || url.searchParams.get('brandIds') || '';
+  const brandIds = brandRaw.split(',').map(toPositiveInt).filter(Boolean);
+
+  if (path === '/productos' || path === '/catalogo') {
+    if (!catId && brandIds.length === 0) return '/repuestos';
+    return mapIdsToPath(catId, brandIds[0] || null);
+  }
+
+  const prodIdPath = path.match(/^\/productos\/(\d+)$/);
+  if (prodIdPath) {
+    const product = await fetchJson(`${API}/products/public/${prodIdPath[1]}`);
+    if (product) return productPath(product);
+  }
+
+  if (path === '/repuestos' && (catId || brandIds.length)) {
+    return mapIdsToPath(catId, brandIds[0] || null);
+  }
+
+  const parts = path.split('/').filter(Boolean);
+  if (parts[0] === 'repuestos' && parts.length === 2 && extractIdFromSlug(parts[1])) {
+    const product = await fetchJson(`${API}/products/public/${extractIdFromSlug(parts[1])}`);
+    if (product) return productPath(product);
+  }
+
+  if (parts[0] === 'repuestos' && parts.length === 2 && parts[1] !== 'marcas' && !extractIdFromSlug(parts[1])) {
+    const [categories, brands] = await Promise.all([
+      fetchJson(`${API}/products/public/categories`),
+      fetchJson(`${API}/products/public/brands`),
+    ]);
+    const catList = Array.isArray(categories) ? categories : [];
+    const brandList = Array.isArray(brands) ? brands : [];
+    const isCat = catList.some((c) => toSlug(nameOf(c)) === parts[1]);
+    const isBrand = brandList.some((b) => toSlug(nameOf(b)) === parts[1]);
+    if (!isCat && isBrand) return `/repuestos/marcas/${parts[1]}`;
+  }
+
+  return null;
 }
 
 export function shouldIntercept(pathname) {

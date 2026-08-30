@@ -123,11 +123,11 @@ export default function ProductoDetalle() {
 
   useDocumentMeta({
     title: product
-      ? `${title} | ORC Inversiones Perú`
+      ? [title, product.marcaNombre, product.codigo ? `SKU ${product.codigo}` : '', 'ORC Perú'].filter(Boolean).join(' | ')
       : 'Producto | ORC Inversiones Perú',
     description: product?.descripcion
       || (title
-        ? `Compra ${title}${product?.marcaNombre ? ` ${product.marcaNombre}` : ''}${product?.codigo ? ` (SKU ${product.codigo})` : ''} en ORC Inversiones Perú. Ate, Lima. Envíos a todo el Perú.`
+        ? `${title}${product?.marcaNombre ? ` marca ${product.marcaNombre}` : ''}${product?.codigo ? `. SKU ${product.codigo}` : ''}. Stock en Ate, Lima. Envíos a todo el Perú.`
         : 'Repuesto en ORC Inversiones Perú'),
     canonicalPath,
     ogImage: product ? getAllValidImageUrls(product)[0] : undefined,

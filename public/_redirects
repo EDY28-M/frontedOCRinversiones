@@ -3,11 +3,8 @@
 # Only keep explicit asset passthrough
 /assets/*  /assets/:splat  200
 
-# Unificar catálogo: /productos duplicaba /repuestos (ya indexada por Google)
+# Unificar catálogo: /productos duplicaba /repuestos
 /productos  /repuestos  301
 /productos/  /repuestos  301
 /catalogo  /repuestos  301
 /catalogo/  /repuestos  301
-
-# Ficha antigua /repuestos/{cat}/{marca}/{producto} → /repuestos/{cat}/{producto}
-/repuestos/:cat/:marca/:product  /repuestos/:cat/:product  301

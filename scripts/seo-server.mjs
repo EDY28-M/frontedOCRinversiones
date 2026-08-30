@@ -13,7 +13,7 @@ const ROOT = process.env.SEO_DIST_DIR
   || '/var/www/orcinversiones-fronted';
 const PORT = Number(process.env.SEO_PORT || 8788);
 
-const { applySeoToHtml, buildSeo, shouldIntercept } = await import(
+const { applySeoToHtml, buildSeo, resolveLegacyRedirect, shouldIntercept } = await import(
   pathToFileURL(path.join(__dirname, '../functions/seo-html.js')).href
 );
 
@@ -50,6 +50,15 @@ function send(res, status, body, headers = {}) {
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url || '/', 'http://127.0.0.1');
+    try {
+      const legacy = await resolveLegacyRedirect(url);
+      if (legacy && legacy !== url.pathname) {
+        send(res, 301, '', { Location: legacy });
+        return;
+      }
+    } catch {
+      // continue
+    }
     const filePath = safeJoin(url.pathname);
     if (!filePath) {
       send(res, 400, 'Bad request');
@@ -79,6 +88,10 @@ const server = http.createServer(async (req, res) => {
       let html = fs.readFileSync(indexPath, 'utf8');
       if (shouldIntercept(url.pathname)) {
         const seo = await buildSeo(url.pathname);
+        if (seo?.redirectTo && seo.redirectTo !== url.pathname) {
+          send(res, 301, '', { Location: seo.redirectTo });
+          return;
+        }
         html = applySeoToHtml(html, seo);
       }
       send(res, 200, html, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=60' });

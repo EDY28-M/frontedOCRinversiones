@@ -21,7 +21,7 @@ export function getCatalogUrl({ categoryName, brandName } = {}) {
   const brand = brandName ? toSlug(brandName) : '';
   if (cat && brand) return `${CATALOG_PATH}/${cat}/${brand}`;
   if (cat) return `${CATALOG_PATH}/${cat}`;
-  if (brand) return `${CATALOG_PATH}/${brand}`;
+  if (brand) return `${CATALOG_PATH}/marcas/${brand}`;
   return CATALOG_PATH;
 }
 
@@ -58,8 +58,7 @@ export function getProductUrl(product) {
   }
 
   const prodSlug = `${toSlug(cleanTitle)}-${productId}`;
-  // Ficha indexable: /repuestos/{categoria}/{nombre}-{id}
-  return `${CATALOG_PATH}/${catSlug}/${prodSlug}`;
+  return `${CATALOG_PATH}/${catSlug}/${marcaSlug}/${prodSlug}`;
 }
 
 export function extractIdFromSlug(slug) {
