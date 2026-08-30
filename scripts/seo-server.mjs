@@ -16,6 +16,9 @@ const PORT = Number(process.env.SEO_PORT || 8788);
 const { applySeoToHtml, buildSeo, resolveLegacyRedirect, shouldIntercept } = await import(
   pathToFileURL(path.join(__dirname, '../functions/seo-html.js')).href
 );
+const { buildSitemapXml, isSitemapPath } = await import(
+  pathToFileURL(path.join(__dirname, '../functions/sitemap.js')).href
+);
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -50,6 +53,7 @@ function send(res, status, body, headers = {}) {
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url || '/', 'http://127.0.0.1');
+    const isGet = req.method === 'GET' || req.method === 'HEAD';
     try {
       const legacy = await resolveLegacyRedirect(url);
       if (legacy && legacy !== url.pathname) {
@@ -59,6 +63,14 @@ const server = http.createServer(async (req, res) => {
     } catch {
       // continue
     }
+    if (isGet && isSitemapPath(url.pathname)) {
+      const xml = await buildSitemapXml(url.pathname);
+      send(res, 200, xml, {
+        'content-type': 'application/xml; charset=utf-8',
+        'cache-control': 'public, max-age=600',
+      });
+      return;
+    }
     const filePath = safeJoin(url.pathname);
     if (!filePath) {
       send(res, 400, 'Bad request');
@@ -67,7 +79,6 @@ const server = http.createServer(async (req, res) => {
 
     const ext = path.extname(filePath).toLowerCase();
     const wantsHtml = shouldIntercept(url.pathname) && (req.headers.accept || '').includes('text/html');
-    const isGet = req.method === 'GET' || req.method === 'HEAD';
 
     if (isGet && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
       const type = MIME[ext] || 'application/octet-stream';

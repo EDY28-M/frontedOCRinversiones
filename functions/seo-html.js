@@ -37,11 +37,11 @@ export function escapeAttr(value) {
   return escapeHtml(value).replace(/\n/g, ' ');
 }
 
-function nameOf(item) {
+export function nameOf(item) {
   return item?.Name || item?.name || item?.Nombre || item?.nombre || '';
 }
 
-function idOf(item) {
+export function idOf(item) {
   const n = Number(item?.Id ?? item?.id);
   return Number.isInteger(n) && n > 0 ? n : null;
 }
@@ -58,7 +58,7 @@ function productTitle(product) {
   }
 }
 
-function productPath(product) {
+export function productPath(product) {
   const cat = toSlug(product.categoryName || product.CategoryName || 'repuestos');
   const marca = toSlug(product.marcaNombre || product.MarcaNombre || 'multimarca');
   const title = toSlug(productTitle(product));

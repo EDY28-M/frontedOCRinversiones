@@ -1,4 +1,5 @@
 import { applySeoToHtml, buildSeo, resolveLegacyRedirect, shouldIntercept } from '../functions/seo-html.js';
+import { buildSitemapXml, isSitemapPath } from '../functions/sitemap.js';
 
 function redirectResponse(from, toPath) {
   if (!toPath || toPath === from.pathname) return null;
@@ -18,6 +19,17 @@ export default {
       if (bounced) return bounced;
     } catch {
       // continue to assets
+    }
+
+    if (isSitemapPath(url.pathname)) {
+      const xml = await buildSitemapXml(url.pathname);
+      return new Response(xml, {
+        status: 200,
+        headers: {
+          'content-type': 'application/xml; charset=utf-8',
+          'cache-control': 'public, max-age=600',
+        },
+      });
     }
 
     const response = await env.ASSETS.fetch(request);
