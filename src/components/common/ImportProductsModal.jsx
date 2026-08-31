@@ -385,7 +385,7 @@ const ImportProductsModal = ({
         isFeatured: p.isFeatured
       }));
 
-      const result = await productService.bulkImportProducts(productsToImport);
+      const result = await productService.bulkImportProducts(productsToImport, file, columnMapping);
 
       // Store result but DON'T go to step 4 yet — let animation finish first
       pendingResultRef.current = {
@@ -581,9 +581,9 @@ const ImportProductsModal = ({
                 </div>
               </div>
               <p className="mt-6 text-sm text-slate-600 font-medium">
-                Procesando <span className="font-bold text-blue-600">{validCount}</span> productos...
+                Subiendo el Excel y guardando <span className="font-bold text-blue-600">{validCount}</span> productos...
               </p>
-              <p className="mt-1 text-xs text-slate-400">Por favor no cierre esta ventana</p>
+              <p className="mt-1 text-xs text-slate-400">Puede tardar un momento. No cierres esta ventana.</p>
               {/* Animated dots */}
               <div className="flex gap-1.5 mt-4">
                 <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '0ms' }} />

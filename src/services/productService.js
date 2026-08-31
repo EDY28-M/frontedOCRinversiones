@@ -43,16 +43,27 @@ export const productService = {
     return response.data;
   },
 
-  // Importación masiva de productos
-  bulkImportProducts: async (products) => {
-    const response = await axiosInstance.post('/products/bulk-import', {
-      products,
-      autoCreateEntities: true
-    }, {
+  // Importación masiva: se manda el Excel (más liviano) y, si no hay archivo, el JSON de siempre
+  bulkImportProducts: async (products, file = null, mapping = null) => {
+    const options = {
       timeout: 180000,
       maxBodyLength: 32 * 1024 * 1024,
       maxContentLength: 32 * 1024 * 1024,
-    });
+    };
+
+    if (file) {
+      const form = new FormData();
+      form.append('file', file);
+      if (mapping) form.append('mappingJson', JSON.stringify(mapping));
+      form.append('autoCreateEntities', 'true');
+      const response = await axiosInstance.post('/products/bulk-import-file', form, options);
+      return response.data;
+    }
+
+    const response = await axiosInstance.post('/products/bulk-import', {
+      products,
+      autoCreateEntities: true
+    }, options);
     return response.data;
   },
 
