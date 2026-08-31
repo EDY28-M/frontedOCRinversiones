@@ -3,13 +3,13 @@ import { cn } from '../../lib/utils';
 
 const Table = forwardRef(({ className, ...props }, ref) => (
   <div className="relative w-full overflow-auto">
-    <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
+    <table ref={ref} className={cn('w-full caption-bottom text-sm font-admin', className)} {...props} />
   </div>
 ));
 Table.displayName = 'Table';
 
 const TableHeader = forwardRef(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn('sticky top-0 z-10 bg-zinc-50 dark:bg-zinc-900', className)} {...props} />
+  <thead ref={ref} className={cn('sticky top-0 z-10 bg-gray-50', className)} {...props} />
 ));
 TableHeader.displayName = 'TableHeader';
 
@@ -21,7 +21,7 @@ TableBody.displayName = 'TableBody';
 const TableRow = forwardRef(({ className, ...props }, ref) => (
   <tr
     ref={ref}
-    className={cn('h-11 border-b border-zinc-100 transition-colors duration-150 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/80', className)}
+    className={cn('h-11 border-b border-gray-100 transition-colors duration-150 hover:bg-gray-50', className)}
     {...props}
   />
 ));
@@ -30,14 +30,14 @@ TableRow.displayName = 'TableRow';
 const TableHead = forwardRef(({ className, ...props }, ref) => (
   <th
     ref={ref}
-    className={cn('h-9 px-3 text-left align-middle text-[11px] font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400', className)}
+    className={cn('h-9 px-3 text-left align-middle text-[11px] font-bold uppercase tracking-wide text-slate-600', className)}
     {...props}
   />
 ));
 TableHead.displayName = 'TableHead';
 
 const TableCell = forwardRef(({ className, ...props }, ref) => (
-  <td ref={ref} className={cn('px-3 align-middle text-sm text-zinc-700 dark:text-zinc-300', className)} {...props} />
+  <td ref={ref} className={cn('px-3 align-middle text-sm text-slate-700', className)} {...props} />
 ));
 TableCell.displayName = 'TableCell';
 

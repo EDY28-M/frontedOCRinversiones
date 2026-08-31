@@ -12,7 +12,7 @@ const TooltipContent = forwardRef(({ className, sideOffset = 6, ...props }, ref)
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        'z-50 max-w-xs rounded-md bg-zinc-900 px-2.5 py-1.5 text-xs text-white shadow-none dark:bg-zinc-100 dark:text-zinc-900',
+        'z-50 max-w-xs bg-[#0F172A] px-2.5 py-1.5 text-xs text-white',
         className
       )}
       {...props}

@@ -473,8 +473,8 @@ const ImportProductsModal = ({
         <DialogContent hideClose={false} onClose={importing ? undefined : onClose} onPointerDownOutside={(e) => importing && e.preventDefault()} onEscapeKeyDown={(e) => importing && e.preventDefault()}>
           <DialogHeader>
             <div className="flex items-center gap-3 pr-10">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
-                <FileSpreadsheet className="h-[18px] w-[18px] text-zinc-700 dark:text-zinc-200" strokeWidth={1.75} />
+              <div className="flex h-9 w-9 items-center justify-center bg-blue-50">
+                <FileSpreadsheet className="h-[18px] w-[18px] text-blue-600" strokeWidth={1.75} />
               </div>
               <div>
                 <DialogTitle>Importar productos</DialogTitle>
@@ -493,14 +493,14 @@ const ImportProductsModal = ({
                       <span className={cn(
                         'inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-medium tabular-nums',
                         done && 'bg-transparent',
-                        active && 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900',
-                        !done && !active && 'border border-zinc-300 text-zinc-400 dark:border-zinc-700'
+                        active && 'bg-blue-600 text-white dark:bg-blue-500 dark:text-white',
+                        !done && !active && 'border border-gray-300 text-slate-400 dark:border-slate-700'
                       )}>
-                        {done ? <CircleCheck className="h-4 w-4 text-emerald-600" strokeWidth={1.75} /> : s.id}
+                        {done ? <CircleCheck className="h-4 w-4 text-[#F5C344]" strokeWidth={1.75} /> : s.id}
                       </span>
-                      <span className={cn('text-[12px]', active ? 'font-medium text-zinc-900 dark:text-zinc-100' : 'text-zinc-400')}>{s.label}</span>
+                      <span className={cn('text-[12px]', active ? 'font-medium text-slate-900 dark:text-slate-100' : 'text-slate-400')}>{s.label}</span>
                     </div>
-                    {i < STEPS.length - 1 && <span className="mx-3 h-px w-8 bg-zinc-200 dark:bg-zinc-800" style={{ height: 1.5 }} />}
+                    {i < STEPS.length - 1 && <span className="mx-3 h-px w-8 bg-gray-200 dark:bg-slate-800" style={{ height: 1.5 }} />}
                   </li>
                 );
               })}
@@ -510,16 +510,16 @@ const ImportProductsModal = ({
           <div className="flex-1 overflow-auto px-6 py-5">
             {error && !importing && (
               <div className={cn(
-                'mb-4 flex items-start gap-3 rounded-xl border px-3.5 py-3',
-                error.tone === 'info' ? 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900' : 'border-rose-200 bg-rose-50/70 dark:border-rose-900 dark:bg-rose-950/40'
+                'mb-4 flex items-start gap-3  border px-3.5 py-3',
+                error.tone === 'info' ? 'border-gray-200 bg-gray-50 dark:border-slate-800 dark:bg-slate-900' : 'border-red-200 bg-red-50/70 dark:border-red-900 dark:bg-red-950/40'
               )}>
-                <CircleAlert className={cn('mt-0.5 h-4 w-4 shrink-0', error.tone === 'info' ? 'text-zinc-500' : 'text-rose-600')} strokeWidth={1.75} />
+                <CircleAlert className={cn('mt-0.5 h-4 w-4 shrink-0', error.tone === 'info' ? 'text-slate-500' : 'text-red-600')} strokeWidth={1.75} />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{error.title || 'No se pudo continuar'}</p>
-                  {error.message && <p className="mt-0.5 text-[13px] text-zinc-600 dark:text-zinc-400">{error.message}</p>}
-                  {error.hint && <p className="mt-1 text-[12px] text-zinc-500">{error.hint}</p>}
+                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{error.title || 'No se pudo continuar'}</p>
+                  {error.message && <p className="mt-0.5 text-[13px] text-slate-600 dark:text-slate-400">{error.message}</p>}
+                  {error.hint && <p className="mt-1 text-[12px] text-slate-500">{error.hint}</p>}
                 </div>
-                <button type="button" onClick={() => setError(null)} className="text-zinc-400 hover:text-zinc-700">
+                <button type="button" onClick={() => setError(null)} className="text-slate-400 hover:text-slate-700">
                   <X className="h-4 w-4" strokeWidth={1.75} />
                 </button>
               </div>
@@ -533,28 +533,28 @@ const ImportProductsModal = ({
                     onDragLeave={() => setDragging(false)}
                     onDrop={(e) => { e.preventDefault(); setDragging(false); ingestFile(e.dataTransfer.files?.[0]); }}
                     className={cn(
-                      'flex min-h-[280px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-8 py-10 text-center transition-colors duration-150',
+                      'flex min-h-[280px] cursor-pointer flex-col items-center justify-center  border-2 border-dashed px-8 py-10 text-center transition-colors duration-150',
                       dragging
-                        ? 'border-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/20'
-                        : 'border-zinc-300 hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-500'
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20'
+                        : 'border-gray-300 hover:border-blue-400 dark:border-slate-700 dark:hover:border-blue-400'
                     )}
                   >
                     <input ref={fileInputRef} type="file" accept=".xls,.xlsx" onChange={handleFileChange} className="hidden" />
-                    <FileUp className="h-8 w-8 text-zinc-500" strokeWidth={1.75} />
-                    <p className="mt-4 text-base font-medium tracking-tight text-zinc-900 dark:text-zinc-50">Arrastra tu Excel aquí</p>
-                    <p className="mt-1 text-[13px] text-zinc-500">.xlsx o .xls · primera hoja · una fila por producto</p>
+                    <FileUp className="h-8 w-8 text-slate-500" strokeWidth={1.75} />
+                    <p className="mt-4 text-base font-medium tracking-tight text-slate-900 dark:text-white">Arrastra tu Excel aquí</p>
+                    <p className="mt-1 text-[13px] text-slate-500">.xlsx o .xls · primera hoja · una fila por producto</p>
                     <Button type="button" variant="outline" className="mt-5" onClick={(e) => { e.preventDefault(); fileInputRef.current?.click(); }}>
                       <Upload className="h-4 w-4" strokeWidth={1.75} />
                       Seleccionar archivo
                     </Button>
                   </label>
                 ) : (
-                  <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
+                  <div className="flex items-center justify-between  border border-gray-200 bg-gray-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900">
                     <div className="flex min-w-0 items-center gap-3">
-                      <FileSpreadsheet className="h-5 w-5 shrink-0 text-zinc-600 dark:text-zinc-300" strokeWidth={1.75} />
+                      <FileSpreadsheet className="h-5 w-5 shrink-0 text-slate-600 dark:text-slate-300" strokeWidth={1.75} />
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">{file.name}</p>
-                        <p className="text-[12px] tabular-nums text-zinc-500">{formatFileSize(file.size)} · {formatCount(rawData.length)} filas</p>
+                        <p className="truncate text-sm font-medium text-slate-900 dark:text-white">{file.name}</p>
+                        <p className="text-[12px] tabular-nums text-slate-500">{formatFileSize(file.size)} · {formatCount(rawData.length)} filas</p>
                       </div>
                     </div>
                     <Button type="button" variant="ghost" size="sm" onClick={() => { setFile(null); setRawData([]); setColumns([]); setColumnMapping({}); setError(null); }}>
@@ -562,8 +562,8 @@ const ImportProductsModal = ({
                     </Button>
                   </div>
                 )}
-                <div className="mt-4 inline-flex max-w-full items-start gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-[12px] leading-relaxed text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-                  <span className="font-medium text-zinc-800 dark:text-zinc-200">Obligatorias:</span>
+                <div className="mt-4 inline-flex max-w-full items-start gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-[12px] leading-relaxed text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+                  <span className="font-medium text-slate-800 dark:text-slate-200">Obligatorias:</span>
                   código · nombre · marca · categoría. Si viene de Google Sheets o CSV, guárdalo primero como Excel.
                 </div>
               </div>
@@ -571,24 +571,24 @@ const ImportProductsModal = ({
 
             {step === 2 && !importing && (
               <div>
-                <div className="mb-5 flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-[13px] text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+                <div className="mb-5 flex items-center gap-2  border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-[13px] text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
                   <FileSpreadsheet className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                  <span className="truncate font-medium text-zinc-800 dark:text-zinc-200">{file?.name}</span>
+                  <span className="truncate font-medium text-slate-800 dark:text-slate-200">{file?.name}</span>
                   <span className="tabular-nums">· {formatCount(rawData.length)} filas en la primera hoja</span>
                 </div>
                 <div className="mb-4 flex items-center gap-2">
-                  <Columns3 className="h-4 w-4 text-zinc-500" strokeWidth={1.75} />
-                  <h3 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">Columnas del Excel</h3>
+                  <Columns3 className="h-4 w-4 text-slate-500" strokeWidth={1.75} />
+                  <h3 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-white">Columnas del Excel</h3>
                 </div>
-                <p className="mb-4 text-[13px] text-zinc-500">Empareja cada campo del sistema con una columna. * obligatorio.</p>
+                <p className="mb-4 text-[13px] text-slate-500">Empareja cada campo del sistema con una columna. * obligatorio.</p>
                 <div className="space-y-2">
                   {systemFields.map((field) => {
                     const mapped = columnMapping[field.key];
                     const preview = columnPreview(mapped);
                     return (
                       <div key={field.key} className="grid grid-cols-1 items-center gap-3 md:grid-cols-[280px_1fr_auto]">
-                        <label className="text-[13px] text-zinc-700 dark:text-zinc-300">
-                          {field.label}{field.required && <span className="ml-0.5 text-rose-600">*</span>}
+                        <label className="text-[13px] text-slate-700 dark:text-slate-300">
+                          {field.label}{field.required && <span className="ml-0.5 text-red-600">*</span>}
                         </label>
                         <div>
                           <Select value={mapped || '__omit__'} onValueChange={(v) => handleMappingChange(field.key, v)}>
@@ -603,16 +603,16 @@ const ImportProductsModal = ({
                             </SelectContent>
                           </Select>
                           {preview.length > 0 && (
-                            <p className="mt-1 text-[11px] text-zinc-500">{preview.join(', ')}</p>
+                            <p className="mt-1 text-[11px] text-slate-500">{preview.join(', ')}</p>
                           )}
                         </div>
                         <div className="flex h-9 w-20 items-center justify-end">
                           {mapped ? (
-                            <CircleCheck className="h-4 w-4 text-emerald-600" strokeWidth={1.75} />
+                            <CircleCheck className="h-4 w-4 text-[#F5C344]" strokeWidth={1.75} />
                           ) : field.required ? (
-                            <CircleAlert className="h-4 w-4 text-rose-500" strokeWidth={1.75} />
+                            <CircleAlert className="h-4 w-4 text-red-500" strokeWidth={1.75} />
                           ) : (
-                            <span className="text-[12px] text-zinc-400">Omitir</span>
+                            <span className="text-[12px] text-slate-400">Omitir</span>
                           )}
                         </div>
                       </div>
@@ -625,31 +625,31 @@ const ImportProductsModal = ({
             {step === 3 && !importing && (
               <div>
                 <div className="mb-3 grid grid-cols-2 gap-3">
-                  <div className="rounded-xl border border-zinc-200 px-4 py-3 dark:border-zinc-800">
+                  <div className=" border border-gray-200 px-4 py-3 dark:border-slate-800">
                     <div className="flex items-center justify-between">
-                      <span className="text-[32px] font-semibold leading-none tracking-tight tabular-nums text-zinc-900 dark:text-zinc-50">{formatCount(validCount)}</span>
-                      <CircleCheck className="h-5 w-5 text-emerald-600" strokeWidth={1.75} />
+                      <span className="text-[32px] font-semibold leading-none tracking-tight tabular-nums text-slate-900 dark:text-white">{formatCount(validCount)}</span>
+                      <CircleCheck className="h-5 w-5 text-[#F5C344]" strokeWidth={1.75} />
                     </div>
-                    <p className="mt-1 text-[13px] text-zinc-500">Productos válidos</p>
+                    <p className="mt-1 text-[13px] text-slate-500">Productos válidos</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => { setOnlyErrors(true); setCurrentPage(1); }}
-                    className="rounded-xl border border-rose-200 px-4 py-3 text-left transition-colors duration-150 hover:bg-rose-50/40 dark:border-rose-900 dark:hover:bg-rose-950/30"
+                    className=" border border-red-200 px-4 py-3 text-left transition-colors duration-150 hover:bg-red-50/40 dark:border-red-900 dark:hover:bg-red-950/30"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-[32px] font-semibold leading-none tracking-tight tabular-nums text-rose-700">{formatCount(invalidCount)}</span>
-                      <CircleAlert className="h-5 w-5 text-rose-600" strokeWidth={1.75} />
+                      <span className="text-[32px] font-semibold leading-none tracking-tight tabular-nums text-red-700">{formatCount(invalidCount)}</span>
+                      <CircleAlert className="h-5 w-5 text-red-600" strokeWidth={1.75} />
                     </div>
-                    <p className="mt-1 text-[13px] text-zinc-500">Filas incompletas</p>
+                    <p className="mt-1 text-[13px] text-slate-500">Filas incompletas</p>
                   </button>
                 </div>
-                <p className="mb-4 text-[13px] text-zinc-600 dark:text-zinc-400">
+                <p className="mb-4 text-[13px] text-slate-600 dark:text-slate-400">
                   Las filas en rojo no se importan. Motivo: campo vacío, marca/categoría inexistente o anulado. Solo se guardan las {formatCount(validCount)} filas completas.
                 </p>
                 <div className="mb-3 flex flex-wrap items-center gap-2">
                   <div className="relative min-w-[220px] flex-1">
-                    <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" strokeWidth={1.75} />
+                    <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" strokeWidth={1.75} />
                     <Input value={query} onChange={(e) => { setQuery(e.target.value); setCurrentPage(1); }} placeholder="Buscar código o producto" className="pl-8" />
                   </div>
                   <Button type="button" variant={onlyErrors ? 'default' : 'outline'} size="sm" onClick={() => { setOnlyErrors((v) => !v); setCurrentPage(1); }}>
@@ -669,7 +669,7 @@ const ImportProductsModal = ({
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+                <div className="overflow-hidden  border border-gray-200 dark:border-slate-800">
                   <div className="max-h-[280px] overflow-auto">
                     <Table>
                       <TableHeader>
@@ -685,14 +685,14 @@ const ImportProductsModal = ({
                       </TableHeader>
                       <TableBody>
                         {pageRows.map((product) => (
-                          <TableRow key={product.rowIndex} className={product.isValid ? '' : 'bg-rose-50/50 hover:bg-rose-50/80 dark:bg-rose-950/20'}>
+                          <TableRow key={product.rowIndex} className={product.isValid ? '' : 'bg-red-50/50 hover:bg-red-50/80 dark:bg-red-950/20'}>
                             <TableCell>
                               {product.isValid ? (
-                                <CircleCheck className="h-4 w-4 text-emerald-600" strokeWidth={1.75} />
+                                <CircleCheck className="h-4 w-4 text-[#F5C344]" strokeWidth={1.75} />
                               ) : (
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <span><CircleAlert className="h-4 w-4 text-rose-600" strokeWidth={1.75} /></span>
+                                    <span><CircleAlert className="h-4 w-4 text-red-600" strokeWidth={1.75} /></span>
                                   </TooltipTrigger>
                                   <TooltipContent>{humanizeRowErrors(product.errors)}</TooltipContent>
                                 </Tooltip>
@@ -703,14 +703,14 @@ const ImportProductsModal = ({
                             <TableCell className="max-w-[220px] truncate">{product.producto || '—'}</TableCell>
                             <TableCell>{product.marcaNombre || '—'}</TableCell>
                             <TableCell>{product.categoriaNombre || '—'}</TableCell>
-                            <TableCell className="max-w-[160px] truncate text-[12px] text-zinc-500">{humanizeRowErrors(product.errors)}</TableCell>
+                            <TableCell className="max-w-[160px] truncate text-[12px] text-slate-500">{humanizeRowErrors(product.errors)}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center justify-between text-[12px] text-zinc-500">
+                <div className="mt-3 flex items-center justify-between text-[12px] text-slate-500">
                   <span className="tabular-nums">{formatCount(Math.min(pageSize, filteredRows.length))} de {formatCount(filteredRows.length)}</span>
                   <div className="flex items-center gap-2">
                     <span className="tabular-nums">Página {currentPage} de {totalPages}</span>
@@ -730,7 +730,7 @@ const ImportProductsModal = ({
                 <div className="flex flex-col items-center justify-center">
                   <div className="relative" style={{ width: ringSize, height: ringSize }}>
                     <svg width={ringSize} height={ringSize} className="-rotate-90">
-                      <circle cx={ringSize / 2} cy={ringSize / 2} r={ringRadius} fill="none" className="stroke-zinc-200 dark:stroke-zinc-800" strokeWidth={ringStroke} />
+                      <circle cx={ringSize / 2} cy={ringSize / 2} r={ringRadius} fill="none" className="stroke-gray-200 dark:stroke-slate-800" strokeWidth={ringStroke} />
                       <circle
                         cx={ringSize / 2}
                         cy={ringSize / 2}
@@ -745,33 +745,33 @@ const ImportProductsModal = ({
                       />
                       <defs>
                         <linearGradient id="importRing" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#10b981" />
-                          <stop offset="100%" stopColor="#2dd4bf" />
+                          <stop offset="0%" stopColor="#2563eb" />
+                          <stop offset="100%" stopColor="#F5C344" />
                         </linearGradient>
                       </defs>
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-[32px] font-semibold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-50">{importProgress}%</span>
-                      <span className="text-[11px] uppercase tracking-widest text-zinc-400">Importando</span>
+                      <span className="text-[32px] font-semibold tabular-nums tracking-tight text-slate-900 dark:text-white">{importProgress}%</span>
+                      <span className="text-[11px] uppercase tracking-widest text-slate-400">Importando</span>
                     </div>
                   </div>
-                  <div className="mt-6 space-y-1 text-center text-[13px] tabular-nums text-zinc-600 dark:text-zinc-400">
+                  <div className="mt-6 space-y-1 text-center text-[13px] tabular-nums text-slate-600 dark:text-slate-400">
                     <p>{formatCount(processedCount)} / {formatCount(validCount)} filas</p>
                     <p>~{formatCount(rowsPerMin)} filas/min</p>
                     <p>ETA {etaLabel}</p>
                   </div>
                 </div>
-                <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
-                  <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">{file?.name}</p>
-                  <p className="mt-0.5 text-[12px] tabular-nums text-zinc-500">{formatFileSize(file?.size)}</p>
-                  <p className="mt-4 text-[13px] text-zinc-600 dark:text-zinc-400">Fase: Guardando productos en catálogo</p>
-                  <div className="mt-4 space-y-1.5 font-mono text-[12px] tabular-nums text-zinc-500">
+                <div className=" border border-gray-200 bg-gray-50 p-4 dark:border-slate-800 dark:bg-slate-900">
+                  <p className="truncate text-sm font-medium text-slate-900 dark:text-white">{file?.name}</p>
+                  <p className="mt-0.5 text-[12px] tabular-nums text-slate-500">{formatFileSize(file?.size)}</p>
+                  <p className="mt-4 text-[13px] text-slate-600 dark:text-slate-400">Fase: Guardando productos en catálogo</p>
+                  <div className="mt-4 space-y-1.5 font-mono text-[12px] tabular-nums text-slate-500">
                     <p>{new Date().toLocaleTimeString('es-PE', { hour12: false })}  Validadas {formatCount(processedCount)} filas</p>
                     <p>{new Date().toLocaleTimeString('es-PE', { hour12: false })}  Listas para guardar {formatCount(validCount)}</p>
                     <p>{new Date().toLocaleTimeString('es-PE', { hour12: false })}  Omitidas {formatCount(invalidCount)}</p>
                   </div>
-                  <div className="mt-4 h-1 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
-                    <div className="h-1 bg-emerald-500 transition-[width] duration-150 ease-out" style={{ width: `${importProgress}%` }} />
+                  <div className="mt-4 h-1 overflow-hidden rounded-full bg-gray-200 dark:bg-slate-800">
+                    <div className="h-1 bg-blue-600 transition-[width] duration-150 ease-out" style={{ width: `${importProgress}%` }} />
                   </div>
                 </div>
               </div>
@@ -780,17 +780,17 @@ const ImportProductsModal = ({
             {step === 4 && importResult && !importing && (
               <div className="flex h-full flex-col items-center justify-center text-center">
                 {importResult.failed > 0 && savedCount > 0 ? (
-                  <CircleAlert className="h-12 w-12 text-rose-600" strokeWidth={1.75} />
+                  <CircleAlert className="h-12 w-12 text-red-600" strokeWidth={1.75} />
                 ) : (
-                  <CircleCheck className="h-12 w-12 text-emerald-600" strokeWidth={1.75} />
+                  <CircleCheck className="h-12 w-12 text-[#F5C344]" strokeWidth={1.75} />
                 )}
-                <p className="mt-4 text-[18px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                <p className="mt-4 text-[18px] font-semibold tracking-tight text-slate-900 dark:text-white">
                   {importResult.failed > 0 && savedCount > 0
                     ? `${formatCount(savedCount)} ok / ${formatCount(importResult.failed)} error`
                     : `${formatCount(savedCount)} productos listos · ${formatCount(importResult.skipped || invalidCount)} omitidas`}
                 </p>
                 {humanizeResultErrors(importResult.errors).length > 0 && (
-                  <ul className="mt-4 max-h-40 w-full max-w-md space-y-1 overflow-auto text-left text-[13px] text-zinc-600 dark:text-zinc-400">
+                  <ul className="mt-4 max-h-40 w-full max-w-md space-y-1 overflow-auto text-left text-[13px] text-slate-600 dark:text-slate-400">
                     {humanizeResultErrors(importResult.errors).slice(0, 8).map((msg, i) => (
                       <li key={i}>{msg}</li>
                     ))}

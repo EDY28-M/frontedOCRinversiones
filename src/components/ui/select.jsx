@@ -11,14 +11,14 @@ const SelectTrigger = forwardRef(({ className, children, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-900 transition-colors duration-150 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:ring-zinc-500 [&>span]:line-clamp-1',
+      'flex h-9 w-full items-center justify-between gap-2 border border-gray-300 bg-white px-3 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
       className
     )}
     {...props}
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronRight className="h-3.5 w-3.5 rotate-90 text-zinc-400" strokeWidth={1.75} />
+      <ChevronRight className="h-3.5 w-3.5 rotate-90 text-slate-400" strokeWidth={1.75} />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ));
@@ -29,7 +29,7 @@ const SelectContent = forwardRef(({ className, children, position = 'popper', ..
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        'relative z-50 max-h-64 min-w-[8rem] overflow-hidden rounded-lg border border-zinc-200 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100',
+        'relative z-50 max-h-64 min-w-[8rem] overflow-hidden border border-gray-200 bg-white text-slate-900 shadow-lg',
         className
       )}
       position={position}
@@ -47,7 +47,7 @@ const SelectItem = forwardRef(({ className, children, ...props }, ref) => (
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex w-full cursor-pointer select-none items-center rounded-md px-2 py-1.5 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-zinc-100 dark:data-[highlighted]:bg-zinc-800',
+      'relative flex w-full cursor-pointer select-none items-center px-2 py-1.5 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-blue-50 data-[highlighted]:text-blue-700',
       className
     )}
     {...props}
