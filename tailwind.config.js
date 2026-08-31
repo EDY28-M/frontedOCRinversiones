@@ -28,7 +28,7 @@ export default {
       },
       fontFamily: {
         display: ['Oswald', 'sans-serif'],
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Geist', 'Inter', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
         body: ["Roboto", "sans-serif"],
       },
