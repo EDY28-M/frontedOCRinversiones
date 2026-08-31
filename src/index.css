@@ -14,6 +14,82 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fotos de línea: recorte centrado a la forma de categoría (placa, corona, tuerca, empaque, anillo) */
+.cat-shape-art {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.cat-shape-photo,
+.cat-shape-overlay,
+.cat-shape-empty {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  z-index: 1;
+}
+
+.cat-shape-photo.is-contain,
+.cat-shape-overlay {
+  object-fit: contain;
+}
+
+.cat-shape-empty {
+  background: #f1f5f9;
+}
+
+.cat-shape-fallback .line-card-svg {
+  position: absolute;
+  inset: 10%;
+  width: 80%;
+  height: 80%;
+}
+
+.cat-shape-art .line-card-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.cat-shape-art.is-plate .cat-shape-photo,
+.cat-shape-art.is-plate .cat-shape-overlay,
+.cat-shape-art.is-plate .cat-shape-empty {
+  clip-path: polygon(11% 4%, 89% 4%, 96% 11%, 96% 89%, 89% 96%, 11% 96%, 4% 89%, 4% 11%);
+}
+
+.cat-shape-art.is-hex .cat-shape-photo,
+.cat-shape-art.is-hex .cat-shape-overlay,
+.cat-shape-art.is-hex .cat-shape-empty {
+  clip-path: polygon(50% 6%, 87% 27%, 87% 73%, 50% 94%, 13% 73%, 13% 27%);
+}
+
+.cat-shape-art.is-gasket .cat-shape-photo,
+.cat-shape-art.is-gasket .cat-shape-overlay,
+.cat-shape-art.is-gasket .cat-shape-empty {
+  clip-path: inset(14% 7% 14% 7% round 9%);
+}
+
+.cat-shape-art.is-ring .cat-shape-photo,
+.cat-shape-art.is-ring .cat-shape-overlay,
+.cat-shape-art.is-ring .cat-shape-empty {
+  clip-path: circle(39% at 50% 50%);
+}
+
+.cat-shape-art.is-gear .cat-shape-photo,
+.cat-shape-art.is-gear .cat-shape-overlay,
+.cat-shape-art.is-gear .cat-shape-empty {
+  clip-path: circle(35% at 50% 50%);
+}
+
 /* ========================================
    RESET CSS - GLOBAL
    Permite scroll en páginas públicas

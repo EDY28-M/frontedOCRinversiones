@@ -13,6 +13,19 @@ function normalizeShape(value) {
   return SHAPES.includes(key) ? key : 'plate';
 }
 
+function displaySrc(url) {
+  if (!url) return '';
+  const value = String(url).trim();
+  if (!value) return '';
+  if (/^https?:\/\//i.test(value) || value.startsWith('data:') || value.startsWith('blob:')) {
+    return value;
+  }
+  if (value.startsWith('/images/') || value.startsWith('/assets/')) {
+    return value;
+  }
+  return resolveMediaUrl(value);
+}
+
 function cleanDescription(value) {
   const text = String(value || '').trim();
   if (!text) return '';
@@ -110,6 +123,39 @@ function ShapeFrame({ shape, gid }) {
   );
 }
 
+export function CategoryShapePhoto({
+  shape,
+  src,
+  overlaySrc,
+  fallback = null,
+  fit = 'cover',
+  className = '',
+}) {
+  const uid = useId();
+  const gid = `shp${uid.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const s = normalizeShape(shape);
+  const photo = displaySrc(src);
+  const overlay = displaySrc(overlaySrc);
+
+  return (
+    <div className={`cat-shape-art is-${s} ${className}`.trim()}>
+      {photo ? (
+        <img
+          src={photo}
+          alt=""
+          className={`cat-shape-photo${fit === 'contain' ? ' is-contain' : ''}`}
+        />
+      ) : fallback ? (
+        <div className="cat-shape-photo cat-shape-fallback">{fallback}</div>
+      ) : (
+        <div className="cat-shape-empty" />
+      )}
+      {overlay ? <img src={overlay} alt="" className="cat-shape-overlay" /> : null}
+      <ShapeFrame shape={s} gid={`${gid}f`} />
+    </div>
+  );
+}
+
 const LineCard = memo(function LineCard({ cat, shape }) {
   const uid = useId();
   const gid = `ln${uid.replace(/[^a-zA-Z0-9]/g, '')}`;
@@ -118,12 +164,12 @@ const LineCard = memo(function LineCard({ cat, shape }) {
   return (
     <Link to={getCatalogUrl({ categoryName: cat.name })} className={`line-card is-${shape}`}>
       <div className="line-card-art">
-        <ShapeFrame shape={shape} gid={`${gid}f`} />
-        {photo ? (
-          <img src={photo} alt="" className="line-card-photo" />
-        ) : (
-          <CategoryPartArt name={cat.name} gid={gid} />
-        )}
+        <CategoryShapePhoto
+          shape={shape}
+          src={photo}
+          overlaySrc={cat.overlayImageUrl}
+          fallback={<CategoryPartArt name={cat.name} gid={gid} />}
+        />
       </div>
       <div className="line-card-copy">
         <p className="line-card-kicker">Línea de pieza</p>
@@ -148,6 +194,7 @@ export default function CategoryLinesShowcase() {
           name: cat.name || cat.Name || '',
           description: cleanDescription(cat.description || cat.Description),
           imageUrl: cat.imageUrl || cat.ImageUrl || '',
+          overlayImageUrl: cat.overlayImageUrl || cat.OverlayImageUrl || '',
         }))
         .filter((cat) => cat.id > 0 && cat.name),
     [categories]

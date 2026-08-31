@@ -5,7 +5,7 @@ import { useNotification } from '../../../context/NotificationContext';
 import { siteSettingsService } from '../../../services/siteSettingsService';
 import { siteSettingsKeys } from '../../../hooks/usePublicSiteSettings';
 import { resolveMediaUrl } from '../../../utils/mediaUrl';
-import { SHOWCASE_SHAPES, ShowcaseShapePreview } from '../../../components/common/CategoryLinesShowcase';
+import { SHOWCASE_SHAPES, ShowcaseShapePreview, CategoryShapePhoto } from '../../../components/common/CategoryLinesShowcase';
 
 function previewSrc(url) {
   return resolveMediaUrl(url);
@@ -15,6 +15,9 @@ function ImageSlot({
   label,
   hint,
   url,
+  overlayUrl,
+  shape,
+  fit = 'cover',
   onUpload,
   onClear,
   isSaving,
@@ -26,13 +29,24 @@ function ImageSlot({
     <div className="border border-gray-200 bg-white p-4">
       <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">{label}</p>
       <div className="flex items-start gap-4">
-        <div className="w-28 h-28 bg-slate-50 border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
-          {src ? (
-            <img src={src} alt="" className="w-full h-full object-contain" />
-          ) : (
-            <span className="material-symbols-outlined text-slate-300 text-3xl">image</span>
-          )}
-        </div>
+        {shape ? (
+          <div className="w-32 h-32 bg-white border border-gray-200 shrink-0">
+            <CategoryShapePhoto
+              shape={shape}
+              src={src}
+              overlaySrc={overlayUrl}
+              fit={fit}
+            />
+          </div>
+        ) : (
+          <div className="w-28 h-28 bg-slate-50 border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+            {src ? (
+              <img src={src} alt="" className="w-full h-full object-contain" />
+            ) : (
+              <span className="material-symbols-outlined text-slate-300 text-3xl">image</span>
+            )}
+          </div>
+        )}
         <div className="flex-1 min-w-0 space-y-2">
           {hint && <p className="text-xs text-slate-500">{hint}</p>}
           <div className="flex flex-wrap gap-2">
@@ -225,7 +239,7 @@ export default function Personalizacion() {
           Líneas de pieza (categorías)
         </h2>
         <p className="text-xs text-slate-500 mb-4">
-          Estas fotos aparecen en el selector del inicio. La imagen base es el fondo; la capa superior se dibuja encima.
+          Estas fotos aparecen en el selector y en las fichas del inicio. Se recortan al centro para llenar la forma elegida arriba, da igual si la foto es cuadrada, horizontal o vertical.
         </p>
         <div className="space-y-6">
           {categories.length === 0 ? (
@@ -244,16 +258,20 @@ export default function Personalizacion() {
                   <div className="grid md:grid-cols-2 gap-4 p-4">
                     <ImageSlot
                       label="Imagen de la línea"
-                      hint="Foto de la pieza (pernos, pistón, etc.)."
+                      hint="Se recorta al centro y llena la forma. Sube cualquier tamaño: lo que importa queda en el medio."
                       url={imageUrl}
+                      overlayUrl={overlayUrl}
+                      shape={showcaseShape}
                       isSaving={saving}
                       onUpload={(file) => categoryImageMutation.mutate({ id, file })}
                       onClear={() => clearCategoryMutation.mutate({ id, field: 'imageUrl' })}
                     />
                     <ImageSlot
                       label="Capa encima (opcional)"
-                      hint="Se superpone sobre la imagen de la línea."
+                      hint="Se superpone sobre la imagen, también dentro de la forma."
                       url={overlayUrl}
+                      shape={showcaseShape}
+                      fit="contain"
                       isSaving={saving}
                       onUpload={(file) => categoryOverlayMutation.mutate({ id, file })}
                       onClear={() => clearCategoryMutation.mutate({ id, field: 'overlayImageUrl' })}

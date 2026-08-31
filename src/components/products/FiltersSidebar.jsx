@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { getCatalogUrl, toSlug } from '../../utils/slugUtils';
+import { usePublicSiteSettings } from '../../hooks/usePublicSiteSettings';
+import { CategoryShapePhoto } from '../common/CategoryLinesShowcase';
 
 const FiltersSidebar = ({
   categories,
@@ -16,6 +18,7 @@ const FiltersSidebar = ({
   brandsError
 }) => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const { showcaseShape } = usePublicSiteSettings();
 
   const selectedBrandIds = useMemo(
     () => new Set(selectedBrands.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0)),
@@ -27,7 +30,9 @@ const FiltersSidebar = ({
     categories.map(cat => ({
       id: Number(cat.Id || cat.id),
       name: cat.Name || cat.name || cat.Nombre || cat.nombre || 'Sin nombre',
-      count: cat.CountActive || 0
+      count: cat.CountActive || 0,
+      imageUrl: cat.imageUrl || cat.ImageUrl || '',
+      overlayImageUrl: cat.overlayImageUrl || cat.OverlayImageUrl || '',
     })),
     [categories]
   );
@@ -101,7 +106,17 @@ const FiltersSidebar = ({
                     to={href}
                     className="group flex items-center gap-3 py-2 px-2 -mx-2 rounded hover:bg-gray-50 cursor-pointer transition-colors text-left w-full no-underline"
                   >
-                    <span className={`w-1 h-5 rounded-full transition-colors ${isActive ? 'bg-primary' : 'bg-gray-300 group-hover:bg-primary/50'}`}></span>
+                    {cat.imageUrl ? (
+                      <span className="w-9 h-9 shrink-0">
+                        <CategoryShapePhoto
+                          shape={showcaseShape}
+                          src={cat.imageUrl}
+                          overlaySrc={cat.overlayImageUrl}
+                        />
+                      </span>
+                    ) : (
+                      <span className={`w-1 h-5 rounded-full transition-colors ${isActive ? 'bg-primary' : 'bg-gray-300 group-hover:bg-primary/50'}`}></span>
+                    )}
                     <span className={`text-sm ${isActive ? 'font-bold text-gray-900' : 'font-medium text-gray-700 group-hover:text-gray-900'}`}>
                       {cat.name}
                       {cat.count > 0 && <span className="ml-1 text-gray-500">({cat.count})</span>}
