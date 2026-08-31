@@ -210,7 +210,7 @@ export default function VehicleSelectorCard({ className = '' }) {
 
         <div className="parts-finder-block">
           <label htmlFor={`parts-finder-brand-${uid}`} className="parts-finder-label">
-            Marca del repuesto
+            Marcas del vehículo
           </label>
           <div className="relative">
             <select
