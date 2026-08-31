@@ -85,12 +85,12 @@ function categoriesXml(data) {
   const today = ymd();
   const urls = [
     urlTag(`${SITE}/`, { lastmod: today, changefreq: 'weekly', priority: '1.0' }),
-    urlTag(`${SITE}/repuestos`, { lastmod: today, changefreq: 'daily', priority: '0.9' }),
+    urlTag(`${SITE}/repuestos`, { lastmod: today, changefreq: 'weekly', priority: '0.9' }),
     urlTag(`${SITE}/nosotros`, { lastmod: today, changefreq: 'monthly', priority: '0.6' }),
     urlTag(`${SITE}/envios-provincias`, { lastmod: today, changefreq: 'monthly', priority: '0.6' }),
-    ...catSlugs.map((sl) => urlTag(`${SITE}/repuestos/${sl}`, { lastmod: today, priority: '0.8' })),
-    ...brandSlugs.map((sl) => urlTag(`${SITE}/repuestos/marcas/${sl}`, { lastmod: today, priority: '0.7' })),
-    ...[...pairs].sort().map((pair) => urlTag(`${SITE}/repuestos/${pair}`, { lastmod: today, priority: '0.7' })),
+    ...catSlugs.map((sl) => urlTag(`${SITE}/repuestos/${sl}`, { lastmod: today, changefreq: 'weekly', priority: '0.8' })),
+    ...brandSlugs.map((sl) => urlTag(`${SITE}/repuestos/marcas/${sl}`, { lastmod: today, changefreq: 'weekly', priority: '0.7' })),
+    ...[...pairs].sort().map((pair) => urlTag(`${SITE}/repuestos/${pair}`, { lastmod: today, changefreq: 'weekly', priority: '0.7' })),
   ];
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -102,7 +102,7 @@ ${urls.join('\n')}
 function productsXml(data) {
   const urls = data.products.map((p) => {
     const lastmod = ymd(p.updatedAt || p.UpdatedAt || p.createdAt);
-    return urlTag(`${SITE}${productPath(p)}`, { lastmod, changefreq: 'weekly', priority: '0.8' });
+    return urlTag(`${SITE}${productPath(p)}`, { lastmod, changefreq: 'weekly', priority: '0.6' });
   });
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

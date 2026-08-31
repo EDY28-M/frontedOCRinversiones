@@ -116,11 +116,91 @@ async function fetchJson(url) {
   return res.json();
 }
 
+async function buildHomeSeo() {
+  const [categories, brands, featured] = await Promise.all([
+    fetchJson(`${API}/products/public/categories`),
+    fetchJson(`${API}/products/public/brands`),
+    fetchJson(`${API}/products/public/featured?page=1&pageSize=9`),
+  ]);
+  const catList = Array.isArray(categories) ? categories : [];
+  const brandList = Array.isArray(brands) ? brands : [];
+  const featuredItems = featured?.items || [];
+
+  const catLinks = catList.map((c) => {
+    const name = nameOf(c);
+    const sl = toSlug(name);
+    return `<li><h3><a href="/repuestos/${escapeAttr(sl)}">${escapeHtml(name)}</a></h3></li>`;
+  }).join('');
+
+  const brandLinks = brandList.map((b) => {
+    const name = nameOf(b);
+    const sl = toSlug(name);
+    return `<li><h3><a href="/repuestos/marcas/${escapeAttr(sl)}">${escapeHtml(name)}</a></h3></li>`;
+  }).join('');
+
+  const featuredCards = featuredItems.map((p) => {
+    const href = productPath(p);
+    const title = productTitle(p);
+    const img = p.imagenPrincipal || '';
+    return `<article>
+      <h3><a href="${escapeAttr(href)}">${escapeHtml(title)}</a></h3>
+      <p>${escapeHtml(p.marcaNombre || '')} ${escapeHtml(p.codigo || '')}</p>
+      ${img ? `<p><a href="${escapeAttr(href)}"><img src="${escapeAttr(img)}" alt="${escapeAttr(title)}" /></a></p>` : ''}
+    </article>`;
+  }).join('');
+
+  const body = `
+<nav>
+  <a href="/">Inicio</a>
+  <a href="/repuestos">Catálogo</a>
+  <a href="/envios-provincias">Envíos a provincias</a>
+  <a href="/nosotros">Empresa</a>
+</nav>
+<main>
+  <h1>Expertos en repuestos coreanos, chinos y japoneses</h1>
+  <p>Venta de repuestos coreanos, chinos y japoneses para vehículos en Lima, Perú. Más de 15 años importando piezas para JAC, Foton, Hyundai, Toyota, JMC y más. Envíos a todo el Perú.</p>
+  <p><a href="/repuestos">Ver catálogo de repuestos</a></p>
+  <section>
+    <h2>Especialistas en Marcas</h2>
+    <ul>${brandLinks}</ul>
+  </section>
+  <section>
+    <h2>Repuestos por Línea</h2>
+    <ul>${catLinks}</ul>
+  </section>
+  <section>
+    <h2>Productos Destacados</h2>
+    ${featuredCards}
+  </section>
+</main>`;
+
+  return {
+    title: 'ORC Inversiones Perú | Venta de Repuestos Automotrices en Lima',
+    description: 'Venta de repuestos coreanos, chinos y japoneses para vehículos en Lima, Perú. Más de 15 años importando piezas para JAC, Foton, Hyundai, Toyota, JMC y más. Envíos a todo el Perú.',
+    canonical: `${SITE}/`,
+    body,
+  };
+}
+
 export async function buildSeo(pathname) {
+  const cleanPath = (pathname || '/').replace(/\/+$/, '') || '/';
+  if (cleanPath === '/') {
+    return buildHomeSeo();
+  }
+
   const parsed = parseCatalogPath(pathname);
   if (parsed.kind === 'other') {
+    const title = cleanPath === '/nosotros'
+      ? 'Empresa | ORC Inversiones Perú'
+      : cleanPath === '/envios-provincias'
+        ? 'Envíos a Provincias | ORC Inversiones Perú'
+        : null;
     return {
-      canonical: `${SITE}${pathname === '/' ? '/' : pathname}`,
+      title: title || undefined,
+      canonical: `${SITE}${cleanPath}`,
+      body: title
+        ? `<h1>${escapeHtml(title.split(' | ')[0])}</h1><p><a href="/repuestos">Ver catálogo de repuestos</a></p>`
+        : undefined,
     };
   }
 
