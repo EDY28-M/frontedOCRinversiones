@@ -73,8 +73,8 @@ function CrownGear({ gid }) {
   const cx = 250;
   const cy = 250;
   const ringPath = useMemo(() => {
-    const outer = buildCrownPath(cx, cy, 36, 214, 248);
-    const hole = `M ${cx} ${cy - 176} A 176 176 0 1 1 ${cx} ${cy + 176} A 176 176 0 1 1 ${cx} ${cy - 176}`;
+    const outer = buildCrownPath(cx, cy, 16, 208, 246);
+    const hole = `M ${cx} ${cy - 198} A 198 198 0 1 1 ${cx} ${cy + 198} A 198 198 0 1 1 ${cx} ${cy - 198}`;
     return `${outer} ${hole}`;
   }, []);
   const bolts = useMemo(
@@ -82,8 +82,8 @@ function CrownGear({ gid }) {
       Array.from({ length: 8 }, (_, i) => {
         const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
         return {
-          cx: cx + Math.cos(a) * 196,
-          cy: cy + Math.sin(a) * 196,
+          cx: cx + Math.cos(a) * 224,
+          cy: cy + Math.sin(a) * 224,
         };
       }),
     []
@@ -92,11 +92,17 @@ function CrownGear({ gid }) {
   return (
     <svg className="parts-finder-chrome" viewBox="0 0 500 500" aria-hidden="true" focusable="false">
       <defs>
-        <linearGradient id={`${gid}-steel`} x1="0.15" y1="0" x2="0.9" y2="1">
-          <stop offset="0%" stopColor="#f1f5f9" />
-          <stop offset="45%" stopColor="#94a3b8" />
-          <stop offset="100%" stopColor="#334155" />
+        <linearGradient id={`${gid}-steel`} x1="0.12" y1="0" x2="0.88" y2="1">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="22%" stopColor="#e2e8f0" />
+          <stop offset="48%" stopColor="#94a3b8" />
+          <stop offset="72%" stopColor="#475569" />
+          <stop offset="100%" stopColor="#0f172a" />
         </linearGradient>
+        <radialGradient id={`${gid}-shine`} cx="0.32" cy="0.28" r="0.7">
+          <stop offset="0%" stopColor="rgba(255,255,255,0.55)" />
+          <stop offset="55%" stopColor="rgba(255,255,255,0)" />
+        </radialGradient>
       </defs>
 
       <path
@@ -106,8 +112,9 @@ function CrownGear({ gid }) {
         stroke="#e2e8f0"
         strokeWidth="1.1"
       />
-      <circle cx={cx} cy={cy} r="182" fill="none" stroke="#facc15" strokeWidth="7" />
-      <circle cx={cx} cy={cy} r="174" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" />
+      <path d={ringPath} fill={`url(#${gid}-shine)`} fillRule="evenodd" />
+      <circle cx={cx} cy={cy} r="200" fill="none" stroke="#facc15" strokeWidth="6" />
+      <circle cx={cx} cy={cy} r="193" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="2" />
 
       {bolts.map((bolt, i) => (
         <g key={i}>
@@ -194,11 +201,10 @@ export default function VehicleSelectorCard({ className = '' }) {
         className={`parts-finder-form${isManyChips ? ' is-compact' : ''}`}
       >
         <header className="text-center">
-          <p className="font-display text-accent text-[11px] font-semibold uppercase tracking-[0.22em] leading-none mb-1.5">
-            Almacén Ate
-          </p>
-          <h3 className="font-display text-white text-[22px] sm:text-[24px] font-medium uppercase tracking-tight leading-none">
-            Consulta de stock
+          <p className="parts-finder-kicker">Almacén Ate</p>
+          <h3 className="parts-finder-title">
+            Encuentra tu
+            <span> Repuesto</span>
           </h3>
         </header>
 
