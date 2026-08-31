@@ -6,15 +6,15 @@ const WA =
 
 const AUTOS = [
   { name: 'Hyundai', models: 'Accent, Elantra, Tucson, Santa Fe, Creta, Venue' },
-  { name: 'Chevrolet', models: 'Sail, Aveo, Onix, Tracker, Captiva, Groove' },
   { name: 'Toyota', models: 'Corolla, Yaris, Avanza, Hilux' },
   { name: 'Kia', models: '' },
-  { name: 'Nissan', models: '' },
-  { name: 'Honda', models: '' },
-  { name: 'Mazda', models: '' },
-  { name: 'Suzuki', models: '' },
   { name: 'Mitsubishi', models: '' },
-  { name: 'Volkswagen', models: '' },
+  { name: 'Foton', models: '' },
+  { name: 'JAC', models: '' },
+  { name: 'Joylong', models: '' },
+  { name: 'Yutong', models: '' },
+  { name: 'Dongfeng', models: '' },
+  { name: 'Yuejin', models: '' },
 ];
 
 const FLOTAS = [
@@ -98,7 +98,7 @@ export default function EmpresaBloques() {
               <h3>Repuestos para tu auto</h3>
               <p>
                 Atendemos autos de familia y uso diario: sedán, SUV y camioneta liviana. Si tu unidad es Hyundai,
-                Chevrolet, Toyota u otra de las marcas de esta ficha, tráenos el modelo exacto y confirmamos pieza
+                Toyota, Foton, JAC u otra de las marcas de esta ficha, tráenos el modelo exacto y confirmamos pieza
                 y disponibilidad desde Ate.
               </p>
               <p>
