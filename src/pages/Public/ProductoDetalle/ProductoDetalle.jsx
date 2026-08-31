@@ -87,7 +87,13 @@ export default function ProductoDetalle() {
     }
   }, [product, canonicalPath, location.pathname, navigate]);
   const images = useMemo(() => (product ? getAllValidImageUrls(product) : []), [product]);
-  const ficha = useMemo(() => parseFicha(product?.fichaTecnica), [product]);
+  const ficha = useMemo(() => {
+    const rows = parseFicha(product?.fichaTecnica);
+    return rows.filter((row) => {
+      const label = String(row.label || '').toLowerCase();
+      return !label.includes('comercial') && !label.includes('cod comer') && !label.includes('código comer');
+    });
+  }, [product]);
   const visibleImages = images.filter((img) => !imageErrors.has(img));
   const currentImage = selectedImage && !imageErrors.has(selectedImage)
     ? selectedImage
@@ -525,7 +531,6 @@ export default function ProductoDetalle() {
 
                           const specs = [
                             product.codigo && { k: 'Código / SKU', v: product.codigo },
-                            product.codigoComer && { k: 'Cód. comercial', v: product.codigoComer },
                             product.marcaNombre && { k: 'Marca', v: product.marcaNombre },
                             product.categoryName && { k: 'Línea', v: product.categoryName },
                             { k: 'Uso', v: 'Reposición / mantenimiento' },
@@ -587,7 +592,6 @@ export default function ProductoDetalle() {
                             ? ficha
                             : [
                                 product.codigo && { label: 'SKU', value: product.codigo },
-                                product.codigoComer && { label: 'Código comercial', value: product.codigoComer },
                                 product.marcaNombre && { label: 'Marca', value: product.marcaNombre },
                                 product.categoryName && { label: 'Categoría', value: product.categoryName },
                               ].filter(Boolean)
