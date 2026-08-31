@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ErrorAlert from '../../../components/common/ErrorAlert';
 import { useCategory, useUpdateCategory } from '../../../hooks/useCategories';
+import { validateCategoryName, getCategoryFormError } from '../../../utils/categoryForm';
 
 const CategoriasEdit = () => {
   const navigate = useNavigate();
@@ -39,19 +40,20 @@ const CategoriasEdit = () => {
     e.preventDefault();
     setError(null);
 
-    if (!formData.name.trim()) {
-      setError('El nombre de la categoría es obligatorio');
+    const nameError = validateCategoryName(formData.name);
+    if (nameError) {
+      setError(nameError);
       return;
     }
 
     updateMutation.mutate(
-      { id, categoryData: formData },
+      { id, categoryData: { Name: formData.name.trim(), Description: formData.description?.trim() || null } },
       {
         onSuccess: () => {
           navigate('/admin/categorias');
         },
         onError: (err) => {
-          setError(err.response?.data?.message || 'Error al actualizar la categoría');
+          setError(getCategoryFormError(err, 'No se pudo actualizar la categoría.'));
         },
       }
     );
@@ -93,7 +95,7 @@ const CategoriasEdit = () => {
         
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {displayError && (
-            <ErrorAlert error={displayError} onClose={clearError} title="Error" />
+            <ErrorAlert error={displayError} onClose={clearError} title="No se pudo guardar" />
           )}
 
           <div>
@@ -108,6 +110,9 @@ const CategoriasEdit = () => {
               className="w-full px-4 py-3 border-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-colors bg-gray-50 text-sm font-semibold"
               required
             />
+            <p className="mt-2 text-xs text-slate-500">
+              Usa un nombre con letras, de al menos 3 caracteres. Ejemplo: Motor, Frenos. No sirve solo un número.
+            </p>
           </div>
 
           <div>

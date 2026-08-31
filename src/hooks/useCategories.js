@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { categoryService } from '../services/productService';
 import { useNotification } from '../context/NotificationContext';
+import { getCategoryFormError } from '../utils/categoryForm';
 
 // Query key factory
 export const categoryKeys = {
@@ -56,16 +57,7 @@ export function useCreateCategory() {
 
     onError: (err) => {
       console.error('Error al crear categoría:', err);
-      let errorMessage = 'Error al crear la categoría';
-      if (err.response?.data) {
-        if (err.response.data.errors) {
-          const errors = Object.values(err.response.data.errors).flat();
-          errorMessage = errors.join(', ');
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        }
-      }
-      showError(errorMessage);
+      showError(getCategoryFormError(err, 'No se pudo crear la categoría.'));
     },
   });
 }
@@ -92,11 +84,7 @@ export function useUpdateCategory() {
 
     onError: (err) => {
       console.error('Error al actualizar categoría:', err);
-      let errorMessage = 'Error al actualizar la categoría';
-      if (err.response?.data?.message) {
-        errorMessage = err.response.data.message;
-      }
-      showError(errorMessage);
+      showError(getCategoryFormError(err, 'No se pudo actualizar la categoría.'));
     },
   });
 }

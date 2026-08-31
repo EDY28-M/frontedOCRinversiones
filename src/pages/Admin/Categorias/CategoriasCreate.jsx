@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ErrorAlert from '../../../components/common/ErrorAlert';
 import { useCreateCategory } from '../../../hooks/useCategories';
+import { validateCategoryName, getCategoryFormError } from '../../../utils/categoryForm';
 
 const CategoriasCreate = () => {
   const navigate = useNavigate();
@@ -26,8 +27,9 @@ const CategoriasCreate = () => {
     e.preventDefault();
     setError(null);
 
-    if (!formData.name.trim()) {
-      setError('El nombre de la categoría es obligatorio');
+    const nameError = validateCategoryName(formData.name);
+    if (nameError) {
+      setError(nameError);
       return;
     }
 
@@ -41,16 +43,7 @@ const CategoriasCreate = () => {
         navigate('/admin/categorias');
       },
       onError: (err) => {
-        let errorMessage = 'Error al crear la categoría';
-        if (err.response?.data) {
-          if (err.response.data.errors) {
-            const errors = Object.values(err.response.data.errors).flat();
-            errorMessage = errors.join(', ');
-          } else if (err.response.data.message) {
-            errorMessage = err.response.data.message;
-          }
-        }
-        setError(errorMessage);
+        setError(getCategoryFormError(err, 'No se pudo crear la categoría.'));
       },
     });
   };
@@ -77,7 +70,7 @@ const CategoriasCreate = () => {
         
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {error && (
-            <ErrorAlert error={error} onClose={clearError} title="Error de Validación" />
+            <ErrorAlert error={error} onClose={clearError} title="No se pudo guardar" />
           )}
 
           <div>
@@ -93,6 +86,9 @@ const CategoriasCreate = () => {
               placeholder="Ej: Repuestos de Motor"
               required
             />
+            <p className="mt-2 text-xs text-slate-500">
+              Usa un nombre con letras, de al menos 3 caracteres. Ejemplo: Motor, Frenos. No sirve solo un número.
+            </p>
           </div>
 
           <div>
