@@ -349,8 +349,11 @@ const ImportProductsModal = ({
         failed: result.failed || 0,
         skipped: (result.skipped || 0) + processedProducts.filter((p) => !p.isValid).length,
         duplicates: result.duplicates || 0,
+        removed: result.removed || 0,
         marcasCreated: result.marcasCreated || 0,
         categoriasCreated: result.categoriasCreated || 0,
+        marcasRemoved: result.marcasRemoved || 0,
+        categoriasRemoved: result.categoriasRemoved || 0,
         errors: result.errors || [],
       };
       setImportDone(true);
@@ -789,6 +792,11 @@ const ImportProductsModal = ({
                     ? `${formatCount(savedCount)} ok / ${formatCount(importResult.failed)} error`
                     : `${formatCount(savedCount)} productos listos · ${formatCount(importResult.skipped || invalidCount)} omitidas`}
                 </p>
+                {importResult.removed > 0 && (
+                  <p className="mt-2 text-[13px] text-slate-600">
+                    Se quitaron {formatCount(importResult.removed)} productos que no venían en el Excel. Las fotos de los que sí estaban se conservaron.
+                  </p>
+                )}
                 {humanizeResultErrors(importResult.errors).length > 0 && (
                   <ul className="mt-4 max-h-40 w-full max-w-md space-y-1 overflow-auto text-left text-[13px] text-slate-600 dark:text-slate-400">
                     {humanizeResultErrors(importResult.errors).slice(0, 8).map((msg, i) => (

@@ -55,14 +55,15 @@ export const productService = {
       const form = new FormData();
       form.append('file', file);
       if (mapping) form.append('mappingJson', JSON.stringify(mapping));
-      form.append('autoCreateEntities', 'false');
+      form.append('autoCreateEntities', 'true');
       const response = await axiosInstance.post('/products/bulk-import-file', form, options);
       return response.data;
     }
 
     const response = await axiosInstance.post('/products/bulk-import', {
       products,
-      autoCreateEntities: false
+      autoCreateEntities: true,
+      syncCatalog: false
     }, options);
     return response.data;
   },
