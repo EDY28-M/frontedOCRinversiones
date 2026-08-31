@@ -68,7 +68,7 @@ const ImportProductsModal = ({
   // Campos requeridos del sistema
   const systemFields = [
     { key: 'codigo', label: 'Código', required: true },
-    { key: 'codigoComercial', label: 'Código Comercial', required: false }, // Opcional, se auto-rellena con Código
+    { key: 'codigoComercial', label: 'Código Comercial', required: true },
     { key: 'producto', label: 'Producto', required: true },
     { key: 'marca', label: 'Marca', required: true },
     { key: 'categoria', label: 'Categoría', required: true },
@@ -309,15 +309,10 @@ const ImportProductsModal = ({
   const processProducts = useCallback(() => {
     const processed = rawData.map((row, index) => {
       const codigo = row[columnMapping.codigo]?.toString().trim() || '';
-      let codigoComercial = row[columnMapping.codigoComercial]?.toString().trim() || '';
+      const codigoComercial = row[columnMapping.codigoComercial]?.toString().trim() || '';
       const producto = row[columnMapping.producto]?.toString().trim() || '';
       const marcaNombre = row[columnMapping.marca]?.toString().trim() || '';
       const categoriaNombre = row[columnMapping.categoria]?.toString().trim() || '';
-
-      // Si código comercial está vacío, usar el código principal
-      if (!codigoComercial && codigo) {
-        codigoComercial = codigo;
-      }
 
       // Campos opcionales (no bloquean la importación si faltan)
       const descripcion = columnMapping.descripcion ? (row[columnMapping.descripcion]?.toString().trim() || '') : '';
@@ -331,6 +326,7 @@ const ImportProductsModal = ({
 
       const errors = [];
       if (!codigo) errors.push('Falta el código');
+      if (!codigoComercial) errors.push('Falta el código comercial');
       if (!producto) errors.push('Falta el nombre');
       if (!marcaNombre) {
         errors.push('Falta la marca');
@@ -726,7 +722,7 @@ const ImportProductsModal = ({
               </div>
               {invalidCount > 0 && (
                 <p className="mb-4 text-sm text-slate-600">
-                  Las filas en rojo no se importan: sin marca, sin categoría, categoría ANULADO o productos vacíos/para eliminar. Continúa solo con las {validCount} filas listas.
+                  Las filas en rojo no se importan y no se rellena nada: campo en blanco, marca/categoría que no existe, o anulado. Solo se guardan las {validCount} filas completas.
                 </p>
               )}
               {validCount === 0 && (
