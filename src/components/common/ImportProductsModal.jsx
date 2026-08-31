@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import { productService } from '../../services/productService';
 import {
@@ -14,6 +14,11 @@ import {
   humanizeResultErrors,
   getResultHeadline,
 } from '../../utils/importErrorMessages';
+
+const normalizeImportKey = (text) => {
+  if (!text) return '';
+  return text.toString().normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim().replace(/\s+/g, ' ');
+};
 
 /**
  * Modal para importación masiva de productos desde Excel
@@ -277,8 +282,15 @@ const ImportProductsModal = ({
     setError(null);
   };
 
-  // Procesar productos con el mapeo actual
-  // Ya NO valida si existen marcas/categorías porque el backend las crea automáticamente
+  const marcaKeys = useMemo(
+    () => new Set((marcas || []).map((m) => normalizeImportKey(m.nombre || m.Nombre)).filter(Boolean)),
+    [marcas]
+  );
+  const categoriaKeys = useMemo(
+    () => new Set((categories || []).map((c) => normalizeImportKey(c.name || c.Name)).filter(Boolean)),
+    [categories]
+  );
+
   const processProducts = useCallback(() => {
     const processed = rawData.map((row, index) => {
       const codigo = row[columnMapping.codigo]?.toString().trim() || '';
@@ -305,8 +317,16 @@ const ImportProductsModal = ({
       const errors = [];
       if (!codigo) errors.push('Falta el código');
       if (!producto) errors.push('Falta el nombre');
-      if (!marcaNombre) errors.push('Falta la marca');
-      if (!categoriaNombre) errors.push('Falta la categoría');
+      if (!marcaNombre) {
+        errors.push('Falta la marca');
+      } else if (marcaKeys.size > 0 && !marcaKeys.has(normalizeImportKey(marcaNombre))) {
+        errors.push(`La marca "${marcaNombre}" no existe`);
+      }
+      if (!categoriaNombre) {
+        errors.push('Falta la categoría');
+      } else if (categoriaKeys.size > 0 && !categoriaKeys.has(normalizeImportKey(categoriaNombre))) {
+        errors.push(`La categoría "${categoriaNombre}" no existe`);
+      }
 
       return {
         rowIndex: index + 1,
@@ -329,7 +349,7 @@ const ImportProductsModal = ({
     });
 
     setProcessedProducts(processed);
-  }, [rawData, columnMapping]);
+  }, [rawData, columnMapping, marcaKeys, categoriaKeys]);
 
   // Ir al paso de preview
   const goToPreview = () => {
@@ -688,12 +708,12 @@ const ImportProductsModal = ({
               </div>
               {invalidCount > 0 && (
                 <p className="mb-4 text-sm text-slate-600">
-                  Las filas incompletas no se importan. Completa código, nombre, marca y categoría, o continúa solo con las {validCount} filas listas.
+                  Las filas en rojo no se importan. Cada producto tiene que tener una marca y una categoría que ya existan en el sistema. Crea esas marcas o categorías primero, o continúa solo con las {validCount} filas listas.
                 </p>
               )}
               {validCount === 0 && (
                 <p className="mb-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 p-3">
-                  Ninguna fila está completa. Revisa el mapeo de columnas o el Excel: hace falta código, nombre, marca y categoría en cada producto.
+                  Ninguna fila se puede guardar. Hace falta código, nombre, y una marca y categoría que ya estén creadas. Si el Excel trae marcas nuevas, créalas en Marcas antes de importar.
                 </p>
               )}
 
