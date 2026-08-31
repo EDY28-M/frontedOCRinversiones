@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-  <!-- SEO Meta Tags -->
   <title>ORC Inversiones Perú | Venta de Repuestos Automotrices en Lima</title>
   <meta name="description"
     content="Venta de repuestos coreanos, chinos y japoneses para vehículos en Lima, Perú. Más de 15 años importando piezas para JAC, Foton, Hyundai, Toyota, JMC y más. Envíos a todo el Perú." />
@@ -15,33 +14,24 @@
   <meta name="author" content="ORC Inversiones Perú" />
   <meta name="theme-color" content="#0056b3" />
   <meta name="color-scheme" content="light" />
-  <!-- Canonical se inyecta por URL en el edge (Cloudflare / seo-server).
-       NO fijarlo a la home: Google tomaría todas las fichas como duplicado de /. -->
 
-  <!-- PWA Meta Tags -->
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="ORC Inversiones" />
 
-  <!-- Manifest -->
   <link rel="manifest" href="/manifest.json" />
 
-  <!-- Icons -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="shortcut icon" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/icon-192x192.png" />
 
-  <!-- Preconnect para dominios externos (mejora LCP) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <!-- DNS Prefetch para recursos externos -->
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
   <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
 
-  <!-- Carga asíncrona de fuentes (optimizado: sin Roboto redundante) -->
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
     media="print" onload="this.media='all'" />
@@ -49,9 +39,7 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&family=Oswald:wght@400;500;600&display=swap"
     media="print" onload="this.media='all'" />
 
-  <!-- Critical CSS inline (evita render blocking) -->
   <style>
-    /* Critical CSS para render inicial */
     html {
       scroll-behavior: smooth;
     }
@@ -68,7 +56,6 @@
       background-color: #ffffff;
     }
 
-    /* Loader inicial mientras carga React */
     #root:empty::before {
       content: '';
       display: block;
@@ -77,7 +64,6 @@
       background: linear-gradient(to bottom, #f8fafc, #ffffff);
     }
 
-    /* Evitar FOUC (Flash of Unstyled Content) */
     .material-symbols-outlined {
       font-family: 'Material Symbols Outlined';
       font-weight: normal;
@@ -95,7 +81,6 @@
     }
   </style>
 
-  <!-- Open Graph / Social Media -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="ORC Inversiones Perú | Venta de Repuestos Automotrices en Lima" />
   <meta property="og:description"
@@ -105,14 +90,12 @@
   <meta property="og:locale" content="es_PE" />
   <meta property="og:site_name" content="ORC Inversiones Perú" />
 
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="ORC Inversiones Perú | Venta de Repuestos Automotrices en Lima" />
   <meta name="twitter:description"
     content="Venta de repuestos coreanos, chinos y japoneses para vehículos en Lima, Perú. Más de 15 años importando piezas." />
   <meta name="twitter:image" content="https://orcinversionesperu.com/og-image.jpg" />
 
-  <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -176,7 +159,6 @@
 <body>
   <div id="root"></div>
 
-  <!-- Fallback para navegadores sin JS -->
   <noscript>
     <style>
       body {
