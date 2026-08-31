@@ -4,8 +4,6 @@ import { usePublicBrands } from '../../hooks/usePublicBrands';
 import { usePublicCategories } from '../../hooks/usePublicCategories';
 import { resolveMediaUrl } from '../../utils/mediaUrl';
 import { getCatalogUrl } from '../../utils/slugUtils';
-import { usePublicSiteSettings } from '../../hooks/usePublicSiteSettings';
-import { CategoryShapePhoto } from './CategoryLinesShowcase';
 
 const FEATURED_BRANDS = ['JAC', 'FOTON', 'TOYOTA', 'CUMMINS'];
 
@@ -137,7 +135,6 @@ export default function VehicleSelectorCard({ className = '' }) {
   const gid = `cg${uid.replace(/[^a-zA-Z0-9]/g, '')}`;
   const { brands = [], isLoading: isLoadingBrands } = usePublicBrands();
   const { categories = [], isLoading: isLoadingCategories } = usePublicCategories();
-  const { showcaseShape } = usePublicSiteSettings();
 
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -265,15 +262,21 @@ export default function VehicleSelectorCard({ className = '' }) {
                     className={`parts-finder-chip ${active ? 'is-active' : ''}`}
                   >
                     <span className="parts-finder-chip-photo">
-                      <CategoryShapePhoto
-                        shape={showcaseShape}
+                      <img
                         src={photoSrc}
-                        overlaySrc={
-                          cat.overlayImageUrl
-                            ? withCacheBust(resolveMediaUrl(cat.overlayImageUrl), cat.updatedAt)
-                            : ''
-                        }
+                        alt=""
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = fallbackCategoryVisual(cat.name);
+                        }}
                       />
+                      {cat.overlayImageUrl ? (
+                        <img
+                          src={withCacheBust(resolveMediaUrl(cat.overlayImageUrl), cat.updatedAt)}
+                          alt=""
+                          className="parts-finder-chip-overlay"
+                        />
+                      ) : null}
                     </span>
                     <span className="parts-finder-chip-name">{cat.name}</span>
                   </button>

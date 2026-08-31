@@ -547,9 +547,7 @@ a[aria-current="page"] .nav-link::after {
 }
 
 .parts-finder-chip-photo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   position: relative;
   flex: 0 0 auto;
   height: 52px;
@@ -784,13 +782,6 @@ a[aria-current="page"] .nav-link::after {
   object-fit: cover;
   object-position: center;
   z-index: 1;
-}
-
-.parts-finder-chip-photo .cat-shape-art {
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  aspect-ratio: 1 / 1;
 }
 
 .line-card-copy {
