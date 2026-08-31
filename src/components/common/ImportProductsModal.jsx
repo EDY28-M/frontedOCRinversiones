@@ -1,6 +1,19 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import { productService } from '../../services/productService';
+import {
+  getMaxExcelBytes,
+  getFileExtensionError,
+  getFileTooLargeError,
+  getEmptyExcelError,
+  getExcelReadError,
+  getMissingMappingError,
+  getNoValidProductsError,
+  getImportRequestError,
+  humanizeRowErrors,
+  humanizeResultErrors,
+  getResultHeadline,
+} from '../../utils/importErrorMessages';
 
 /**
  * Modal para importación masiva de productos desde Excel
@@ -153,14 +166,29 @@ const ImportProductsModal = ({
   // Procesar archivo Excel
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files?.[0];
+    if (e.target) e.target.value = '';
     if (!selectedFile) return;
 
-    // Validar extensión
     const validExtensions = ['.xls', '.xlsx'];
     const fileExtension = selectedFile.name.substring(selectedFile.name.lastIndexOf('.')).toLowerCase();
 
     if (!validExtensions.includes(fileExtension)) {
-      setError('Formato de archivo no válido. Use archivos .xls o .xlsx');
+      setError(getFileExtensionError(selectedFile.name));
+      return;
+    }
+
+    if (selectedFile.size === 0) {
+      setError({
+        title: 'El archivo está vacío',
+        message: 'El Excel que elegiste no tiene contenido.',
+        hint: 'Abre el archivo, confirma que tiene productos y guárdalo otra vez antes de subirlo.',
+        tone: 'warning',
+      });
+      return;
+    }
+
+    if (selectedFile.size > getMaxExcelBytes()) {
+      setError(getFileTooLargeError(selectedFile));
       return;
     }
 
@@ -170,7 +198,8 @@ const ImportProductsModal = ({
     try {
       const data = await readExcelFile(selectedFile);
       if (data.length === 0) {
-        setError('El archivo está vacío o no tiene datos válidos');
+        setError(getEmptyExcelError());
+        setFile(null);
         return;
       }
 
@@ -178,14 +207,26 @@ const ImportProductsModal = ({
       setColumns(cols);
       setRawData(data);
 
-      // Auto-mapear columnas
       const autoMapping = autoMapColumns(cols);
       setColumnMapping(autoMapping);
+
+      const missingRequired = systemFields
+        .filter((f) => f.required && !autoMapping[f.key])
+        .map((f) => f.label);
+      if (missingRequired.length > 0) {
+        setError({
+          title: 'Revisa el mapeo de columnas',
+          message: `No detectamos automáticamente: ${missingRequired.join(', ')}.`,
+          hint: 'Elige en cada lista la columna del Excel que corresponde. Si el título en el archivo es distinto (por ejemplo SKU en vez de Código), selecciónalo a mano.',
+          tone: 'info',
+        });
+      }
 
       setStep(2);
     } catch (err) {
       console.error('Error al leer archivo:', err);
-      setError('Error al leer el archivo Excel. Verifique que el archivo no esté corrupto.');
+      setFile(null);
+      setError(getExcelReadError(err));
     }
   };
 
@@ -199,19 +240,30 @@ const ImportProductsModal = ({
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
 
-          // Tomar la primera hoja
+          if (!workbook.SheetNames?.length) {
+            reject(new Error('NO_SHEETS'));
+            return;
+          }
+
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
+          if (!worksheet) {
+            reject(new Error('NO_SHEETS'));
+            return;
+          }
 
-          // Convertir a JSON
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
-          resolve(jsonData);
+          const meaningful = jsonData.filter((row) =>
+            Object.values(row).some((v) => String(v ?? '').trim() !== '')
+          );
+          resolve(meaningful);
         } catch (err) {
           reject(err);
         }
       };
 
       reader.onerror = () => reject(new Error('Error al leer archivo'));
+      reader.onabort = () => reject(new Error('Error al leer archivo'));
       reader.readAsArrayBuffer(file);
     });
   };
@@ -222,6 +274,7 @@ const ImportProductsModal = ({
       ...prev,
       [field]: column
     }));
+    setError(null);
   };
 
   // Procesar productos con el mapeo actual
@@ -249,12 +302,11 @@ const ImportProductsModal = ({
       const isActive = parseBoolean(columnMapping.activo ? row[columnMapping.activo] : undefined, true);
       const isFeatured = parseBoolean(columnMapping.destacado ? row[columnMapping.destacado] : undefined, false);
 
-      // Solo validar campos obligatorios vacíos
       const errors = [];
-      if (!codigo) errors.push('Código vacío');
-      if (!producto) errors.push('Producto vacío');
-      if (!marcaNombre) errors.push('Marca vacía');
-      if (!categoriaNombre) errors.push('Categoría vacía');
+      if (!codigo) errors.push('Falta el código');
+      if (!producto) errors.push('Falta el nombre');
+      if (!marcaNombre) errors.push('Falta la marca');
+      if (!categoriaNombre) errors.push('Falta la categoría');
 
       return {
         rowIndex: index + 1,
@@ -287,7 +339,7 @@ const ImportProductsModal = ({
       .map(f => f.label);
 
     if (missingFields.length > 0) {
-      setError(`Campos sin mapear: ${missingFields.join(', ')}`);
+      setError(getMissingMappingError(missingFields));
       return;
     }
 
@@ -305,7 +357,7 @@ const ImportProductsModal = ({
     const validProducts = processedProducts.filter(p => p.isValid);
 
     if (validProducts.length === 0) {
-      setError('No hay productos válidos para importar');
+      setError(getNoValidProductsError());
       return;
     }
 
@@ -353,7 +405,7 @@ const ImportProductsModal = ({
 
     } catch (err) {
       console.error('Error en importación:', err);
-      setError(err.response?.data?.message || err.message || 'Error al importar productos');
+      setError(getImportRequestError(err));
       setImporting(false);
       setImportDone(false);
     }
@@ -489,10 +541,10 @@ const ImportProductsModal = ({
                 Importar Productos
               </h2>
               <p className="text-xs text-slate-500">
-                {step === 1 && 'Seleccione archivo Excel'}
-                {step === 2 && 'Configure el mapeo de columnas'}
-                {step === 3 && 'Revise los productos a importar'}
-                {step === 4 && 'Resultado de la importación'}
+                {step === 1 && 'Elige el Excel con tus productos'}
+                {step === 2 && 'Indica qué columna es cada dato'}
+                {step === 3 && 'Revisa el listado antes de guardar'}
+                {step === 4 && 'Resumen de lo que se guardó'}
               </p>
             </div>
           </div>
@@ -541,18 +593,8 @@ const ImportProductsModal = ({
             </div>
           )}
 
-          {/* Error Alert */}
           {error && !importing && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 flex items-start gap-3">
-              <span className="material-symbols-outlined text-red-500">error</span>
-              <div className="flex-1">
-                <p className="font-semibold">Error</p>
-                <p className="text-sm">{error}</p>
-              </div>
-              <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700">
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
+            <ImportNotice notice={error} onClose={() => setError(null)} />
           )}
 
           {/* Step 1: File Selection */}
@@ -576,7 +618,10 @@ const ImportProductsModal = ({
               </label>
 
               <p className="mt-4 text-sm text-slate-500">
-                Formatos soportados: .xls, .xlsx
+                Archivos Excel .xlsx o .xls. La primera hoja debe tener títulos y una fila por producto.
+              </p>
+              <p className="mt-2 text-xs text-slate-400 max-w-md text-center">
+                Columnas necesarias: código, nombre del producto, marca y categoría. Si usas Google Sheets o un CSV, guárdalo primero como Excel.
               </p>
             </div>
           )}
@@ -585,12 +630,15 @@ const ImportProductsModal = ({
           {step === 2 && !importing && (
             <div>
               <div className="mb-4 p-3 bg-blue-50 border border-blue-200 text-blue-800 text-sm">
-                <strong>Archivo:</strong> {file?.name} | <strong>Filas encontradas:</strong> {rawData.length}
+                Archivo <strong>{file?.name}</strong> · {rawData.length} {rawData.length === 1 ? 'fila' : 'filas'} en la primera hoja
               </div>
 
-              <h3 className="font-bold text-slate-900 uppercase tracking-wide mb-4">
-                Mapeo de Columnas
+              <h3 className="font-bold text-slate-900 uppercase tracking-wide mb-1">
+                Columnas del Excel
               </h3>
+              <p className="text-sm text-slate-500 mb-4">
+                Empareja cada dato del sistema con la columna de tu archivo. Los campos con * son obligatorios.
+              </p>
 
               <div className="grid gap-4">
                 {systemFields.map(field => (
@@ -607,7 +655,7 @@ const ImportProductsModal = ({
                         onChange={(e) => handleMappingChange(field.key, e.target.value)}
                         className="w-full p-3 border border-gray-300 bg-white text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
-                        <option value="">-- Seleccionar columna --</option>
+                        <option value="">Elige la columna del Excel</option>
                         {columns.map(col => (
                           <option key={col} value={col}>{col}</option>
                         ))}
@@ -635,9 +683,19 @@ const ImportProductsModal = ({
                 </div>
                 <div className="flex-1 p-4 bg-red-50 border border-red-200">
                   <div className="text-2xl font-bold text-red-700">{invalidCount}</div>
-                  <div className="text-sm text-red-600">Con errores</div>
+                  <div className="text-sm text-red-600">Filas incompletas</div>
                 </div>
               </div>
+              {invalidCount > 0 && (
+                <p className="mb-4 text-sm text-slate-600">
+                  Las filas incompletas no se importan. Completa código, nombre, marca y categoría, o continúa solo con las {validCount} filas listas.
+                </p>
+              )}
+              {validCount === 0 && (
+                <p className="mb-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 p-3">
+                  Ninguna fila está completa. Revisa el mapeo de columnas o el Excel: hace falta código, nombre, marca y categoría en cada producto.
+                </p>
+              )}
 
               {/* Table */}
               <div className="border border-gray-200 overflow-auto max-h-96">
@@ -677,7 +735,7 @@ const ImportProductsModal = ({
                           <td className="p-3">{product.marcaNombre || '-'}</td>
                           <td className="p-3">{product.categoriaNombre || '-'}</td>
                           <td className="p-3 text-xs text-red-600">
-                            {product.errors.join(', ')}
+                            {humanizeRowErrors(product.errors)}
                           </td>
                         </tr>
                       ))}
@@ -730,55 +788,106 @@ const ImportProductsModal = ({
             </div>
           )}
 
-          {/* Step 4: Result */}
-          {step === 4 && importResult && (
+          {step === 4 && importResult && (() => {
+            const headline = getResultHeadline(importResult);
+            const friendlyErrors = humanizeResultErrors(importResult.errors);
+            const shownErrors = friendlyErrors.slice(0, 12);
+            const extraErrors = Math.max(0, friendlyErrors.length - shownErrors.length);
+            const iconWrap = {
+              success: 'bg-green-100 text-green-600',
+              warning: 'bg-amber-100 text-amber-600',
+              error: 'bg-red-100 text-red-600',
+              info: 'bg-blue-100 text-blue-600',
+            }[headline.tone] || 'bg-green-100 text-green-600';
+            const iconName = {
+              success: 'check_circle',
+              warning: 'error',
+              error: 'cancel',
+              info: 'info',
+            }[headline.tone] || 'check_circle';
+
+            return (
             <div className="text-center py-8">
-              <div className="w-20 h-20 bg-green-100 mx-auto mb-6 flex items-center justify-center">
-                <span className="material-symbols-outlined text-5xl text-green-600">check_circle</span>
+              <div className={`w-20 h-20 mx-auto mb-6 flex items-center justify-center ${iconWrap.split(' ')[0]}`}>
+                <span className={`material-symbols-outlined text-5xl ${iconWrap.split(' ')[1]}`}>{iconName}</span>
               </div>
 
-              <h3 className="text-xl font-bold text-slate-900 mb-6">
-                ¡Importación Completada!
+              <h3 className="text-xl font-bold text-slate-900 mb-2">
+                {headline.title}
               </h3>
+              <p className="text-sm text-slate-500 mb-6 max-w-lg mx-auto">
+                {(importResult.imported || 0) + (importResult.updated || 0) > 0
+                  ? 'Así quedó el listado después de guardar.'
+                  : 'No se guardó ningún producto. Corrige el Excel y vuelve a importar.'}
+              </p>
 
-              <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto mb-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto mb-6">
                 <div className="p-4 bg-green-50 border border-green-200">
                   <div className="text-2xl font-bold text-green-700">{importResult.imported}</div>
-                  <div className="text-xs text-green-600 uppercase">Nuevos</div>
+                  <div className="text-xs text-green-600">Productos nuevos</div>
                 </div>
                 <div className="p-4 bg-blue-50 border border-blue-200">
                   <div className="text-2xl font-bold text-blue-700">{importResult.updated || 0}</div>
-                  <div className="text-xs text-blue-600 uppercase">Actualizados</div>
+                  <div className="text-xs text-blue-600">Ya existían y se actualizaron</div>
                 </div>
                 <div className="p-4 bg-orange-50 border border-orange-200">
                   <div className="text-2xl font-bold text-orange-700">{importResult.duplicates || 0}</div>
-                  <div className="text-xs text-orange-600 uppercase">Repetidos en archivo</div>
+                  <div className="text-xs text-orange-600">Códigos repetidos en el archivo</div>
                 </div>
                 <div className="p-4 bg-red-50 border border-red-200">
                   <div className="text-2xl font-bold text-red-700">{importResult.failed}</div>
-                  <div className="text-xs text-red-600 uppercase">Fallidos</div>
+                  <div className="text-xs text-red-600">No se pudieron guardar</div>
                 </div>
               </div>
-              <p className="text-xs text-slate-500 mb-6 -mt-2">
-                Los productos con código ya existente se actualizaron (excepto las imágenes, que se mantienen).
+              <p className="text-xs text-slate-500 mb-4 -mt-2 max-w-xl mx-auto">
+                Si un código ya estaba en el catálogo, se actualizó el producto y se dejaron las imágenes como están.
               </p>
 
-              {/* Entidades creadas */}
+              {importResult.skipped > 0 && (
+                <p className="text-sm text-slate-600 mb-4 max-w-xl mx-auto">
+                  Se omitieron {importResult.skipped} {importResult.skipped === 1 ? 'fila' : 'filas'} del Excel porque les faltaba código, nombre, marca o categoría.
+                </p>
+              )}
+              {(importResult.duplicates || 0) > 0 && (
+                <p className="text-sm text-slate-600 mb-4 max-w-xl mx-auto">
+                  {importResult.duplicates === 1
+                    ? 'Un código aparecía más de una vez en el Excel: solo se tomó la primera fila.'
+                    : `${importResult.duplicates} códigos aparecían más de una vez en el Excel: de cada uno se tomó solo la primera fila.`}
+                </p>
+              )}
+
               {(importResult.marcasCreated > 0 || importResult.categoriasCreated > 0) && (
                 <div className="max-w-lg mx-auto mb-6 p-4 bg-blue-50 border border-blue-200 text-left">
-                  <h4 className="font-bold text-blue-800 mb-2 text-sm uppercase">Entidades creadas automáticamente:</h4>
-                  <div className="flex gap-6 text-sm text-blue-700">
+                  <h4 className="font-bold text-blue-800 mb-2 text-sm">Se crearon automáticamente</h4>
+                  <div className="flex flex-wrap gap-6 text-sm text-blue-700">
                     {importResult.marcasCreated > 0 && (
-                      <span>✓ {importResult.marcasCreated} marcas nuevas</span>
+                      <span>{importResult.marcasCreated} {importResult.marcasCreated === 1 ? 'marca nueva' : 'marcas nuevas'}</span>
                     )}
                     {importResult.categoriasCreated > 0 && (
-                      <span>✓ {importResult.categoriasCreated} categorías nuevas</span>
+                      <span>{importResult.categoriasCreated} {importResult.categoriasCreated === 1 ? 'categoría nueva' : 'categorías nuevas'}</span>
                     )}
                   </div>
                 </div>
               )}
+
+              {shownErrors.length > 0 && (
+                <div className="max-w-xl mx-auto mt-2 p-4 bg-red-50 border border-red-200 text-left">
+                  <h4 className="font-bold text-red-800 mb-2 text-sm">Qué filas no se pudieron guardar</h4>
+                  <ul className="space-y-1.5 text-sm text-red-700 list-disc pl-5">
+                    {shownErrors.map((msg, i) => (
+                      <li key={i}>{msg}</li>
+                    ))}
+                  </ul>
+                  {extraErrors > 0 && (
+                    <p className="mt-2 text-xs text-red-600">
+                      Y {extraErrors} {extraErrors === 1 ? 'aviso más' : 'avisos más'}. Corrige esas filas en el Excel y vuelve a importar solo esas.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
-          )}
+            );
+          })()}
         </div>
 
         {/* Footer */}
@@ -786,7 +895,10 @@ const ImportProductsModal = ({
           <div>
             {step > 1 && step < 4 && !importing && (
               <button
-                onClick={() => setStep(step - 1)}
+                onClick={() => {
+                  setError(null);
+                  setStep(step - 1);
+                }}
                 className="px-6 py-3 bg-gray-200 text-gray-700 font-bold text-sm uppercase tracking-wider hover:bg-gray-300 transition-all"
               >
                 Atrás
@@ -848,5 +960,67 @@ const ImportProductsModal = ({
     </div>
   );
 };
+
+function ImportNotice({ notice, onClose }) {
+  if (!notice) return null;
+
+  const title = typeof notice === 'string' ? 'No se pudo continuar' : notice.title;
+  const message = typeof notice === 'string' ? notice : notice.message;
+  const hint = typeof notice === 'string' ? '' : notice.hint;
+  const tone = typeof notice === 'string' ? 'error' : (notice.tone || 'error');
+
+  const styles = {
+    error: {
+      box: 'bg-red-50 border-red-200',
+      icon: 'error',
+      iconColor: 'text-red-500',
+      title: 'text-red-800',
+      text: 'text-red-700',
+      hint: 'text-red-600',
+    },
+    warning: {
+      box: 'bg-amber-50 border-amber-200',
+      icon: 'warning',
+      iconColor: 'text-amber-500',
+      title: 'text-amber-900',
+      text: 'text-amber-800',
+      hint: 'text-amber-700',
+    },
+    info: {
+      box: 'bg-blue-50 border-blue-200',
+      icon: 'info',
+      iconColor: 'text-blue-500',
+      title: 'text-blue-900',
+      text: 'text-blue-800',
+      hint: 'text-blue-700',
+    },
+  }[tone] || {
+    box: 'bg-red-50 border-red-200',
+    icon: 'error',
+    iconColor: 'text-red-500',
+    title: 'text-red-800',
+    text: 'text-red-700',
+    hint: 'text-red-600',
+  };
+
+  return (
+    <div className={`mb-4 p-4 border ${styles.box} flex items-start gap-3`} role="alert">
+      <span className={`material-symbols-outlined ${styles.iconColor} flex-shrink-0`}>{styles.icon}</span>
+      <div className="flex-1 min-w-0">
+        <p className={`font-semibold ${styles.title}`}>{title}</p>
+        {message && <p className={`text-sm mt-1 ${styles.text}`}>{message}</p>}
+        {hint && <p className={`text-sm mt-2 ${styles.hint}`}>{hint}</p>}
+      </div>
+      <button
+        type="button"
+        onClick={onClose}
+        className={`${styles.iconColor} hover:opacity-70 flex-shrink-0`}
+        aria-label="Cerrar aviso"
+      >
+        <span className="material-symbols-outlined">close</span>
+      </button>
+    </div>
+  );
+}
 
 export default ImportProductsModal;
