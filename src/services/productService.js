@@ -48,6 +48,10 @@ export const productService = {
     const response = await axiosInstance.post('/products/bulk-import', {
       products,
       autoCreateEntities: true
+    }, {
+      timeout: 180000,
+      maxBodyLength: 32 * 1024 * 1024,
+      maxContentLength: 32 * 1024 * 1024,
     });
     return response.data;
   },
