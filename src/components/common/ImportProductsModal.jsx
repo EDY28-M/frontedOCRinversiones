@@ -20,6 +20,21 @@ const normalizeImportKey = (text) => {
   return text.toString().normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim().replace(/\s+/g, ' ');
 };
 
+const VOID_LABELS = new Set([
+  'anulado', 'anular', 'n/a', 'na', 'sin categoria', 'sin marca',
+  'vacio', 'vacia', 'ninguno', 'ninguna', '-', 'eliminar', 'eliminado', 'no activo',
+]);
+
+const isVoidImportRow = (marca, categoria, producto) => {
+  if (!marca || !categoria) return true;
+  const brand = normalizeImportKey(marca);
+  const cat = normalizeImportKey(categoria);
+  const prod = normalizeImportKey(producto);
+  if (VOID_LABELS.has(cat) || VOID_LABELS.has(brand) || VOID_LABELS.has(prod)) return true;
+  if (prod.startsWith('elim') || prod.startsWith('xxxx') || prod.includes('no activo')) return true;
+  return false;
+};
+
 /**
  * Modal para importación masiva de productos desde Excel
  * Características:
@@ -327,6 +342,9 @@ const ImportProductsModal = ({
       } else if (categoriaKeys.size > 0 && !categoriaKeys.has(normalizeImportKey(categoriaNombre))) {
         errors.push(`La categoría "${categoriaNombre}" no existe`);
       }
+      if (errors.length === 0 && isVoidImportRow(marcaNombre, categoriaNombre, producto)) {
+        errors.push('Anulado / vacío: no se importa');
+      }
 
       return {
         rowIndex: index + 1,
@@ -388,7 +406,7 @@ const ImportProductsModal = ({
     setError(null);
 
     try {
-      // Enviar nombres de marca y categoría, el backend los crea si no existen
+      // Solo se envían filas válidas: marca y categoría ya existentes, nada anulado/vacío
       const productsToImport = validProducts.map(p => ({
         codigo: p.codigo,
         codigoComer: p.codigoComercial,
@@ -413,7 +431,7 @@ const ImportProductsModal = ({
         imported: result.imported || 0,
         updated: result.updated || 0,
         failed: result.failed || 0,
-        skipped: processedProducts.filter(p => !p.isValid).length,
+        skipped: (result.skipped || 0) + processedProducts.filter(p => !p.isValid).length,
         duplicates: result.duplicates || 0,
         marcasCreated: result.marcasCreated || 0,
         categoriasCreated: result.categoriasCreated || 0,
@@ -708,7 +726,7 @@ const ImportProductsModal = ({
               </div>
               {invalidCount > 0 && (
                 <p className="mb-4 text-sm text-slate-600">
-                  Las filas en rojo no se importan. Cada producto tiene que tener una marca y una categoría que ya existan en el sistema. Crea esas marcas o categorías primero, o continúa solo con las {validCount} filas listas.
+                  Las filas en rojo no se importan: sin marca, sin categoría, categoría ANULADO o productos vacíos/para eliminar. Continúa solo con las {validCount} filas listas.
                 </p>
               )}
               {validCount === 0 && (
@@ -865,7 +883,7 @@ const ImportProductsModal = ({
 
               {importResult.skipped > 0 && (
                 <p className="text-sm text-slate-600 mb-4 max-w-xl mx-auto">
-                  Se omitieron {importResult.skipped} {importResult.skipped === 1 ? 'fila' : 'filas'} del Excel porque les faltaba código, nombre, marca o categoría.
+                  Se omitieron {importResult.skipped} {importResult.skipped === 1 ? 'fila' : 'filas'} vacías o anuladas. Esas no se guardan.
                 </p>
               )}
               {(importResult.duplicates || 0) > 0 && (
