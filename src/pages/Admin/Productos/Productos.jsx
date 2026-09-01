@@ -97,13 +97,14 @@ const Productos = () => {
         const matchCodigoComer = producto.codigoComer?.toString().toLowerCase().includes(token);
         const matchProducto = producto.producto?.toLowerCase().includes(token);
         const matchDescripcion = producto.descripcion?.toLowerCase().includes(token);
+        const matchFicha = producto.fichaTecnica?.toLowerCase().includes(token);
         const matchMarca = producto.marcaNombre?.toLowerCase().includes(token);
         const matchCategoria = producto.categoryName?.toLowerCase().includes(token) ||
           producto.categoria?.toLowerCase().includes(token) ||
           producto.category?.nombre?.toLowerCase().includes(token) ||
           producto.category?.toLowerCase().includes(token);
 
-        return matchCodigo || matchCodigoComer || matchProducto || matchDescripcion || matchMarca || matchCategoria;
+        return matchCodigo || matchCodigoComer || matchProducto || matchDescripcion || matchFicha || matchMarca || matchCategoria;
       });
 
       if (!allTokensMatch) return false;
