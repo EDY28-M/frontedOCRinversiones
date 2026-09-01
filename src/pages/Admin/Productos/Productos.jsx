@@ -11,6 +11,7 @@ import { categoryKeys } from '../../../hooks/useCategories';
 import { brandKeys } from '../../../hooks/useBrands';
 import RecentProductsPanel from '../../../components/products/RecentProductsPanel';
 import PageLoader from '../../../components/common/PageLoader';
+import { matchingFichaRows } from '../../../utils/fichaTecnica';
 
 const Productos = () => {
   const { can } = usePermissions();
@@ -351,7 +352,7 @@ const Productos = () => {
           </div>
           <input
             className="bg-white border border-gray-300 text-slate-900 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 block w-full pl-11 p-3 placeholder-slate-400 transition-all font-mono shadow-sm"
-            placeholder="BUSCAR CÓDIGO, SKU, PRODUCTO, MARCA, CATEGORÍA..."
+            placeholder="BUSCAR CÓDIGO, SKU, PRODUCTO, MARCA, CATEGORÍA, FICHA TÉCNICA..."
             type="text"
             value={searchTerm}
             onChange={handleSearchChange}
@@ -455,6 +456,13 @@ const Productos = () => {
                       <span className="text-sm text-slate-900 font-semibold">
                         {producto.producto || 'Sin nombre'}
                       </span>
+                      {searchTerm ? matchingFichaRows(producto.fichaTecnica, searchTerm).map((row, index) => (
+                        <p key={`${producto.id}-ficha-${index}`} className="mt-1 text-[11px] text-slate-500 truncate">
+                          {row.label}
+                          {row.label && row.value ? ': ' : ''}
+                          {row.value}
+                        </p>
+                      )) : null}
                     </td>
                     <td className="p-4 py-3 max-w-[280px]">
                       <span className="text-sm text-slate-600 line-clamp-2" title={producto.descripcion || ''}>

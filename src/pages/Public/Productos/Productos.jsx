@@ -167,7 +167,7 @@ export default function Productos() {
               </div>
               <input
                 className="block w-full pl-10 pr-3 py-2 border border-gray-100 rounded bg-gray-50 text-sm placeholder-gray-400 focus:outline-none focus:bg-white focus:border-primary/30 focus:ring-2 focus:ring-primary/10 transition-all"
-                placeholder="Buscar refacción..."
+                placeholder="Buscar nombre, código o ficha técnica..."
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -318,6 +318,7 @@ export default function Productos() {
               error={error}
               refetch={refetch}
               total={total}
+              searchQuery={searchQuery}
               onPreviewClick={(product) => setSelectedProduct(product)}
             />
           </section>

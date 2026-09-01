@@ -1,17 +1,22 @@
-import { memo, useState, useCallback } from 'react';
+import { memo, useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import OptimizedImage from '../common/OptimizedImage';
 import { getAllValidImageUrls } from '../../utils/imageUtils';
 import { getProductUrl } from '../../utils/slugUtils';
+import { matchingFichaRows } from '../../utils/fichaTecnica';
 
 /**
  * ProductCard
  * - The card is a real <Link> so Googlebot can crawl each product sheet
  * - Previsualizar opens the modal without leaving the catalog
  */
-const ProductCard = memo(({ product, onPreviewClick, priority = false }) => {
+const ProductCard = memo(({ product, onPreviewClick, priority = false, searchQuery = '' }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [allImagesFailed, setAllImagesFailed] = useState(false);
+  const fichaHits = useMemo(
+    () => matchingFichaRows(product?.fichaTecnica, searchQuery),
+    [product?.fichaTecnica, searchQuery]
+  );
 
   const getDisplayTitle = () => {
     if (!product?.producto) return 'Sin nombre';
@@ -79,6 +84,21 @@ const ProductCard = memo(({ product, onPreviewClick, priority = false }) => {
           <h3 className="text-sm font-bold text-gray-900 leading-snug mb-3 line-clamp-2">
             {title}
           </h3>
+          {fichaHits.length > 0 && (
+            <dl className="mb-3 space-y-1">
+              {fichaHits.map((row, index) => (
+                <div key={`${row.label}-${index}`} className="text-[11px] leading-snug text-slate-600 truncate">
+                  {row.label ? (
+                    <dt className="inline font-semibold uppercase tracking-wide text-slate-500">
+                      {row.label}
+                    </dt>
+                  ) : null}
+                  {row.label && row.value ? <span className="text-slate-300"> · </span> : null}
+                  {row.value ? <dd className="inline">{row.value}</dd> : null}
+                </div>
+              ))}
+            </dl>
+          )}
           <div className="mt-auto flex items-center justify-between gap-3 pt-2">
             <span className="text-xs font-bold text-gray-500 uppercase tracking-wide truncate">
               {product.marcaNombre || 'Sin marca'}
@@ -102,8 +122,10 @@ const ProductCard = memo(({ product, onPreviewClick, priority = false }) => {
     prevProps.product.id === nextProps.product.id &&
     prevProps.product.isActive === nextProps.product.isActive &&
     prevProps.product.isFeatured === nextProps.product.isFeatured &&
+    prevProps.product.fichaTecnica === nextProps.product.fichaTecnica &&
     prevProps.onPreviewClick === nextProps.onPreviewClick &&
-    prevProps.priority === nextProps.priority
+    prevProps.priority === nextProps.priority &&
+    prevProps.searchQuery === nextProps.searchQuery
   );
 });
 

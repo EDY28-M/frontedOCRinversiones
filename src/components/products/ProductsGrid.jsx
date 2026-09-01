@@ -10,6 +10,7 @@ const ProductsGrid = ({
   total,
   onProductClick,
   onPreviewClick,
+  searchQuery = '',
 }) => {
   // Loading inicial (sin datos)
   if (isLoading && products.length === 0) {
@@ -74,6 +75,7 @@ const ProductsGrid = ({
             product={product} 
             onProductClick={onProductClick}
             onPreviewClick={onPreviewClick}
+            searchQuery={searchQuery}
             priority={index < 4} /* Primeros 4 productos cargan inmediatamente */
           />
         ))}

@@ -7,6 +7,7 @@ import { publicProductsApi } from '../../../api/publicApi';
 import { getAllValidImageUrls } from '../../../utils/imageUtils';
 import { useDocumentMeta } from '../../../hooks/useDocumentMeta';
 import { extractIdFromSlug, getProductUrl } from '../../../utils/slugUtils';
+import { parseFichaTecnica } from '../../../utils/fichaTecnica';
 
 const WHATSAPP = '51984244498';
 
@@ -19,35 +20,6 @@ function cleanTitle(product) {
   } catch {
     return product.producto;
   }
-}
-
-function parseFicha(raw) {
-  if (!raw) return [];
-  const text = String(raw).trim();
-  if (!text) return [];
-  try {
-    const parsed = JSON.parse(text);
-    if (Array.isArray(parsed)) {
-      return parsed
-        .map((item) => ({
-          label: item.label || item.Label || item.key || '',
-          value: item.value || item.Value || '',
-        }))
-        .filter((x) => x.label || x.value);
-    }
-  } catch {
-    // pipe format
-  }
-  return text
-    .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const i = line.indexOf('|');
-      if (i === -1) return { label: line, value: '' };
-      return { label: line.slice(0, i).trim(), value: line.slice(i + 1).trim() };
-    })
-    .filter((x) => x.label || x.value);
 }
 
 export default function ProductoDetalle() {
@@ -88,7 +60,7 @@ export default function ProductoDetalle() {
   }, [product, canonicalPath, location.pathname, navigate]);
   const images = useMemo(() => (product ? getAllValidImageUrls(product) : []), [product]);
   const ficha = useMemo(() => {
-    const rows = parseFicha(product?.fichaTecnica);
+    const rows = parseFichaTecnica(product?.fichaTecnica);
     return rows.filter((row) => {
       const label = String(row.label || '').toLowerCase();
       return !label.includes('comercial') && !label.includes('cod comer') && !label.includes('código comer');
